@@ -419,7 +419,7 @@ border:none;
           <widget class="QPushButton" name="Button_search">
            <property name="maximumSize">
             <size>
-             <width>45</width>
+             <width>50</width>
              <height>32</height>
             </size>
            </property>

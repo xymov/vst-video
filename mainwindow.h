@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 
+//QMediaPlayer
 #include <QMediaPlayer> //add
 #include <QComboBox>
 #include <QPlainTextEdit>
@@ -23,6 +24,9 @@
 //xml
 #include <QXmlStreamReader>
 #include <QDomDocument>
+
+//QThread
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -48,9 +52,9 @@ private slots:
 
     void sliderProgressReleased();
 
-     void positionChange(qint64);
+     void positionChange(int);
 
-     void durationChange(qint64);
+     void durationChange(int);
 
      void mediaStatusChanged(QMediaPlayer::MediaStatus);
 
@@ -62,17 +66,24 @@ private slots:
 
      void on_comboBox_part_currentIndexChanged(int index);
 
-
 private:
 
     Ui::MainWindow *ui;
     bool eventFilter(QObject *target, QEvent *event);
     QMediaPlayer *player;
     QVideoWidget *video;
-    void setSTime(qint64);
+    void setSTime(int);
     QString STimeDuration="00:00:00";
     QString API;
 
+    void ThreadFunc(bool type,QString name);
+
+    //影片信息
+    QVector<QString>vid;QVector<QString>vname;
+    QString vdes;QVector<QString>vurl;
+
+
+    //取网页数据
     static QString UrlRequestGet( const QString url )
 
         {
@@ -91,11 +102,12 @@ private:
             QString replyData = codec->toUnicode( reply->readAll() );
 
             reply->deleteLater();
-            reply = 0;
+            reply = nullptr;
 
             return replyData;
         }
 
+      //提交网页数据
         static QString UrlRequestPost( const QString url,const QString data )
         {
             QNetworkAccessManager qnam;
@@ -112,11 +124,12 @@ private:
             QString replyData = codec->toUnicode( reply->readAll() );
 
             reply->deleteLater();
-            reply = 0;
+            reply =nullptr;
 
             return replyData;
         }
 
+         //写日志
         static void log( const QString &logFile, const QByteArray &data )
             {
                 QFile file( logFile );
@@ -130,7 +143,7 @@ private:
             }
 
 
-
+      //xml文本转dom对象
         static QDomElement xmltoDom(QString xmlText)
         {
             QDomDocument doc; doc.setContent(xmlText.toUtf8());
@@ -140,9 +153,11 @@ private:
             return docElem;
         }
 
-
-        static void listDom(QDomElement docElem,QString tag)
+     //dom遍历xml获取影片信息
+        static void listDom(QDomElement docElem,QVector<QString>&vid,QVector<QString>&vname,QVector<QString>&vurl,QString &vdes)
         {
+            //vid.clear();vname.clear();vurl.clear();vdes.clear();
+
             QDomNode node = docElem.firstChild();
 
             if(node.toElement().isNull())
@@ -156,21 +171,46 @@ private:
                 if( !element.isNull() )
                 {
 
-                    if(element.tagName()==tag){
+                    if(element.tagName()=="id"){
 
-                       // box->addItem(element.text());
+                        vid.append(element.text());
 
+
+                    }else if(element.tagName()=="name"){
+
+                          vname.append(element.text());
+
+
+                   }else if(element.tagName()=="dd"){
+                          vurl.append(element.text());
+
+
+                    }else if(element.tagName()=="des"){
+
+                          vdes=element.text();
                     }
-                    listDom(element,tag);
+
+                    listDom(element,vid,vname,vurl,vdes);
 
                 }
 
                 node = node.nextSibling();
             }
+
             return;
         }
 
+
         //搜索显示影片名称
+        static void  getvideo(bool type,const QString &api,const QString &word,QVector<QString>&vid,QVector<QString>&vname,QVector<QString>&vurl,QString &vdes){
+         QString  url,done;
+         if(type){url="?wd=";}else{url="?ac=videolist&ids=";}
+             done=UrlRequestGet(api+url+word);
+             listDom(xmltoDom(done),vid,vname,vurl,vdes);
+        }
+
+
+        //正则搜索显示影片名称
         static void getname(QComboBox * box,const QString &api,const QString &name){
 
             QString done=UrlRequestGet(api+"?wd="+name);
@@ -191,7 +231,11 @@ private:
                      pos+= rxlen.matchedLength();
                  }
         }
-            static void getpart(QComboBox * box,QTextEdit * des,const QString &api,const QString &id){
+
+        //正则搜索影片详情
+
+        static void getpart(QComboBox * box,QTextEdit * des,const QString &api,const QString &id){
+
                  QString done=UrlRequestGet(api+"?ac=videolist&ids="+id);
                  QString str;  
                  //qDebug()<<"done:"<<done;
@@ -234,6 +278,9 @@ private:
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
         }
+
+
+
 
 };
 #endif // MAINWINDOW_H

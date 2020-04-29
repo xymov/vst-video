@@ -1,4 +1,4 @@
-QT       += core gui multimedia multimediawidgets xml
+QT       += core gui multimedia multimediawidgets xml concurrent
 
 
 
