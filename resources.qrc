@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rc/fashf_on.png</file>
+        <file>rc/fashf_out.png</file>
+        <file>rc/fashr_on.png</file>
+        <file>rc/fashr_out.png</file>
+        <file>rc/full_on.png</file>
+        <file>rc/full_out.png</file>
+        <file>rc/general_out.png</file>
+        <file>rc/general_on.png</file>
+        <file>rc/mute_on.png</file>
+        <file>rc/mute_out.png</file>
+        <file>rc/pause_on.png</file>
+        <file>rc/pause_out.png</file>
+        <file>rc/pause_scgedyke_on.png</file>
+        <file>rc/pause_scgedyke_out.png</file>
+        <file>rc/play_on.png</file>
+        <file>rc/play_out.png</file>
+        <file>rc/sound_on.png</file>
+        <file>rc/sound_out.png</file>
+    </qresource>
+</RCC>
