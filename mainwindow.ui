@@ -23,7 +23,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视  测试版</string>
+   <string>全聚合影视   v1.0 bata</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
