@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 
-
+#include <QTimer>
 
 
 //QMediaPlayer
@@ -77,24 +77,27 @@ private slots:
 
      void addseek();
      void decseek();
+     void volumeUp();
+     void volumeDown();
+     void TimerTimeOut();
 
 signals:
-     void hide();
+     void quit();
 
 private:
 
     Ui::MainWindow *ui;
     bool eventFilter(QObject *target, QEvent *event);
+    void ThreadFunc(bool type,QString name);
+    QString STimeDuration="00:00:00";
+    QMediaPlaylist *playlist;
     QMediaPlayer *player;
     QVideoWidget *video;
     void setSTime(qint64);
-
-
-    QString STimeDuration="00:00:00";
+    void echoload(bool);
     QString API;
     loading load;
-    QMediaPlaylist *playlist;
-    void ThreadFunc(bool type,QString name);
+    QTimer *m_timer;
 
     //影片信息
      QStringList vid,vname,vurl;
@@ -102,9 +105,7 @@ private:
 
       //取网页数据
       QString UrlRequestGet( const QString url )
-
         {
-
             QNetworkAccessManager qnam;
             const QUrl aurl( url );
             QNetworkRequest qnr( aurl );
@@ -173,14 +174,10 @@ private:
      //dom遍历xml获取影片信息
         void listDom(QDomElement docElem)
         {
-            //vid.clear();vname.clear();vurl.clear();vdes.clear();
-
             QDomNode node = docElem.firstChild();
 
-            if(node.toElement().isNull())
-            {
-                //pItem->setText (1, docElem.text());
-            }
+            //if(node.toElement().isNull()){}
+
             while(!node.isNull())
             {
                 QDomElement element = node.toElement();
@@ -211,7 +208,6 @@ private:
             return;
         }
 
-
        //DOM遍历方式搜索显示影片名称
        void  getvideo(bool type,const QString api,const QString word){
          QString  url,done;
@@ -220,78 +216,12 @@ private:
              listDom(xmltoDom(done));
         }
 
-        //正则搜索显示影片名称
-         void getname(QComboBox * box,const QString &api,const QString &name){
-
-            QString done=UrlRequestGet(api+"?wd="+name);
-
-            //xml方法
-            // listDom(xmltoDom(done),box,"name");
-
-             QRegExp rxlen("<id>(\\d+)</id>.*<name><!\\[CDATA\\[(.*)\\]\\]></name>");
-
-              rxlen.setMinimal (true) ;
-                 int pos=0;
-                 box->clear();
-
-                 while ((pos=rxlen.indexIn(done,pos))!=-1){
-                     QString value = rxlen.cap(1);
-                     QString unit = rxlen.cap(2);
-                     box->addItem(rxlen.cap(2),rxlen.cap(1));
-                     pos+= rxlen.matchedLength();
-                 }
-        }
-
-        //正则搜索影片详情
-
-       void getpart(QComboBox * box,QTextEdit * des,const QString &api,const QString &id){
-
-                 QString done=UrlRequestGet(api+"?ac=videolist&ids="+id);
-                 QString str;  
-                 //qDebug()<<"done:"<<done;
-                 QRegExp rxlen("<dd.*><!\\[CDATA\\[(.*)\\]\\]></dd>.*<des><!\\[CDATA\\[(.*)\\]\\]></des>");
-
-                  rxlen.setMinimal (true) ;
-                     int pos=0;
-                     box->clear();
-                     des->clear();
-
-                     while ((pos=rxlen.indexIn(done,pos))!=-1){
-
-                              // des->setPlainText(rxlen.cap(2));
-
-                               des->setHtml(rxlen.cap(2));
-
-                        // qDebug()<<"done:"<<rxlen.cap(1);
-
-                         str=rxlen.cap(1);
-
-                         QStringList list = str.split("#");
-                         QStringList video;
-
-                         foreach (QString s, list) {
-                             //第30集$https://index.m3u8$ckm3u8
-
-                              video=s.split("$");
-                             if(video.size()>1){
-                                 box->addItem(video[0],video[1]);
-                             }
-                         }
-                         pos+= rxlen.matchedLength();
-                     }
-            }
-
-          //本地编码转换为Unicode
+        //本地编码转换为Unicode
          QString toUnicode(QString text){
-
             QTextCodec *codec = QTextCodec::codecForLocale();
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
         }
-
-
-
-
 
 };
 #endif // MAINWINDOW_H

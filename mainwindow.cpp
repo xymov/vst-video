@@ -5,6 +5,7 @@
 #include <QVideoWidget>
 #include <QDesktopWidget>
 #include <QTime>
+
 #include <QShortcut>
 #include <QtConcurrent>
 
@@ -15,10 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
      ui->setupUi(this);
-
     //关联退出
-     connect(this,SIGNAL(hide()),&load,SLOT(hide()));
-
+     connect(this,SIGNAL(quit()),&load,SLOT(hide()));
     //窗口居中
     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
     //初始化播放器
@@ -33,6 +32,12 @@ MainWindow::MainWindow(QWidget *parent)
         player = new QMediaPlayer;
         player->setVolume(100);
         player->setVideoOutput(video);
+        player->setVolume(100);
+
+        playlist = new QMediaPlaylist;
+        player->setPlaylist(playlist);
+        playlist->playbackModeChanged(QMediaPlaylist::Sequential);
+
 
 
        //关联播放进度条
@@ -51,14 +56,20 @@ MainWindow::MainWindow(QWidget *parent)
 
        //回车全屏
       connect(new QShortcut(QKeySequence(Qt::Key_Enter),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-
       connect(new QShortcut(QKeySequence(16777220),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-
 
       //快进快退
 
         connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(decseek()));
         connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(addseek()));
+
+     //音量+-
+
+       connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(volumeUp()));
+       connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(volumeDown()));
+
+     //空格 播放/暂停
+      connect(new QShortcut(QKeySequence(Qt::Key_Space),this), SIGNAL(activated()), this, SLOT(on_pushButton_paly_clicked()));
 
       //ESC取消全屏
       connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
@@ -68,12 +79,13 @@ MainWindow::MainWindow(QWidget *parent)
 
      //初始化
        ui->comboBox_id->hide();
-       //video->setFocus();
        ui->lineEdit_name->setFocus();
 
-       playlist = new QMediaPlaylist;
-
-
+      //定时器
+       m_timer = new QTimer;
+       m_timer->setSingleShot(false);
+      // m_timer->start(1000);
+       connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
 
 }
 
@@ -82,17 +94,32 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
+void MainWindow::TimerTimeOut()
+{
+    if(isFullScreen()){
+         //隐藏鼠标
+          video->setCursor(Qt::BlankCursor);
+          ui->box_control->hide();
+      }else{
+          if(m_timer->isActive())m_timer->stop();
+    }
+}
 
 //监视对象,处理回车消息
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
     if(target == video){
 
-
     /*处理鼠标消息 */
     if (event->type() == QEvent::MouseMove){
+         //重启定时器
+         m_timer->start(5000);
+          if(ui->box_control->isHidden()){
+              video->setCursor(Qt::ArrowCursor);
+              ui->box_control->show();
+          }
 
+        /*
           QMouseEvent  *mouseEvent = static_cast<QMouseEvent *>(event);
 
           if(mouseEvent->y()>video->height()-ui->box_control->height()){
@@ -100,10 +127,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
           }else{
                if(isFullScreen())ui->box_control->hide();
           }
-
-
-        //  qDebug()<<"switchControl:"<<mouseEvent->x()<<","<<mouseEvent->y();
-
+*/
+            //  qDebug()<<"switchControl:"<<mouseEvent->x()<<","<<mouseEvent->y();
 
        }else if(event->type() == QEvent::MouseButtonDblClick){
 
@@ -114,33 +139,21 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
     }else if(event->type() == QEvent::MouseButtonRelease){
 
-         ui->sliderProgress->setFocus();
-
-
-
+        // ui->sliderProgress->setFocus();
 
     }
 
-
-
-
-    //线程搜索影片
+  //线程搜索影片列表结束
   }else if(event->type() ==QEvent::User+1){
-
           ui->comboBox_name->clear();
           ui->comboBox_part->clear();
-
-
     for(int i=0;i<vid.size();i++){
-
         ui->comboBox_name->addItem(vname[i],vid[i]);
-
-
     }
-     emit hide();
+      //echoload(false);
       qDebug() << __FUNCTION__  <<"线程结束";
 
-   //线程影片详情
+   //线程搜索影片详情结束
 
 }else if(event->type() ==QEvent::User+2){
 
@@ -152,32 +165,26 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
             foreach (QString s, list) {
                 //第30集$https://index.m3u8$ckm3u8
-
                  video=s.split("$");
                 if(video.size()>1){
-                    ui->comboBox_part->addItem(video[0],video[1]);
-                      playlist->addMedia(QUrl(video[1]));
-
+                     playlist->addMedia(QUrl(video[1]));
+                     ui->comboBox_part->addItem(video[0],video[1]);
                 }
-                     playlist->playbackModeChanged(QMediaPlaylist::Sequential);
-                     player->setPlaylist(playlist);
-
-
             }
-            ui->textEdit->setHtml(vdes);
-            emit hide();
         }
 
+        //循坏结束
+        echoload(false);
+        ui->textEdit->setHtml(vdes);
 }
-
-
-
-
-
     /*处理按键消息 */
     return QWidget::eventFilter(target, event);
 }
 
+void MainWindow::echoload(bool echo){
+
+    if(echo){load.show();}else{emit quit();}
+}
 
 //播放器媒体状态被改变
 void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
@@ -185,15 +192,14 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     switch (status) {
     case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");break;
     case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
-    case QMediaPlayer::LoadingMedia :if(load.isHidden()){load.show();};ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());break;
-    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");player->play();emit hide();break;
-    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲...");if(load.isHidden()){load.show();}break;
+    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());break;
+    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");player->play();break;
+    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲..."); echoload(true);break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
-    case QMediaPlayer::BufferedMedia:ui->status->setText("缓冲完成");emit hide();break;
+    case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);;break;
     case QMediaPlayer::EndOfMedia:ui->status->setText("媒体播放结束");break;
     case QMediaPlayer::InvalidMedia:ui->status->setText("无法播放当前媒体");break;
     }
-
 }
 //播放器媒体状态被改变
 void MainWindow::stateChanged(QMediaPlayer::State state)
@@ -204,13 +210,9 @@ void MainWindow::stateChanged(QMediaPlayer::State state)
     switch (state) {
      case QMediaPlayer::PlayingState:ui->status->setText("正在播放"); ui->pushButton_paly->setStyleSheet(pause);break;
      case QMediaPlayer::PausedState:ui->status->setText("已暂停");ui->pushButton_paly->setStyleSheet(play);break;
-     case QMediaPlayer::StoppedState:ui->status->setText("已结束");ui->pushButton_paly->setStyleSheet(play);break;
-
+     case QMediaPlayer::StoppedState:ui->status->setText("已停止");ui->pushButton_paly->setStyleSheet(play);break;
     }
-
 }
-
-
 
 //播放器视频长度状态发生改变
 void MainWindow::durationChange(qint64 playtime)
@@ -256,7 +258,20 @@ void MainWindow::setSTime(qint64 v)
     ui->sliderProgress->setToolTip(STimeElapse);
 }
 
+//音量+-
+void MainWindow::volumeUp()
+{
+        player->setMuted(false);
+        player->setVolume(player->volume()+1);
+}
 
+void MainWindow::volumeDown()
+{
+    player->setMuted(false);
+    player->setVolume(player->volume()-1);
+}
+
+//快退快进
 void MainWindow::decseek()
 {
     player->setPosition(player->position() - 5000);
@@ -312,13 +327,14 @@ void MainWindow::on_pushButton_full_clicked()
       ui->box_control->show();
       ui->box_search->show();
       showNormal();
+       m_timer->stop();
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
 
  }else{
-         //ui->box_control->hide();
+         ui->box_control->hide();
          ui->box_search->hide();
-         video->setCursor(Qt::BlankCursor);  //隐藏鼠标
-
+         m_timer->start(5000);
+         //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          showFullScreen();
  }
 
@@ -328,7 +344,7 @@ void MainWindow::on_pushButton_full_clicked()
 void MainWindow::on_Button_search_clicked()
 {
     if(ui->lineEdit_name->text()!=""){
-      load.show();
+      echoload(true);
       QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,true,ui->lineEdit_name->text());
       //f1.waitForFinished();
  }
@@ -352,6 +368,7 @@ void MainWindow::ThreadFunc(bool type,QString word){
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 {
     load.show();
+    player->stop();
     ui->comboBox_part->clear();
     QtConcurrent::run(this,&MainWindow::ThreadFunc,false,ui->comboBox_name->itemData(index).toString());
 
@@ -359,6 +376,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 //剧集被改变
 void MainWindow::on_comboBox_part_currentIndexChanged(int index)
 {
+
      playlist->setCurrentIndex(index);
      player->play();
 }

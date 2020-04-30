@@ -18,6 +18,9 @@ public:
     explicit loading(QWidget *parent = nullptr);
     ~loading();
 
+ private slots:
+
+    //void quit();
 
 private:
     Ui::loading *ui;
