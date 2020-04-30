@@ -1,21 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>loading</class>
- <widget name="loading" class="QWidget">
+ <widget class="QWidget" name="loading">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>149</width>
+    <height>87</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lbl_gif">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>

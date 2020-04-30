@@ -2,8 +2,12 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 
+
+
+
 //QMediaPlayer
 #include <QMediaPlayer> //add
+#include <QMediaPlaylist>
 #include <QComboBox>
 #include <QPlainTextEdit>
 #include <QTextEdit>
@@ -27,6 +31,10 @@
 
 //QThread
 #include <QThread>
+
+
+#include "loading.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,11 +60,12 @@ private slots:
 
     void sliderProgressReleased();
 
-     void positionChange(int);
+     void positionChange(qint64);
 
-     void durationChange(int);
+     void durationChange(qint64);
 
      void mediaStatusChanged(QMediaPlayer::MediaStatus);
+     void stateChanged(QMediaPlayer::State);
 
      void on_sliderProgress_sliderMoved(int position);
 
@@ -66,25 +75,33 @@ private slots:
 
      void on_comboBox_part_currentIndexChanged(int index);
 
+     void addseek();
+     void decseek();
+
+signals:
+     void hide();
+
 private:
 
     Ui::MainWindow *ui;
     bool eventFilter(QObject *target, QEvent *event);
     QMediaPlayer *player;
     QVideoWidget *video;
-    void setSTime(int);
+    void setSTime(qint64);
+
+
     QString STimeDuration="00:00:00";
     QString API;
-
+    loading load;
+    QMediaPlaylist *playlist;
     void ThreadFunc(bool type,QString name);
 
     //影片信息
-    QVector<QString>vid;QVector<QString>vname;
-    QString vdes;QVector<QString>vurl;
+     QStringList vid,vname,vurl;
+     QString vdes;
 
-
-    //取网页数据
-    static QString UrlRequestGet( const QString url )
+      //取网页数据
+      QString UrlRequestGet( const QString url )
 
         {
 
@@ -108,7 +125,7 @@ private:
         }
 
       //提交网页数据
-        static QString UrlRequestPost( const QString url,const QString data )
+        QString UrlRequestPost( const QString url,const QString data )
         {
             QNetworkAccessManager qnam;
             const QUrl aurl( url );
@@ -129,8 +146,8 @@ private:
             return replyData;
         }
 
-         //写日志
-        static void log( const QString &logFile, const QByteArray &data )
+      //写日志
+        void log( const QString &logFile, const QByteArray &data )
             {
                 QFile file( logFile );
                 if( file.open(QIODevice::WriteOnly | QIODevice::Append) )
@@ -144,7 +161,7 @@ private:
 
 
       //xml文本转dom对象
-        static QDomElement xmltoDom(QString xmlText)
+        QDomElement xmltoDom(QString xmlText)
         {
             QDomDocument doc; doc.setContent(xmlText.toUtf8());
 
@@ -154,7 +171,7 @@ private:
         }
 
      //dom遍历xml获取影片信息
-        static void listDom(QDomElement docElem,QVector<QString>&vid,QVector<QString>&vname,QVector<QString>&vurl,QString &vdes)
+        void listDom(QDomElement docElem)
         {
             //vid.clear();vname.clear();vurl.clear();vdes.clear();
 
@@ -170,28 +187,22 @@ private:
 
                 if( !element.isNull() )
                 {
-
                     if(element.tagName()=="id"){
 
-                        vid.append(element.text());
+                           this->vid.append(element.text());
 
+                      }else if(element.tagName()=="name"){
 
-                    }else if(element.tagName()=="name"){
+                           this->vname.append(element.text());
 
-                          vname.append(element.text());
+                     }else if(element.tagName()=="dd"){
+                           this->vurl.append(element.text());
 
+                      }else if(element.tagName()=="des"){
 
-                   }else if(element.tagName()=="dd"){
-                          vurl.append(element.text());
-
-
-                    }else if(element.tagName()=="des"){
-
-                          vdes=element.text();
+                          this->vdes=element.text();
                     }
-
-                    listDom(element,vid,vname,vurl,vdes);
-
+                      listDom(element);
                 }
 
                 node = node.nextSibling();
@@ -201,17 +212,16 @@ private:
         }
 
 
-        //搜索显示影片名称
-        static void  getvideo(bool type,const QString &api,const QString &word,QVector<QString>&vid,QVector<QString>&vname,QVector<QString>&vurl,QString &vdes){
+       //DOM遍历方式搜索显示影片名称
+       void  getvideo(bool type,const QString api,const QString word){
          QString  url,done;
-         if(type){url="?wd=";}else{url="?ac=videolist&ids=";}
+         if(type){url="?wd=";this->vid.clear();this->vname.clear();}else{url="?ac=videolist&ids=";this->vurl.clear();this->vdes.clear();}
              done=UrlRequestGet(api+url+word);
-             listDom(xmltoDom(done),vid,vname,vurl,vdes);
+             listDom(xmltoDom(done));
         }
 
-
         //正则搜索显示影片名称
-        static void getname(QComboBox * box,const QString &api,const QString &name){
+         void getname(QComboBox * box,const QString &api,const QString &name){
 
             QString done=UrlRequestGet(api+"?wd="+name);
 
@@ -234,7 +244,7 @@ private:
 
         //正则搜索影片详情
 
-        static void getpart(QComboBox * box,QTextEdit * des,const QString &api,const QString &id){
+       void getpart(QComboBox * box,QTextEdit * des,const QString &api,const QString &id){
 
                  QString done=UrlRequestGet(api+"?ac=videolist&ids="+id);
                  QString str;  
@@ -272,12 +282,13 @@ private:
             }
 
           //本地编码转换为Unicode
-          static QString toUnicode(QString text){
+         QString toUnicode(QString text){
 
             QTextCodec *codec = QTextCodec::codecForLocale();
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
         }
+
 
 
 

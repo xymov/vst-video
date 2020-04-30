@@ -18,5 +18,7 @@
         <file>rc/play_out.png</file>
         <file>rc/sound_on.png</file>
         <file>rc/sound_out.png</file>
+        <file>rc/loading.gif</file>
+        <file>favicon.ico</file>
     </qresource>
 </RCC>

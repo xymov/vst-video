@@ -2,6 +2,7 @@
 
 #include <QApplication>
 
+
 int main(int argc, char *argv[])
 {
 //适配高清屏
@@ -10,6 +11,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     MainWindow w;
+    //loading load;
+    //load.show();
     w.show();
     return a.exec();
 }

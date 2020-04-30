@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+#include <QDesktopWidget>
+#include <QMovie>
+
 namespace Ui {
 class loading;
 }
@@ -14,6 +17,7 @@ class loading : public QWidget
 public:
     explicit loading(QWidget *parent = nullptr);
     ~loading();
+
 
 private:
     Ui::loading *ui;

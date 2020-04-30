@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>全聚合影视   v1.0 bata</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/favicon.ico</normaloff>:/favicon.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
@@ -192,10 +196,10 @@ border:none;
               <bool>true</bool>
              </property>
              <property name="tabletTracking">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::WheelFocus</enum>
              </property>
              <property name="acceptDrops">
               <bool>false</bool>
@@ -248,6 +252,9 @@ border:none;
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton{
     border-image:url(://rc/play_out.png) 0px 0px no-repeat;
@@ -275,6 +282,9 @@ QPushButton:hover{
                  <width>41</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton{
@@ -323,6 +333,9 @@ QPushButton:hover{
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="styleSheet">
                 <string notr="true">
 
@@ -354,6 +367,9 @@ border:none;
                  <width>41</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="styleSheet">
                 <string notr="true">
@@ -466,6 +482,8 @@ border:none;
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -14,7 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+     ui->setupUi(this);
+
+    //关联退出
+     connect(this,SIGNAL(hide()),&load,SLOT(hide()));
 
     //窗口居中
     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
@@ -39,17 +42,26 @@ MainWindow::MainWindow(QWidget *parent)
        //视频长度状态发生改变
        connect(player,SIGNAL(durationChanged(qint64)),this,SLOT(durationChange(qint64)));
 
-       //表示当前媒体的状态已更改
+       //表示当前媒体的打开状态已更改
        connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+
+
+       //表示当前媒体的播放状态已更改
+       connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(stateChanged(QMediaPlayer::State)));
 
        //回车全屏
       connect(new QShortcut(QKeySequence(Qt::Key_Enter),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
 
       connect(new QShortcut(QKeySequence(16777220),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
 
+
+      //快进快退
+
+        connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(decseek()));
+        connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(addseek()));
+
       //ESC取消全屏
       connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-
 
       //注册监视对象
       video->installEventFilter(this); installEventFilter(this);
@@ -59,12 +71,18 @@ MainWindow::MainWindow(QWidget *parent)
        //video->setFocus();
        ui->lineEdit_name->setFocus();
 
+       playlist = new QMediaPlaylist;
+
+
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 
 //监视对象,处理回车消息
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
@@ -93,19 +111,33 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
           //  qDebug()<<"switchControl:";
 
+
+    }else if(event->type() == QEvent::MouseButtonRelease){
+
+         ui->sliderProgress->setFocus();
+
+
+
+
     }
+
+
+
 
     //线程搜索影片
   }else if(event->type() ==QEvent::User+1){
 
           ui->comboBox_name->clear();
+          ui->comboBox_part->clear();
+
 
     for(int i=0;i<vid.size();i++){
 
         ui->comboBox_name->addItem(vname[i],vid[i]);
 
-    }
 
+    }
+     emit hide();
       qDebug() << __FUNCTION__  <<"线程结束";
 
    //线程影片详情
@@ -113,7 +145,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 }else if(event->type() ==QEvent::User+2){
 
         ui->comboBox_part->clear();
-
+        playlist->clear();
         for(int i=0;i<vurl.size();i++){
             QStringList list =vurl[i].split("#");
             QStringList video;
@@ -124,12 +156,24 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
                  video=s.split("$");
                 if(video.size()>1){
                     ui->comboBox_part->addItem(video[0],video[1]);
+                      playlist->addMedia(QUrl(video[1]));
+
                 }
+                     playlist->playbackModeChanged(QMediaPlaylist::Sequential);
+                     player->setPlaylist(playlist);
+
+
             }
             ui->textEdit->setHtml(vdes);
-
+            emit hide();
         }
+
 }
+
+
+
+
+
     /*处理按键消息 */
     return QWidget::eventFilter(target, event);
 }
@@ -141,20 +185,35 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     switch (status) {
     case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");break;
     case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
-    case QMediaPlayer::LoadingMedia:ui->status->setText("正在加载...");break;
-    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");break;
-    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲...");break;
+    case QMediaPlayer::LoadingMedia :if(load.isHidden()){load.show();};ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());break;
+    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");player->play();emit hide();break;
+    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲...");if(load.isHidden()){load.show();}break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
-    case QMediaPlayer::BufferedMedia:ui->status->setText("缓冲完成");break;
+    case QMediaPlayer::BufferedMedia:ui->status->setText("缓冲完成");emit hide();break;
     case QMediaPlayer::EndOfMedia:ui->status->setText("媒体播放结束");break;
     case QMediaPlayer::InvalidMedia:ui->status->setText("无法播放当前媒体");break;
     }
 
 }
+//播放器媒体状态被改变
+void MainWindow::stateChanged(QMediaPlayer::State state)
+{
+    QString play="QPushButton{border-image:url(://rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/play_on.png) -0px 0px no-repeat;}";
+    QString pause="QPushButton{border-image:url(://rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/pause_on.png) -0px 0px no-repeat;}";
+
+    switch (state) {
+     case QMediaPlayer::PlayingState:ui->status->setText("正在播放"); ui->pushButton_paly->setStyleSheet(pause);break;
+     case QMediaPlayer::PausedState:ui->status->setText("已暂停");ui->pushButton_paly->setStyleSheet(play);break;
+     case QMediaPlayer::StoppedState:ui->status->setText("已结束");ui->pushButton_paly->setStyleSheet(play);break;
+
+    }
+
+}
+
 
 
 //播放器视频长度状态发生改变
-void MainWindow::durationChange(int playtime)
+void MainWindow::durationChange(qint64 playtime)
 {
     ui->sliderProgress->setMaximum(playtime);
     QTime t(0,0,0);
@@ -163,7 +222,7 @@ void MainWindow::durationChange(int playtime)
 }
 
 //播放器进度被改变
-void MainWindow::positionChange(int p)
+void MainWindow::positionChange(qint64 p)
 {
     if (!ui->sliderProgress->isSliderDown()) {
      ui->sliderProgress->setValue(p);
@@ -185,7 +244,7 @@ void MainWindow::sliderProgressReleased()
 }
 
 //设置进度标签
-void MainWindow::setSTime(int v)
+void MainWindow::setSTime(qint64 v)
 {
     //时间转换
     QTime t(0,0,0);
@@ -198,37 +257,38 @@ void MainWindow::setSTime(int v)
 }
 
 
+void MainWindow::decseek()
+{
+    player->setPosition(player->position() - 5000);
+}
+
+void MainWindow::addseek()
+{
+    player->setPosition(player->position() + 5000);
+}
+
+
 //播放按钮被单击
 void MainWindow::on_pushButton_paly_clicked()
 {
-    QString play="QPushButton{border-image:url(://rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/play_on.png) -0px 0px no-repeat;}";
-    QString pause="QPushButton{border-image:url(://rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/pause_on.png) -0px 0px no-repeat;}";
-
-    if(QMediaPlayer::PlayingState==player->state()){
+    if(player->state()==QMediaPlayer::PlayingState){
 
      player->pause();
-     //动态修改样式
-     ui->pushButton_paly->setStyleSheet(play);
-
-     ui->status->setText("已暂停");
 
   }else{
 
      player->play();
 
-     ui->pushButton_paly->setStyleSheet(pause);
-
-     ui->status->setText("播放中");
   }
-
    qApp->processEvents();
 
 }
 //控制条下集按钮被单击
 void MainWindow::on_pushButton_next_clicked()
 {
-    //player->pause();
+   playlist->next();
 }
+
 
 //控制条静音按钮被单击
 void MainWindow::on_pushButton_sound_clicked()
@@ -263,23 +323,22 @@ void MainWindow::on_pushButton_full_clicked()
  }
 
 }
-
 //搜索被单击
 
 void MainWindow::on_Button_search_clicked()
 {
     if(ui->lineEdit_name->text()!=""){
-      vid.clear();vname.clear();vurl.clear();vdes.clear();
+      load.show();
       QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,true,ui->lineEdit_name->text());
       //f1.waitForFinished();
-
  }
 }
 
 void MainWindow::ThreadFunc(bool type,QString word){
 
+    if (word=="")return;
    //获取影片信息
-   getvideo(type,api,word,vid,vname,vurl,vdes);
+   getvideo(type,api,word);
 
   //发送线程退出消息
    int user=type?1:2;
@@ -289,18 +348,17 @@ void MainWindow::ThreadFunc(bool type,QString word){
    //qDebug() << __FUNCTION__  << QThread::currentThreadId() << QThread::currentThread();
 }
 
-
 //影片名被改变
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 {
-   QtConcurrent::run(this,&MainWindow::ThreadFunc,false,ui->comboBox_name->itemData(index).toString());
+    load.show();
+    ui->comboBox_part->clear();
+    QtConcurrent::run(this,&MainWindow::ThreadFunc,false,ui->comboBox_name->itemData(index).toString());
 
 }
-
 //剧集被改变
 void MainWindow::on_comboBox_part_currentIndexChanged(int index)
 {
-     player->setMedia(QUrl(ui->comboBox_part->itemData(index).toString()));
-     on_pushButton_paly_clicked();
-
+     playlist->setCurrentIndex(index);
+     player->play();
 }
