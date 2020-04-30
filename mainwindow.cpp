@@ -5,7 +5,7 @@
 #include <QVideoWidget>
 #include <QDesktopWidget>
 #include <QTime>
-
+#include <QMessageBox>
 #include <QShortcut>
 #include <QtConcurrent>
 
@@ -151,15 +151,20 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
     for(int i=0;i<vid.size();i++){
         ui->comboBox_name->addItem(vname[i],vid[i]);
     }
-      //echoload(false);
-      qDebug() << __FUNCTION__  <<"线程结束";
+    if(ui->comboBox_name->count()==0){
+      echoload(false);
+      QMessageBox::warning(nullptr, "提示", "未找到任何资源!请检查网络或影片名是否正确？",QMessageBox::Yes);
+    }
+    //qDebug() << __FUNCTION__  <<"线程结束";
 
    //线程搜索影片详情结束
 
 }else if(event->type() ==QEvent::User+2){
 
         ui->comboBox_part->clear();
+        ui->textEdit->clear();
         playlist->clear();
+
         for(int i=0;i<vurl.size();i++){
             QStringList list =vurl[i].split("#");
             QStringList video;
@@ -355,6 +360,7 @@ void MainWindow::on_Button_search_clicked()
 {
     if(ui->lineEdit_name->text()!=""){
       echoload(true);
+
       QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,true,ui->lineEdit_name->text());
       //f1.waitForFinished();
  }
