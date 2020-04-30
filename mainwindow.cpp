@@ -79,7 +79,8 @@ MainWindow::MainWindow(QWidget *parent)
 
      //初始化
        ui->comboBox_id->hide();
-       ui->lineEdit_name->setFocus();
+
+      ui->lineEdit_name->setFocus();
 
       //定时器
        m_timer = new QTimer;
@@ -331,9 +332,11 @@ void MainWindow::on_pushButton_full_clicked()
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
 
  }else{
+         video->setFocus();
          ui->box_control->hide();
          ui->box_search->hide();
          m_timer->start(5000);
+
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          showFullScreen();
  }
