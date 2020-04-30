@@ -324,12 +324,18 @@ void MainWindow::on_pushButton_sound_clicked()
 void MainWindow::on_pushButton_full_clicked()
 
 {
+
+    QString full="QPushButton{border-image:url(://rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
+    QString general="QPushButton{border-image:url(://rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
+
+
  if(isFullScreen()){
       ui->box_control->show();
       ui->box_search->show();
       showNormal();
        m_timer->stop();
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
+       ui->pushButton_full->setStyleSheet(full);
 
  }else{
          video->setFocus();
@@ -339,6 +345,7 @@ void MainWindow::on_pushButton_full_clicked()
 
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          showFullScreen();
+         ui->pushButton_full->setStyleSheet(general);
  }
 
 }
