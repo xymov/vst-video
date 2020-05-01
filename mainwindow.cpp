@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
      connect(this,SIGNAL(quit()),&load,SLOT(hide()));
     //窗口居中
     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
+    //默认大小
+    resize(QSize( 800, 600 ));
     //初始化播放器
        //动态添加播放控件
        video = new QVideoWidget;
@@ -92,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+   load.close();
     delete ui;
 }
 
@@ -395,4 +398,16 @@ void MainWindow::on_comboBox_part_currentIndexChanged(int index)
 
      playlist->setCurrentIndex(index);
      player->play();
+}
+
+void MainWindow::on_pushButton_playlist_clicked()
+{
+
+    if(ui->box_search->isHidden()){
+        ui->box_search->show();
+    }else{
+        ui->box_search->hide();
+
+    }
+
 }

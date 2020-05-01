@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>930</width>
-    <height>577</height>
+    <width>649</width>
+    <height>435</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -23,7 +23,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视   v1.0 bata</string>
+   <string>全聚合影视   v1.0 Beta</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
@@ -137,21 +137,6 @@ border:none;
            <string/>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>3</number>
-           </property>
            <item>
             <widget class="QLabel" name="status">
              <property name="layoutDirection">
@@ -234,8 +219,11 @@ border:none;
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
+            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
              <property name="spacing">
+              <number>10</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -280,7 +268,7 @@ QPushButton:hover{
                <property name="maximumSize">
                 <size>
                  <width>41</width>
-                 <height>16777215</height>
+                 <height>41</height>
                 </size>
                </property>
                <property name="focusPolicy">
@@ -330,7 +318,7 @@ QPushButton:hover{
                <property name="maximumSize">
                 <size>
                  <width>41</width>
-                 <height>16777215</height>
+                 <height>41</height>
                 </size>
                </property>
                <property name="focusPolicy">
@@ -355,6 +343,41 @@ border:none;
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="pushButton_playlist">
+               <property name="minimumSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">
+
+QPushButton{
+    border-image:url(://rc/playlist _out.png) 0px 0px no-repeat;
+filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
+}
+QPushButton:hover{
+     border-image:url(://rc/playlist _on.png) -0px 0px no-repeat;
+border:none;
+}
+</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="pushButton_full">
                <property name="minimumSize">
                 <size>
@@ -365,7 +388,7 @@ border:none;
                <property name="maximumSize">
                 <size>
                  <width>41</width>
-                 <height>16777215</height>
+                 <height>41</height>
                 </size>
                </property>
                <property name="focusPolicy">
@@ -427,7 +450,7 @@ border:none;
             </size>
            </property>
            <property name="text">
-            <string>西游记</string>
+            <string/>
            </property>
           </widget>
          </item>

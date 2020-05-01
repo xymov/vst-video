@@ -81,6 +81,9 @@ private slots:
      void volumeDown();
      void TimerTimeOut();
 
+
+     void on_pushButton_playlist_clicked();
+
 signals:
      void quit();
 
