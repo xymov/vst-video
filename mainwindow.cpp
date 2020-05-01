@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
        //表示当前媒体的打开状态已更改
        connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
+       connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
+
 
        //表示当前媒体的播放状态已更改
        connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(stateChanged(QMediaPlayer::State)));
@@ -76,13 +78,26 @@ MainWindow::MainWindow(QWidget *parent)
       //ESC取消全屏
       connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
 
+
+
+
       //注册监视对象
-      video->installEventFilter(this); installEventFilter(this);
+      video->installEventFilter(this); this->installEventFilter(this);
+
+      ui->pushButton_sound->installEventFilter(this);
+
+      ui->value_Slider->installEventFilter(this);
+
+
+
+
 
      //初始化
        ui->comboBox_id->hide();
+       ui->value_Slider->hide();
+       ui->lineEdit_name->setFocus();
 
-      ui->lineEdit_name->setFocus();
+
 
       //定时器
        m_timer = new QTimer;
@@ -156,7 +171,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
     }
     if(ui->comboBox_name->count()==0){
       echoload(false);
-      QMessageBox::warning(nullptr, "提示", "未找到任何资源!请检查网络或影片名是否正确？",QMessageBox::Yes);
+      QMessageBox::warning(nullptr, "提示", "未找到任何资源,请尽量输入简短名称!",QMessageBox::Yes);
     }
     //qDebug() << __FUNCTION__  <<"线程结束";
 
@@ -185,7 +200,20 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         //循坏结束
         echoload(false);
         ui->textEdit->setHtml(vdes);
-}
+       //音量按钮鼠标移动事件
+     }else if(target == ui->pushButton_sound){
+
+        if (event->type() == QEvent::HoverEnter) ui->value_Slider->show();
+
+    }else if(event->type() == QEvent::Leave and target == ui->value_Slider){
+
+        ui->value_Slider->hide();
+
+  //end
+
+    }
+
+
     /*处理按键消息 */
     return QWidget::eventFilter(target, event);
 }
@@ -330,30 +358,26 @@ void MainWindow::on_pushButton_sound_clicked()
 }
 //控制条全屏按钮被单击
 void MainWindow::on_pushButton_full_clicked()
-
 {
-
     QString full="QPushButton{border-image:url(://rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
     QString general="QPushButton{border-image:url(://rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
 
-
  if(isFullScreen()){
-      ui->box_control->show();
-      ui->box_search->show();
-      showNormal();
+
+       ui->box_control->show();
        m_timer->stop();
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
        ui->pushButton_full->setStyleSheet(full);
+       showNormal();
 
  }else{
          video->setFocus();
          ui->box_control->hide();
          ui->box_search->hide();
          m_timer->start(5000);
-
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
-         showFullScreen();
          ui->pushButton_full->setStyleSheet(general);
+         showFullScreen();
  }
 
 }
@@ -411,3 +435,18 @@ void MainWindow::on_pushButton_playlist_clicked()
     }
 
 }
+
+void MainWindow::volumeChange(int value){
+
+ ui->value_Slider->setValue(value);
+
+}
+
+void MainWindow::on_value_Slider_valueChanged(int value)
+{
+
+    player->setVolume(value);
+}
+
+
+

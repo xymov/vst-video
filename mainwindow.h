@@ -84,6 +84,12 @@ private slots:
 
      void on_pushButton_playlist_clicked();
 
+
+     void on_value_Slider_valueChanged(int value);
+
+     void volumeChange(int value);
+
+
 signals:
      void quit();
 
