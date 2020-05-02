@@ -39,6 +39,7 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    source.txt \
     vst-video \
     install.sh \
     icon.png

@@ -9,6 +9,9 @@
 #include <QShortcut>
 #include <QtConcurrent>
 
+
+
+
 #define api "https://api.iokzy.com/inc/ldg_seackm3u8s.php"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -81,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+
       //注册监视对象
       video->installEventFilter(this); this->installEventFilter(this);
 
@@ -93,7 +97,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
      //初始化
-       ui->comboBox_id->hide();
+
        ui->value_Slider->hide();
        ui->lineEdit_name->setFocus();
 
@@ -104,6 +108,12 @@ MainWindow::MainWindow(QWidget *parent)
        m_timer->setSingleShot(false);
       // m_timer->start(1000);
        connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
+
+
+       getclass(ui->tree_source,"./source.txt");
+
+
+
 
 }
 
@@ -180,7 +190,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 }else if(event->type() ==QEvent::User+2){
 
         ui->comboBox_part->clear();
-        ui->textEdit->clear();
+        ui->edit_des->clear();
         playlist->clear();
 
         for(int i=0;i<vurl.size();i++){
@@ -199,7 +209,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
         //循坏结束
         echoload(false);
-        ui->textEdit->setHtml(vdes);
+        ui->edit_des ->setHtml(vdes);
        //音量按钮鼠标移动事件
      }else if(target == ui->pushButton_sound){
 
@@ -388,20 +398,20 @@ void MainWindow::on_Button_search_clicked()
     if(ui->lineEdit_name->text()!=""){
       echoload(true);
 
-      QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,true,ui->lineEdit_name->text());
+      QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->lineEdit_name->text());
       //f1.waitForFinished();
  }
 }
 
-void MainWindow::ThreadFunc(bool type,QString word){
+void MainWindow::ThreadFunc(int type,QString word){
 
     if (word=="")return;
    //获取影片信息
+
    getvideo(type,api,word);
 
   //发送线程退出消息
-   int user=type?1:2;
-   QEvent event (QEvent::Type(QEvent::User+user));
+   QEvent event (QEvent::Type(QEvent::User+type));
    QApplication::postEvent(this ,new QEvent(event));
 
    //qDebug() << __FUNCTION__  << QThread::currentThreadId() << QThread::currentThread();
@@ -413,7 +423,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
     load.show();
     player->stop();
     ui->comboBox_part->clear();
-    QtConcurrent::run(this,&MainWindow::ThreadFunc,false,ui->comboBox_name->itemData(index).toString());
+    QtConcurrent::run(this,&MainWindow::ThreadFunc,2,ui->comboBox_name->itemData(index).toString());
 
 }
 //剧集被改变
@@ -449,4 +459,23 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 }
 
 
+//树形框项目被选择
 
+void MainWindow::on_tree_source_pressed(const QModelIndex &index)
+{
+
+       // ui->tree_source->resizeColumnToContents(index.row());
+        QString selectedRowTxt = ui->tree_source->model()->itemData(index).values()[0].toString();
+
+     QString a=urls[index.parent().data().toString().trimmed()];
+
+      QStringList list =selectedRowTxt.split(" ");
+
+      //取影片数据
+       getvideo(4,a,list[0]);
+
+
+
+        qDebug()<<"result=="<<selectedRowTxt<<urls[index.parent().data().toString().trimmed()];
+
+}

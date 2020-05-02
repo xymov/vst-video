@@ -31,9 +31,45 @@
 
 //QThread
 #include <QThread>
+#include <QStandardItemModel>
 
+#include <QTreeView>
 
 #include "loading.h"
+
+typedef struct playinfo
+{
+    QString last;
+    QString id;
+    QString tid;
+    QString name;
+    QString type;
+    QString pic;
+    QString note;
+    QString actor;     //演员
+    QString director;  //导演
+    QString url;
+    QString des;
+
+    operator QVariant() const
+        {
+            return QVariant::fromValue(*this);
+        }
+
+}play;
+Q_DECLARE_METATYPE(play);
+
+typedef struct videoinfo
+{
+    QString page;
+    QString pagecount;
+    QString pagesize;
+    QString recordcount;
+    QList<QVariant>video;
+}video;
+Q_DECLARE_METATYPE(video);
+
+
 
 
 QT_BEGIN_NAMESPACE
@@ -49,6 +85,8 @@ public:
     ~MainWindow();
 
 private slots:
+
+
 
     void on_pushButton_paly_clicked();
 
@@ -89,6 +127,7 @@ private slots:
 
      void volumeChange(int value);
 
+     void on_tree_source_pressed(const QModelIndex &index);
 
 signals:
      void quit();
@@ -97,7 +136,7 @@ private:
 
     Ui::MainWindow *ui;
     bool eventFilter(QObject *target, QEvent *event);
-    void ThreadFunc(bool type,QString name);
+    void ThreadFunc(int type,QString name);
     QString STimeDuration="00:00:00";
     QMediaPlaylist *playlist;
     QMediaPlayer *player;
@@ -110,7 +149,9 @@ private:
 
     //影片信息
      QStringList vid,vname,vurl;
-     QString vdes;
+     QString vdes; QMap<QString,QString>type;
+     QStandardItemModel * model;
+     QMap<QString,QString>urls;
 
       //取网页数据
       QString UrlRequestGet( const QString url )
@@ -207,6 +248,11 @@ private:
                       }else if(element.tagName()=="des"){
 
                           this->vdes=element.text();
+
+                     }else if(element.tagName()=="ty"){
+
+                          this->type.insert(element.attribute("id"), element.text());
+
                     }
                       listDom(element);
                 }
@@ -217,12 +263,89 @@ private:
             return;
         }
 
-       //DOM遍历方式搜索显示影片名称
-       void  getvideo(bool type,const QString api,const QString word){
+
+
+        //dom遍历xml获取影片信息
+           void videoDom(QDomElement docElem)
+           {
+               QDomNode node = docElem.firstChild();
+
+               //if(node.toElement().isNull()){}
+
+               while(!node.isNull())
+               {
+                   QDomElement element = node.toElement();
+
+                   if( !element.isNull() )
+                   {
+                       if(element.tagName()=="list"){
+
+                            this->type.insert(element.attribute("page"), element.text());
+
+
+
+                              this->vid.append(element.text());
+
+                         }else if(element.tagName()=="name"){
+
+                              this->vname.append(element.text());
+
+                        }else if(element.tagName()=="dd"){
+                              this->vurl.append(element.text());
+
+                         }else if(element.tagName()=="des"){
+
+                             this->vdes=element.text();
+
+                        }else if(element.tagName()=="ty"){
+
+                             this->type.insert(element.attribute("id"), element.text());
+
+                       }
+                         videoDom(element);
+                   }
+
+                   node = node.nextSibling();
+               }
+
+               return;
+           }
+
+
+
+
+
+
+
+
+
+       //DOM遍历方式搜索显示影片信息
+       void  getvideo(int type,const QString api,const QString word="", const QString page=""){
          QString  url,done;
-         if(type){url="?wd=";this->vid.clear();this->vname.clear();}else{url="?ac=videolist&ids=";this->vurl.clear();this->vdes.clear();}
-             done=UrlRequestGet(api+url+word);
-             listDom(xmltoDom(done));
+         switch (type) {
+
+          case 1 :
+
+             url=api+"?wd="+word;this->vid.clear();this->vname.clear();
+             break;
+
+         case 2:
+
+             url=api+"?ac=videolist&ids="+word;;this->vurl.clear();this->vdes.clear();
+             break;
+
+          case 3:
+             url=api;this->type.clear();
+             break;
+
+         case 4:
+
+              url=api+"?ac=videolist&t="+word+"&pg="+page;
+              break;
+
+         }
+         done=UrlRequestGet(url);
+         listDom(xmltoDom(done));
         }
 
         //本地编码转换为Unicode
@@ -231,6 +354,44 @@ private:
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
         }
+
+
+    //取所有资源类型
+       void getclass(QTreeView * tree,const QString pfile){
+
+           QFile file(pfile);
+
+            if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
+                model = new QStandardItemModel(tree);//创建模型
+                tree->setModel(model);
+                model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
+               // tree->setColumnWidth(0,200);
+                urls.clear();
+                for(int i=0;!file.atEnd();i++){
+                     QByteArray line = file.readLine().trimmed();
+                     QString str(line);
+                     QStringList list =str.split(",");
+                     //添加到变量
+                     urls.insert(list[0],list[1]);
+                     //添加到树形框
+                     model->setItem(i,0,new QStandardItem(list[0]));
+                     //取分类信息
+                     getvideo(3,list[1],"");
+
+                     QMap<QString,QString>::iterator it;
+                     for ( it =type.begin(); it != type.end(); ++it)
+                     {
+                          if(it.key().size()==1){
+                              model->item(i)->appendRow(new QStandardItem("0"+it.key()+" "+it.value()));
+                          }else{
+                              model->item(i)->appendRow(new QStandardItem(it.key()+" "+it.value()));
+                          }
+                      }
+                }
+                        file.close();
+             }
+         }
+
 
 };
 #endif // MAINWINDOW_H
