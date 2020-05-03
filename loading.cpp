@@ -32,3 +32,5 @@ loading::~loading()
 
     delete ui;
 }
+
+

@@ -8,12 +8,16 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QtConcurrent>
+#include <QListWidgetItem>
+#include <QScrollBar>
+#include <QMutex>
+#include <QFileInfo>
 
 
 
 
-#define api "https://api.iokzy.com/inc/ldg_seackm3u8s.php"
 
+//#define api "https://api.iokzy.com/inc/ldg_seackm3u8s.php"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -101,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent)
        ui->value_Slider->hide();
        ui->lineEdit_name->setFocus();
 
-
+       initListWidget(ui->listWidget);
 
       //定时器
        m_timer = new QTimer;
@@ -110,9 +114,29 @@ MainWindow::MainWindow(QWidget *parent)
        connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
 
 
-       getclass(ui->tree_source,"./source.txt");
+       getclass("./source.txt");
+
+         model = new QStandardItemModel(ui->tree_source);//创建模型
+         ui->tree_source->setModel(model);
+         model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
 
 
+           QMap<QString,SourceInfo>::iterator it; //遍历map
+           int i=0;
+             for ( it = type.begin(); it != type.end(); ++it,++i ) {
+
+               model->setItem(i,0,new QStandardItem(it.key()));
+
+                 //model->appendRow(new QStandardItem(it.key()));
+
+                 foreach (Nameinfo var,it.value().type) {
+
+                      model->item(i)->appendRow(new QStandardItem(var.name));
+                 }
+
+
+                    // qDebug( "%s: %s", it.key().ascii(), it.data().ascii()); //用key()和data()分别获取“键”和“值”
+                 }
 
 
 }
@@ -147,6 +171,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
               video->setCursor(Qt::ArrowCursor);
               ui->box_control->show();
           }
+
 
         /*
           QMouseEvent  *mouseEvent = static_cast<QMouseEvent *>(event);
@@ -210,7 +235,20 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         //循坏结束
         echoload(false);
         ui->edit_des ->setHtml(vdes);
-       //音量按钮鼠标移动事件
+
+
+    }else if(event->type()>(QEvent::User+2)){
+
+        int key=event->type()-QEvent::User-3;
+
+        createListWidget(ui->listWidget,key);
+
+       // qDebug()<<key;
+
+      //return true;
+
+
+        //音量按钮鼠标移动事件
      }else if(target == ui->pushButton_sound){
 
         if (event->type() == QEvent::HoverEnter) ui->value_Slider->show();
@@ -398,24 +436,56 @@ void MainWindow::on_Button_search_clicked()
     if(ui->lineEdit_name->text()!=""){
       echoload(true);
 
-      QFuture<void> f1 =QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->lineEdit_name->text());
-      //f1.waitForFinished();
+      QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->lineEdit_name->text());
+
+      //QFuture<void> f1 ; f1.waitForFinished();
  }
 }
 
 void MainWindow::ThreadFunc(int type,QString word){
 
     if (word=="")return;
-   //获取影片信息
 
-   getvideo(type,api,word);
+      QEvent event (QEvent::Type(QEvent::User+type));
 
-  //发送线程退出消息
-   QEvent event (QEvent::Type(QEvent::User+type));
-   QApplication::postEvent(this ,new QEvent(event));
+
+    switch (type){
+
+      case 1:
+
+         getvideo(type,vInfo.api,word);
+         QApplication::postEvent(this ,new QEvent(event));
+         break;
+
+      case 2:
+
+          getvideo(type,vInfo.api,word);
+          QApplication::postEvent(this ,new QEvent(event));
+
+          break;
+
+       case 3 :
+
+         //qDebug()<<word.toInt()<<word;
+
+          UrlRequestImg(vInfo.pic[word.toInt()],toHash(vInfo.api)+"_"+vInfo.id[word.toInt()]);
+
+          QEvent event (QEvent::Type(QEvent::User+type+word.toInt()));
+
+          QApplication::postEvent(this ,new QEvent(event));
+
+          break;
+
+    }
 
    //qDebug() << __FUNCTION__  << QThread::currentThreadId() << QThread::currentThread();
 }
+
+
+
+
+
+
 
 //影片名被改变
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
@@ -461,21 +531,117 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 
 //树形框项目被选择
 
+
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
+       QString id,row,api;
+       //selectedRowTxt= index.data().toString().trimmed();
+       row=index.parent().data().toString().trimmed();
+       if(row==""){
+           id="";
+           row=index.data().toString().trimmed();
+       }else{
 
-       // ui->tree_source->resizeColumnToContents(index.row());
-        QString selectedRowTxt = ui->tree_source->model()->itemData(index).values()[0].toString();
+           id=type.value(row).type[index.row()].id;
+       }
 
-     QString a=urls[index.parent().data().toString().trimmed()];
-
-      QStringList list =selectedRowTxt.split(" ");
-
-      //取影片数据
-       getvideo(4,a,list[0]);
+       api=type.value(row).api;
 
 
 
-        qDebug()<<"result=="<<selectedRowTxt<<urls[index.parent().data().toString().trimmed()];
+       getvideo(4,api,id);
+       ui->listWidget->clear();
+
+        for (int i=0;i<vInfo.id.size();i++) {
+          //qDebug()<<i;
+
+           QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+       }
+        connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
 
 }
+
+
+
+
+
+void MainWindow::initListWidget(QListWidget *listWidget)
+{
+    //listWidget = new QListWidget(this);
+    listWidget->setIconSize(QSize(210,210));
+
+
+    listWidget->setResizeMode(QListView::Adjust);
+    listWidget->setViewMode(QListView::IconMode);  //大图标模式
+
+    listWidget->setMovement(QListView::Static);
+    listWidget->setSpacing(10);
+    listWidget->horizontalScrollBar()->setDisabled(true);  //不显示横向滚动条
+
+
+
+}
+
+
+void MainWindow::createListWidget(QListWidget *listWidget,int key){
+
+    if(key>=vInfo.id.size() || key>=vInfo.name.size())return;
+
+    QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id[key]+".jpg";
+
+    if(!isFileExist(file)){file="://rc/timg.jpeg";}
+
+
+
+
+    QPixmap pixmap(file); QMutex mutex;
+
+    QListWidgetItem *item = new QListWidgetItem;
+
+    //item->setIcon(QIcon(file));
+
+
+    //item->setText(vInfo.name[key]);
+
+
+
+   // item->setSizeHint(QSize(200,240));
+
+
+
+
+
+
+    QWidget *widget = new QWidget;
+    QVBoxLayout *widgetLayout = new QVBoxLayout;
+    QLabel *imageLabel = new QLabel;
+
+    QLabel *txtLabel = new QLabel(tr("%1").arg(vInfo.name[key]));
+     widget->setLayout(widgetLayout);
+     widgetLayout->setMargin(0);
+     widgetLayout->setSpacing(0);
+     widgetLayout->addWidget(imageLabel);
+     widgetLayout->addWidget(txtLabel);
+
+            if(pixmap.width()>227||pixmap.height()>227)
+            {
+                pixmap=pixmap.scaled(234,234,Qt::KeepAspectRatio);
+            }
+            imageLabel->setPixmap(pixmap);
+            txtLabel->setFixedHeight(60);
+            txtLabel->setWordWrap(true);
+
+           item->setSizeHint(QSize(240,240));
+           item->setTextAlignment(Qt::AlignCenter | Qt::AlignBottom);
+
+
+
+           mutex.lock();
+
+           listWidget->addItem(item);
+           listWidget->setSizeIncrement(240,240);       //当用户重新定义窗口尺寸的时候，窗口会以此为基准
+           listWidget->setItemWidget(item,widget);
+            mutex.unlock();
+};
+
+

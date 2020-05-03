@@ -22,5 +22,6 @@
         <file>favicon.ico</file>
         <file>rc/playlist _out.png</file>
         <file>rc/playlist _on.png</file>
+        <file>rc/timg.jpeg</file>
     </qresource>
 </RCC>
