@@ -1,151 +1,184 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-#include <QMediaPlayer>
-#include <QVideoWidget>
-#include <QDesktopWidget>
-#include <QTime>
-#include <QMessageBox>
-#include <QShortcut>
-#include <QtConcurrent>
-#include <QListWidgetItem>
-#include <QScrollBar>
-#include <QMutex>
-#include <QFileInfo>
+#define  nopic "://rc/timg.jpeg"
 
 
-
-
-
-//#define api "https://api.iokzy.com/inc/ldg_seackm3u8s.php"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
      ui->setupUi(this);
-    //关联退出
-     connect(this,SIGNAL(quit()),&load,SLOT(hide()));
-    //窗口居中
-    move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
-    //默认大小
-    resize(QSize( 800, 600 ));
-    //初始化播放器
-       //动态添加播放控件
-       video = new QVideoWidget;
-       video->setStyleSheet("background:black;");
-       ui->box_video->addWidget(video);
-       video->setMouseTracking(true);
-       video->show();
 
-       //初始化播放器
-        player = new QMediaPlayer;
-        player->setVolume(100);
-        player->setVideoOutput(video);
-        player->setVolume(100);
+     //窗口居中
+     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
-        playlist = new QMediaPlaylist;
-        player->setPlaylist(playlist);
-        playlist->playbackModeChanged(QMediaPlaylist::Sequential);
+     //默认大小
+     resize(QSize( 800, 600 ));
 
+     //最大化
+     setWindowState(Qt::WindowMaximized);
 
+     //程序初始
 
-       //关联播放进度条
-       connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
-       connect(player,SIGNAL(positionChanged(qint64)),this,SLOT(positionChange(qint64)));
+     init();
 
-       //视频长度状态发生改变
-       connect(player,SIGNAL(durationChanged(qint64)),this,SLOT(durationChange(qint64)));
-
-       //表示当前媒体的打开状态已更改
-       connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
-
-       connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
-
-
-       //表示当前媒体的播放状态已更改
-       connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(stateChanged(QMediaPlayer::State)));
-
-       //回车全屏
-      connect(new QShortcut(QKeySequence(Qt::Key_Enter),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-      connect(new QShortcut(QKeySequence(16777220),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-
-      //快进快退
-
-        connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(decseek()));
-        connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(addseek()));
-
-     //音量+-
-
-       connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(volumeUp()));
-       connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(volumeDown()));
-
-     //空格 播放/暂停
-      connect(new QShortcut(QKeySequence(Qt::Key_Space),this), SIGNAL(activated()), this, SLOT(on_pushButton_paly_clicked()));
-
-      //ESC取消全屏
-      connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
-
-
-
-
-
-      //注册监视对象
-      video->installEventFilter(this); this->installEventFilter(this);
-
-      ui->pushButton_sound->installEventFilter(this);
-
-      ui->value_Slider->installEventFilter(this);
-
-
-
-
-
-     //初始化
-
-       ui->value_Slider->hide();
-       ui->lineEdit_name->setFocus();
-
-       initListWidget(ui->listWidget);
-
-      //定时器
-       m_timer = new QTimer;
-       m_timer->setSingleShot(false);
-      // m_timer->start(1000);
-       connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
-
-
-       getclass("./source.txt");
-
-         model = new QStandardItemModel(ui->tree_source);//创建模型
-         ui->tree_source->setModel(model);
-         model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
-
-
-           QMap<QString,SourceInfo>::iterator it; //遍历map
-           int i=0;
-             for ( it = type.begin(); it != type.end(); ++it,++i ) {
-
-               model->setItem(i,0,new QStandardItem(it.key()));
-
-                 //model->appendRow(new QStandardItem(it.key()));
-
-                 foreach (Nameinfo var,it.value().type) {
-
-                      model->item(i)->appendRow(new QStandardItem(var.name));
-                 }
-
-
-                    // qDebug( "%s: %s", it.key().ascii(), it.data().ascii()); //用key()和data()分别获取“键”和“值”
-                 }
-
+      createSource(sourcePath);
 
 }
+
 
 MainWindow::~MainWindow()
 {
    load.close();
     delete ui;
 }
+
+
+
+
+//初始化工作
+void MainWindow::init(){
+
+    sourcePath=QCoreApplication::applicationDirPath()+"/source.txt";
+
+    cache=QCoreApplication::applicationDirPath()+"/cache";
+
+    //检查资源文件
+    if(!isFileExist(sourcePath)){
+                QFile file(sourcePath);
+                 file.open(QIODevice::ReadWrite);
+                 file.write("OK资源,https://api.iokzy.com/inc/ldg_seackm3u8s.php\n最大资源,http://www.zdziyuan.com/inc/s_ldgm3u8_sea.php");
+                 file.close();
+            }
+    //检查缓存目录
+     if(!isDirExist(cache,true)){
+         //QMessageBox::warning(nullptr, "提示", "创建缓存目录(cache)失败!",QMessageBox::Yes);
+     }
+
+     //qDebug()<<sourcePath<<cache;
+
+  /*       控件初始化     */
+
+
+                  //动态添加播放控件
+                  video = new QVideoWidget;
+                  video->setStyleSheet("background:black;");
+                  ui->box_video->addWidget(video);
+                  video->setMouseTracking(true);
+                  video->show();
+
+                  //初始化播放器
+                   player = new QMediaPlayer;
+                   player->setVideoOutput(video);
+                   playlist = new QMediaPlaylist;
+                   playlist->playbackModeChanged(QMediaPlaylist::Sequential);   //顺序播放模式
+                   player->setVolume(100);                                      //默认音量最大
+                   player->setPlaylist(playlist);
+
+
+            //图片列表框
+
+
+
+
+            ui->listWidget->setIconSize(QSize(210,210));//设置图标大小
+             ui->listWidget->setGridSize(QSize(240,240));       //设置item大小
+            ui->listWidget->setResizeMode(QListView::Adjust);   //自动适应布局
+            ui->listWidget->setViewMode(QListView::IconMode);  //大图标模式
+            ui->listWidget->setMovement(QListView::Static);      //禁止拖动
+            ui->listWidget->setSpacing(10);                    //间距
+            ui->listWidget->horizontalScrollBar()->setDisabled(true);  //不显示横向滚动条
+
+
+           //定时器
+            m_timer = new QTimer;
+            m_timer->setSingleShot(false);
+           // m_timer->start(1000);
+            connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
+
+           ui->value_Slider->hide();                  //音量调节隐藏
+           //ui->lineEdit_name->setFocus();         //搜索框获得焦点
+
+            /*  各种信号 与 槽    */
+
+                        //关联退出
+                        connect(this,SIGNAL(quit()),&load,SLOT(hide()));
+
+                        //关联播放进度条
+                        connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
+                        connect(player,SIGNAL(positionChanged(qint64)),this,SLOT(positionChange(qint64)));
+
+                        //视频长度状态发生改变
+                        connect(player,SIGNAL(durationChanged(qint64)),this,SLOT(durationChange(qint64)));
+
+                        //表示当前媒体的打开状态已更改
+                        connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+
+                        connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
+
+
+                        //表示当前媒体的播放状态已更改
+                        connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(stateChanged(QMediaPlayer::State)));
+
+                        //回车全屏
+                       connect(new QShortcut(QKeySequence(Qt::Key_Enter),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
+                       connect(new QShortcut(QKeySequence(16777220),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
+
+                       //快进快退
+
+                         connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(decseek()));
+                         connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(addseek()));
+
+                      //音量+-
+
+                        connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(volumeUp()));
+                        connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(volumeDown()));
+
+                      //空格 播放/暂停
+                       connect(new QShortcut(QKeySequence(Qt::Key_Space),this), SIGNAL(activated()), this, SLOT(on_pushButton_paly_clicked()));
+
+                       //ESC取消全屏
+                       connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(on_pushButton_full_clicked()));
+
+
+                       //注册监视对象
+                            video->installEventFilter(this); this->installEventFilter(this);
+
+                            ui->pushButton_sound->installEventFilter(this);
+
+                            ui->value_Slider->installEventFilter(this);
+
+
+
+
+}
+
+//
+void  MainWindow::createSource(QString sourcePath){
+
+     ui->tree_source->reset();
+      getclass(sourcePath);
+
+      model = new QStandardItemModel(ui->tree_source);//创建模型
+      ui->tree_source->setModel(model);
+      model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
+      QMap<QString,SourceInfo>::iterator it; //遍历map
+      int i=0;
+      for ( it = type.begin(); it != type.end(); ++it,++i ) {
+       model->setItem(i,0,new QStandardItem(it.key()));
+
+           foreach (Nameinfo var,it.value().type) {
+
+                 model->item(i)->appendRow(new QStandardItem(var.name));
+           }
+
+           }
+
+}
+
+
+
+
 
 void MainWindow::TimerTimeOut()
 {
@@ -239,9 +272,14 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
     }else if(event->type()>(QEvent::User+2)){
 
+
+
+
+
+
         int key=event->type()-QEvent::User-3;
 
-        createListWidget(ui->listWidget,key);
+        createListWidget(ui->listWidget,key,false);
 
        // qDebug()<<key;
 
@@ -534,8 +572,13 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
-       QString id,row,api;
+
+
+      QString id,row,api;
+
        //selectedRowTxt= index.data().toString().trimmed();
+
+
        row=index.parent().data().toString().trimmed();
        if(row==""){
            id="";
@@ -547,101 +590,121 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
        api=type.value(row).api;
 
+      ui->listWidget->clear();
+
+
+
+      //异常处理
+    try
+       {
+
 
 
        getvideo(4,api,id);
-       ui->listWidget->clear();
+
+
+       isDirExist(cache,true);
+
 
         for (int i=0;i<vInfo.id.size();i++) {
           //qDebug()<<i;
 
-           QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+           QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id[i]+".jpg";
+
+           createListWidget(ui->listWidget,i,true);
+
+           if(!isFileExist(file)){
+
+              QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+
+
+           }
+
        }
         connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
 
-}
 
 
+}catch(int n)
 
+       {
+           qDebug()<<"num="<<n<<",on_tree_source_pressed() error!"<<endl;
 
-
-void MainWindow::initListWidget(QListWidget *listWidget)
-{
-    //listWidget = new QListWidget(this);
-    listWidget->setIconSize(QSize(210,210));
-
-
-    listWidget->setResizeMode(QListView::Adjust);
-    listWidget->setViewMode(QListView::IconMode);  //大图标模式
-
-    listWidget->setMovement(QListView::Static);
-    listWidget->setSpacing(10);
-    listWidget->horizontalScrollBar()->setDisabled(true);  //不显示横向滚动条
-
+           return ;
+      }
 
 
 }
 
 
-void MainWindow::createListWidget(QListWidget *listWidget,int key){
+void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=false){
 
     if(key>=vInfo.id.size() || key>=vInfo.name.size())return;
 
     QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id[key]+".jpg";
 
-    if(!isFileExist(file)){file="://rc/timg.jpeg";}
-
-
-
+    if(!isFileExist(file)){file=nopic;}
 
     QPixmap pixmap(file); QMutex mutex;
 
     QListWidgetItem *item = new QListWidgetItem;
 
-    //item->setIcon(QIcon(file));
-
-
-    //item->setText(vInfo.name[key]);
-
-
-
-   // item->setSizeHint(QSize(200,240));
-
-
-
-
-
-
     QWidget *widget = new QWidget;
     QVBoxLayout *widgetLayout = new QVBoxLayout;
     QLabel *imageLabel = new QLabel;
 
-    QLabel *txtLabel = new QLabel(tr("%1").arg(vInfo.name[key]));
+    QLabel *txtLabel = new QLabel;
+    QString name=vInfo.name[key];
+    if(name.size()>30){
+        name=name.mid(0, 20)+"...";
+       txtLabel->setToolTip(vInfo.name[key]);
+    }
+
+    //QLabel *txtLabel = new QLabel(tr("%1").arg(vInfo.name[key]));
+
+    txtLabel->setText(name);
+
      widget->setLayout(widgetLayout);
      widgetLayout->setMargin(0);
      widgetLayout->setSpacing(0);
      widgetLayout->addWidget(imageLabel);
      widgetLayout->addWidget(txtLabel);
 
+      //头像裁剪
             if(pixmap.width()>227||pixmap.height()>227)
             {
                 pixmap=pixmap.scaled(234,234,Qt::KeepAspectRatio);
             }
             imageLabel->setPixmap(pixmap);
+            imageLabel->setAlignment(Qt::AlignCenter);  //图片居中
             txtLabel->setFixedHeight(60);
             txtLabel->setWordWrap(true);
+            txtLabel->setAlignment(Qt::AlignCenter);    //文本居中
 
-           item->setSizeHint(QSize(240,240));
-           item->setTextAlignment(Qt::AlignCenter | Qt::AlignBottom);
-
-
+            item->setSizeHint(QSize(240,240));
 
            mutex.lock();
 
-           listWidget->addItem(item);
-           listWidget->setSizeIncrement(240,240);       //当用户重新定义窗口尺寸的时候，窗口会以此为基准
-           listWidget->setItemWidget(item,widget);
-            mutex.unlock();
+
+           if(create){
+
+               listWidget->addItem(item);
+
+               listWidget->setSizeIncrement(240,240);       //当用户重新定义窗口尺寸的时候，窗口会以此为基准
+               listWidget->setItemWidget(item,widget);
+
+           }else{
+
+
+                if(listWidget->count()>key){
+                   QListWidgetItem *pItem = listWidget->item(key);
+                   listWidget->setItemWidget(pItem,widget);
+             }
+
+
+
+           }
+
+mutex.unlock();
+
 };
-
-

@@ -1,17 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include <QMainWindow>
-#include <QQueue>
+#include "loading.h"
 
-#include <QTimer>
+
 
 
 //QMediaPlayer
 #include <QMediaPlayer> //add
 #include <QMediaPlaylist>
-#include <QComboBox>
-#include <QPlainTextEdit>
-#include <QTextEdit>
+#include <QVideoWidget>
+
 
 //QtNetwork
 #include <QtNetwork/QNetworkAccessManager>
@@ -20,11 +19,10 @@
 #include <QEventLoop>
 #include <QTextCodec>
 
-
-#include <QListWidget>
 //log
-
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QByteArray>
 #include <QDateTime>
 
@@ -36,22 +34,31 @@
 #include <QThread>
 #include <QStandardItemModel>
 
-#include <QTreeView>
 
-#include "loading.h"
+#include <QQueue>
+#include <QTimer>
+#include <QMutex>
 
-#include <QFileInfo>
+
 
 #include <QEvent>
+#include <QTime>
+#include <QTextEdit>
+#include <QTreeView>
+#include <QComboBox>
+#include <QPlainTextEdit>
+#include <QListWidget>
 
-class QUserEvent: public QEvent
-{
-public:
-    static Type eventType;
-    int key;
-    QString value;
 
-};
+
+#include <QDesktopWidget>
+#include <QMessageBox>
+#include <QShortcut>
+#include <QtConcurrent>
+#include <QListWidgetItem>
+#include <QScrollBar>
+
+
 
 //名称信息
 typedef struct Nameinfo
@@ -171,12 +178,19 @@ private slots:
 
      void on_tree_source_pressed(const QModelIndex &index);
 
+     void init();
+
 signals:
      void quit();
 
 private:
 
     Ui::MainWindow *ui;
+
+    QString cache,sourcePath;
+
+    void  createSource(QString sourcePath);
+
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
 
@@ -190,7 +204,7 @@ private:
     QString API;
     loading load;
     QTimer *m_timer;
-    void createListWidget(QListWidget *listWidget,int key);
+    void createListWidget(QListWidget *listWidget,int key,bool insert);
     //影片信息
      QStringList vid,vname,vurl;
      QString vdes;
@@ -211,6 +225,11 @@ private:
       //取网页数据
       QString UrlRequestGet( const QString url )
         {
+
+          //异常处理
+
+          try
+              {
             QNetworkAccessManager qnam;
             const QUrl aurl( url );
             QNetworkRequest qnr( aurl );
@@ -228,24 +247,29 @@ private:
             reply = nullptr;
 
             return replyData;
-        }
 
+          }catch(int n){
+
+              qDebug()<<"num="<<n<<",UrlRequestGet() error!"<<endl;
+              return "";
+
+          }
+
+       }
 
       //下载图片文件
     void UrlRequestImg(const QString url,const QString key)
         {
-            QString filename ="./cache/"+key+".jpg";
-            if(!isFileExist(filename)){
+        //异常处理
 
-              QNetworkAccessManager qnam;
-              const QUrl aurl( url );
-              QNetworkRequest qnr( aurl );
-              qnr.setRawHeader("Content-Type","application/octet-stream ");
-              QNetworkReply *reply = qnam.get( qnr );
+        try
+            {
+             QString filename ="./cache/"+key+".jpg";
 
+          if(!isFileExist(filename)){
 
-           // QNetworkAccessManager qnam;
-           // QNetworkReply *reply=qnam.get(QNetworkRequest(QUrl(url)));
+            QNetworkAccessManager qnam;
+            QNetworkReply *reply=qnam.get(QNetworkRequest(QUrl(url)));
             QEventLoop eventloop;
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
@@ -257,7 +281,14 @@ private:
             reply = nullptr;
 
             }
+
+        }catch(int n){
+
+            qDebug()<<"num="<<n<<",UrlRequestImg() error!"<<endl;
+
         }
+
+   }
 
       //提交网页数据
         QString UrlRequestPost( const QString url,const QString data )
@@ -298,16 +329,42 @@ private:
       //xml文本转dom对象
         QDomElement xmltoDom(QString xmlText)
         {
+
+            //异常处理
+
+            try
+                {
+
             QDomDocument doc; doc.setContent(xmlText.toUtf8());
 
             QDomElement  docElem = doc.documentElement();
 
             return docElem;
+
+            }catch(int n)
+
+            {
+
+                QDomElement  docElem;
+
+                qDebug()<<"num="<<n<<",xmltoDom() error!"<<endl;
+
+                return docElem;
+
+            }
+
         }
 
      //dom遍历xml获取影片信息
         void listDom(QDomElement docElem)
         {
+
+         //异常处理
+
+         try
+             {
+
+
             QDomNode node = docElem.firstChild();
             //if(node.toElement().isNull()){}
             while(!node.isNull())
@@ -343,14 +400,33 @@ private:
                       listDom(element);
                 }
 
+
+
+
                 node = node.nextSibling();
             }
+
+
+
+            }catch(int n)
+
+            {
+                qDebug()<<"num="<<n<<",listDom() error!"<<endl;
+
+                return;
+            }
+
 
             return;
         }
 
       //DOM遍历方式搜索显示影片信息
        void  getvideo(int tp,const QString api,const QString word="", const QString page=""){
+
+ //异常处理
+ try
+   {
+
          QString  url,done;vInfo.api=api; vInfo.clear();
          switch (tp) {
           case 1 :
@@ -368,18 +444,44 @@ private:
          }
          done=UrlRequestGet(url);
          listDom(xmltoDom(done));
-        }
 
-        //本地编码转换为Unicode
-         QString toUnicode(QString text){
+
+    }catch(int n)
+
+          {
+           qDebug()<<"num="<<n<<",getvideo() error!"<<endl;
+
+           return;
+          }
+
+       }
+
+       //本地编码转换为Unicode
+        QString toUnicode(QString text){
+         //异常处理
+         try
+              {
+
             QTextCodec *codec = QTextCodec::codecForLocale();
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
-        }
+
+            }catch(int n)
+
+              {
+                   qDebug()<<"num="<<n<<",toUnicode() error!"<<endl;
+                   return text;
+              }
+    }
 
 
     //取所有资源类型
        void getclass(const QString pfile){
+
+           //异常处理
+           try
+             {
+
            QFile file(pfile);type.clear();
             if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
                 for(int i=0;!file.atEnd();i++){
@@ -391,6 +493,15 @@ private:
                 }
               file.close();
              }
+
+           }catch(int n)
+
+                 {
+                  qDebug()<<"num="<<n<<",getclass() error!"<<endl;
+
+                  return;
+             }
+
          }
 
       //取MD5
@@ -416,6 +527,35 @@ private:
            }
            return false;
        }
+
+       //判断文件夹是否存在,不存在则创建，默认假
+
+             bool isDirExist(QString fullPath,bool mk=false)
+             {
+
+               //异常处理
+                 try
+            {
+                 QDir dir(fullPath);
+                 if(dir.exists())
+                 {
+                   return true;
+                 }
+                 else
+                 {
+                   if (mk){qDebug()<<dir.mkdir(fullPath);return dir.mkdir(fullPath);}else{return false;}
+                 }
+
+
+             }catch(int n)
+
+                    {
+                       qDebug()<<"num="<<n<<",isDirExist() error!"<<endl;
+
+                        return false;
+                   }
+
+             }
 
 };
 #endif // MAINWINDOW_H
