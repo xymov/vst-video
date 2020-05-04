@@ -69,6 +69,10 @@ typedef struct Nameinfo
 Q_DECLARE_METATYPE(Nameinfo);
 
 
+
+
+
+
 //资源信息
 typedef struct SourceInfo
 {
@@ -179,6 +183,19 @@ private slots:
      void on_tree_source_pressed(const QModelIndex &index);
 
      void init();
+
+     void on_listWidget_currentRowChanged(int currentRow);
+
+     void on_page_front_clicked();
+
+     void on_page_next_clicked();
+
+     void on_page_jmp_clicked();
+
+     void getpageinfo (int page);
+
+     void loadMedia(int);
+
 
 signals:
      void quit();
@@ -488,7 +505,7 @@ private:
                      QByteArray line = file.readLine().trimmed();
                      QString str(line);
                      QStringList list =str.split(",");
-                     SourceInfo info;info.name=list[0];info.api=list[1];
+                     SourceInfo info;info.name=list.value(0);info.api=list.value(1);
                      getvideo(3,info.api);info.type=vInfo.type;type.insert(info.name,info);
                 }
               file.close();

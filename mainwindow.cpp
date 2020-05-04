@@ -13,14 +13,20 @@ MainWindow::MainWindow(QWidget *parent)
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
      //默认大小
-     resize(QSize( 800, 600 ));
+     resize(QSize( 900, 600 ));
 
      //最大化
      setWindowState(Qt::WindowMaximized);
 
+
+     ui->box_search->hide();
+
      //程序初始
 
      init();
+
+
+     //ui->toolButton->
 
       createSource(sourcePath);
 
@@ -98,6 +104,11 @@ void MainWindow::init(){
 
            ui->value_Slider->hide();                  //音量调节隐藏
            //ui->lineEdit_name->setFocus();         //搜索框获得焦点
+
+           ui->info_pic->setAlignment(Qt::AlignCenter);  //视频信息图片居中
+
+
+
 
             /*  各种信号 与 槽    */
 
@@ -272,14 +283,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
     }else if(event->type()>(QEvent::User+2)){
 
-
-
-
-
-
         int key=event->type()-QEvent::User-3;
 
-        createListWidget(ui->listWidget,key,false);
+         createListWidget(ui->listWidget,key,false);
 
        // qDebug()<<key;
 
@@ -451,19 +457,39 @@ void MainWindow::on_pushButton_full_clicked()
  if(isFullScreen()){
 
        ui->box_control->show();
+       ui->box_source->show();
+        ui->box_info->show();
+        ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
        m_timer->stop();
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
        ui->pushButton_full->setStyleSheet(full);
+      ui->tabWidget->setStyleSheet("border:5;");
        showNormal();
+
+
 
  }else{
          video->setFocus();
          ui->box_control->hide();
          ui->box_search->hide();
+         ui->box_source->hide();
+          ui->box_info->hide();
+         ui->box_search->hide();
+
+
+        ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
+        ui->tabWidget->setStyleSheet("border:0;");
+
+
+ //ui->tabWidget->set
+
          m_timer->start(5000);
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
-         showFullScreen();
+
+          showFullScreen();
+
+
  }
 
 }
@@ -521,10 +547,6 @@ void MainWindow::ThreadFunc(int type,QString word){
 
 
 
-
-
-
-
 //影片名被改变
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 {
@@ -567,81 +589,27 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 }
 
 
-//树形框项目被选择
 
+
+
+//树形框项目被选择
 
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
 
-
-      QString id,row,api;
-
-       //selectedRowTxt= index.data().toString().trimmed();
-
-
-       row=index.parent().data().toString().trimmed();
-       if(row==""){
-           id="";
-           row=index.data().toString().trimmed();
-       }else{
-
-           id=type.value(row).type[index.row()].id;
-       }
-
-       api=type.value(row).api;
-
-      ui->listWidget->clear();
-
-
-
-      //异常处理
-    try
-       {
-
-
-
-       getvideo(4,api,id);
-
-
-       isDirExist(cache,true);
-
-
-        for (int i=0;i<vInfo.id.size();i++) {
-          //qDebug()<<i;
-
-           QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id[i]+".jpg";
-
-           createListWidget(ui->listWidget,i,true);
-
-           if(!isFileExist(file)){
-
-              QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
-
-
-           }
-
-       }
-        connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
-
-
-
-}catch(int n)
-
-       {
-           qDebug()<<"num="<<n<<",on_tree_source_pressed() error!"<<endl;
-
-           return ;
-      }
-
+       getpageinfo(1);
 
 }
 
 
 void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=false){
 
+    if(!create && listWidget->count()<=key)return;
+
     if(key>=vInfo.id.size() || key>=vInfo.name.size())return;
 
-    QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id[key]+".jpg";
+
+    QString file=cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
 
     if(!isFileExist(file)){file=nopic;}
 
@@ -657,7 +625,7 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
     QString name=vInfo.name[key];
     if(name.size()>30){
         name=name.mid(0, 20)+"...";
-       txtLabel->setToolTip(vInfo.name[key]);
+       txtLabel->setToolTip(vInfo.name.value(key));
     }
 
     //QLabel *txtLabel = new QLabel(tr("%1").arg(vInfo.name[key]));
@@ -676,7 +644,9 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
                 pixmap=pixmap.scaled(234,234,Qt::KeepAspectRatio);
             }
             imageLabel->setPixmap(pixmap);
-            imageLabel->setAlignment(Qt::AlignCenter);  //图片居中
+
+             //imageLabel->setScaledContents(true);  //图片缩放
+             imageLabel->setAlignment(Qt::AlignCenter);  //图片居中
             txtLabel->setFixedHeight(60);
             txtLabel->setWordWrap(true);
             txtLabel->setAlignment(Qt::AlignCenter);    //文本居中
@@ -684,7 +654,6 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
             item->setSizeHint(QSize(240,240));
 
            mutex.lock();
-
 
            if(create){
 
@@ -695,16 +664,148 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 
            }else{
 
-
                 if(listWidget->count()>key){
                    QListWidgetItem *pItem = listWidget->item(key);
                    listWidget->setItemWidget(pItem,widget);
              }
 
-
-
            }
 
-mutex.unlock();
+          mutex.unlock();
 
 };
+
+void MainWindow::on_listWidget_currentRowChanged(int key)
+{
+ //QString file=vInfo.id.value(200);
+
+ if(key!=-1){
+
+
+    QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
+     if(!isFileExist(file)){file=nopic;}
+
+     QPixmap pixmap(file);
+
+
+     ui->info_pic->setPixmap(pixmap);
+
+     ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
+
+    // QString info="名称："+vInfo.name[currentRow]+"\n类型："+vInfo.tname[currentRow]+"  年份："+vInfo.actor[currentRow]+"\n地区："+vInfo.area[currentRow]+"  语言："+vInfo.lang[currentRow]+"\n主演："+vInfo.actor[currentRow]+"\n导演："+vInfo.director[currentRow]+"\n简介："+vInfo.des[currentRow];
+
+     ui->info_des->setHtml(vInfo.des.value(key));
+
+
+    loadMedia(key);
+
+}
+
+
+   // qDebug()<<currentRow;
+
+}
+
+
+
+//取分页信息
+void MainWindow::getpageinfo (int page){
+
+     QString id,row,api;
+
+     //取当前选择项
+     QModelIndex index=ui->tree_source->currentIndex();
+
+     if(index.row()<0){return;}
+
+    //取选择项目文本
+     row=index.parent().data().toString().trimmed();
+
+     //取关联分类ID
+     if(row==""){
+         id="";
+         row=index.data().toString().trimmed();
+     }else{
+
+         id=type.value(row).type.value(index.row()).id;
+     }
+
+     //取关联api地址
+     api=type.value(row).api;
+
+
+     ui->listWidget->clear(); isDirExist(cache,true);
+
+     getvideo(4,api,id,QString::number(page));
+
+      for (int i=0;i<vInfo.id.size();i++) {
+        //qDebug()<<i;
+
+         QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
+
+         createListWidget(ui->listWidget,i,true);
+
+         if(!isFileExist(file)){
+
+            QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+
+         }
+
+     }
+    //connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
+
+      QString str=QString("视频：%2/%4，页数：%1/%3").arg(vInfo.page).arg(vInfo.pagesize).arg(vInfo.pagecount).arg(vInfo.recordcount);
+
+      ui->page_info->setText(str);
+
+      ui->page_edit->setValidator(new QIntValidator(1, vInfo.pagecount.toInt(), this));    //限定输入范围
+}
+
+
+//上页
+void MainWindow::on_page_front_clicked()
+{
+
+    int page=vInfo.page.toInt()-1;if(page<1){return;}
+    getpageinfo(page);
+
+}
+
+//下页
+void MainWindow::on_page_next_clicked()
+{
+    int page=vInfo.page.toInt()+1;if(page>vInfo.pagecount.toInt()){return;}
+    getpageinfo(page);
+
+}
+
+//跳页
+void MainWindow::on_page_jmp_clicked()
+{
+
+    getpageinfo(ui->page_edit->text().toInt());
+
+ qDebug()<<vInfo.api<<vInfo.tid.value(0)<<ui->page_edit->text();
+
+}
+
+void MainWindow::loadMedia(int key){
+
+       playlist->clear();ui->comboBox_part->clear();
+
+        QStringList list =vInfo.video.value(key).split("#");
+        QStringList video;
+        foreach (QString s, list) {
+            //第30集$https://index.m3u8$ckm3u8
+             video=s.split("$");
+            if(video.size()>1){
+                 playlist->addMedia(QUrl(video.value(1)));
+                 ui->comboBox_part->addItem(video.value(0),video.value(1));
+            }
+        }
+
+
+}
+
+
+
