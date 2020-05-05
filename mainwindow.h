@@ -71,8 +71,6 @@ Q_DECLARE_METATYPE(Nameinfo);
 
 
 
-
-
 //资源信息
 typedef struct SourceInfo
 {
@@ -87,6 +85,7 @@ Q_DECLARE_METATYPE(SourceInfo);
 //视频信息
 typedef struct VideoInfo
 {
+    QString sname;       //接口名称
     QString api;         //接口地址
     QString page;        //当前页数
     QString pagecount;   //总页数
@@ -138,8 +137,6 @@ public:
     ~MainWindow();
 
 private slots:
-
-
 
     void on_pushButton_paly_clicked();
 
@@ -196,6 +193,18 @@ private slots:
 
      void loadMedia(int);
 
+     void on_info_play_clicked();
+
+
+     void on_info_front_clicked();
+
+     void on_info_next_clicked();
+
+     void on_search_ok_clicked();
+
+     void on_search_list_pressed(const QModelIndex &index);
+
+     void on_tabWidget_currentChanged(int index);
 
 signals:
      void quit();
@@ -210,7 +219,7 @@ private:
 
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
-
+    QStandardItemModel *student_model;
 
     QString STimeDuration="00:00:00";
     QMediaPlaylist *playlist;
@@ -222,18 +231,20 @@ private:
     loading load;
     QTimer *m_timer;
     void createListWidget(QListWidget *listWidget,int key,bool insert);
+
     //影片信息
-     QStringList vid,vname,vurl;
-     QString vdes;
-     //QMap<QString,QString>type;
+
      QStandardItemModel * model;
+
+     //资源分类信息
 
      QMap<QString,SourceInfo>type;
 
-     //搜索资源信息
-     VideoInfo  vSearch;
 
-     //分类资源信息
+     //搜索资源信息
+     QQueue<VideoInfo>vSearch;
+
+     //播放资源信息
      VideoInfo  vInfo;
 
      void initListWidget(QListWidget *listWidget);
@@ -373,7 +384,7 @@ private:
         }
 
      //dom遍历xml获取影片信息
-        void listDom(QDomElement docElem)
+        void listDom(QDomElement docElem,VideoInfo &cInfo)
         {
 
          //异常处理
@@ -391,30 +402,30 @@ private:
                 {
                     //页面信息
                     if(element.tagName()=="list"){
-                         vInfo.page=element.attribute("page");
-                         vInfo.pagecount=element.attribute("pagecount");
-                         vInfo.pagesize=element.attribute("pagesize");
-                         vInfo.recordcount=element.attribute("recordcount");
-                    }else if(element.tagName()=="list"){vInfo.last<<element.text();     //日期
-                    }else if(element.tagName()=="id"){ vInfo.id<<element.text();        //影片id
-                    }else if(element.tagName()=="tid"){vInfo.tid<<element.text();       //分类ID
-                    }else if(element.tagName()=="name"){vInfo.name<<element.text();     //影片名称
-                    }else if(element.tagName()=="type"){vInfo.tname<<element.text();    //名称分类
-                    }else if(element.tagName()=="dd"){vInfo.video<<element.text();      //影片数据
-                    }else if(element.tagName()=="pic"){vInfo.pic<<element.text();       //影片图片
-                    }else if(element.tagName()=="lang"){vInfo.lang<<element.text();      //语言
-                    }else if(element.tagName()=="area"){vInfo.area<<element.text();     //地区
-                    }else if(element.tagName()=="year"){vInfo.year<<element.text();     //年份
-                    }else if(element.tagName()=="state"){vInfo.state<<element.text();   //状态
-                    }else if(element.tagName()=="note"){ vInfo.note<<element.text();    //标签
-                    }else if(element.tagName()=="des"){vInfo.des<<element.text();       //简介
+                         cInfo.page=element.attribute("page");
+                         cInfo.pagecount=element.attribute("pagecount");
+                         cInfo.pagesize=element.attribute("pagesize");
+                         cInfo.recordcount=element.attribute("recordcount");
+                    }else if(element.tagName()=="last"){cInfo.last<<element.text();     //日期
+                    }else if(element.tagName()=="id"){ cInfo.id<<element.text();        //影片id
+                    }else if(element.tagName()=="tid"){cInfo.tid<<element.text();       //分类ID
+                    }else if(element.tagName()=="name"){cInfo.name<<element.text();     //影片名称
+                    }else if(element.tagName()=="type"){cInfo.tname<<element.text();    //名称分类
+                    }else if(element.tagName()=="dd"){cInfo.video<<element.text();      //影片数据
+                    }else if(element.tagName()=="pic"){cInfo.pic<<element.text();       //影片图片
+                    }else if(element.tagName()=="lang"){cInfo.lang<<element.text();      //语言
+                    }else if(element.tagName()=="area"){cInfo.area<<element.text();     //地区
+                    }else if(element.tagName()=="year"){cInfo.year<<element.text();     //年份
+                    }else if(element.tagName()=="state"){cInfo.state<<element.text();   //状态
+                    }else if(element.tagName()=="note"){ cInfo.note<<element.text();    //标签
+                    }else if(element.tagName()=="des"){cInfo.des<<element.text();       //简介
                     }else if(element.tagName()=="ty"){                                  //分类信息
                         Nameinfo  name;
                         name.id=element.attribute("id");
                         name.name=element.text();
-                        vInfo.type << name;
+                        cInfo.type << name;
                     }
-                      listDom(element);
+                      listDom(element,cInfo);
                 }
 
 
@@ -437,6 +448,10 @@ private:
             return;
         }
 
+
+
+
+
       //DOM遍历方式搜索显示影片信息
        void  getvideo(int tp,const QString api,const QString word="", const QString page=""){
 
@@ -444,13 +459,13 @@ private:
  try
    {
 
-         QString  url,done;vInfo.api=api; vInfo.clear();
+         QString  url,done;vInfo.clear();vInfo.api=api;
          switch (tp) {
           case 1 :
-             url=api+"?wd="+word;this->vid.clear();this->vname.clear();
+             url=api+"?wd="+word+"&pg="+page;
              break;
          case 2:
-             url=api+"?ac=videolist&ids="+word;;this->vurl.clear();this->vdes.clear();
+             url=api+"?ac=videolist&ids="+word;
              break;
           case 3:
              url=api;
@@ -460,8 +475,7 @@ private:
               break;
          }
          done=UrlRequestGet(url);
-         listDom(xmltoDom(done));
-
+         listDom(xmltoDom(done),vInfo);
 
     }catch(int n)
 
@@ -504,9 +518,11 @@ private:
                 for(int i=0;!file.atEnd();i++){
                      QByteArray line = file.readLine().trimmed();
                      QString str(line);
+                     if(str!=""){
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
                      getvideo(3,info.api);info.type=vInfo.type;type.insert(info.name,info);
+                     }
                 }
               file.close();
              }
@@ -520,6 +536,44 @@ private:
              }
 
          }
+
+       //搜索资源站
+       void  search(QString  searchword,QString name="全部"){
+
+           QString done,url,api;  VideoInfo cInfo;vSearch.clear();
+           if(name=="全部"){
+                QMap<QString,SourceInfo>::iterator it; //遍历map
+
+                for ( it = type.begin(); it != type.end(); ++it) {
+                    url=it->api+"?wd="+searchword;
+                    done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
+                    cInfo.sname=it->name;vSearch.append(cInfo);
+                }
+
+            }else{
+                 api=type.value(name).api;
+                 url=api+"?wd="+searchword;
+                 done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
+                  cInfo.sname=name;vSearch.append(cInfo);
+
+            }
+       }
+
+
+       QString todes(VideoInfo cInfo,int index){
+
+           QString str =QString("<h3>《%1》</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
+                      .arg(cInfo.name.value(index))
+                      .arg(cInfo.year.value(index))
+                      .arg(cInfo.area.value(index))
+                      .arg(cInfo.tname.value(index))
+                      .arg(cInfo.lang.value(index))
+                      .arg(cInfo.director.value(index))
+                      .arg(cInfo.actor.value(index))
+                       .arg(cInfo.des.value(index));
+            return str;
+       }
+
 
       //取MD5
        QString toHash(const QString pwd){
