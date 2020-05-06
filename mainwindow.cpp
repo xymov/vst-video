@@ -257,11 +257,13 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
   //线程搜索影片列表结束
   }else if(event->type() ==QEvent::User+1){
-        int row=0;
+        int row=0;QString word;
         student_model->removeRows(0,student_model->rowCount()); ui->comboBox_name->clear();
         for(int i=0;i<vSearch.size();i++){
             for(int i2=0;i2<vSearch.value(i).id.size();i2++,row++){
-             ui->comboBox_name->addItem(vSearch.value(i).name.value(i2),vSearch.value(i).id.value(i2));
+
+             word=vSearch.value(i).api+"|"+vSearch.value(i).id.value(i2);
+             ui->comboBox_name->addItem(vSearch.value(i).name.value(i2),word);
              student_model->setItem(row, 0, new QStandardItem(vSearch.value(i).last.value(i2)));
              student_model->setItem(row, 1, new QStandardItem(vSearch.value(i).sname));
              student_model->setItem(row, 2, new QStandardItem(vSearch.value(i).id.value(i2)));
@@ -537,7 +539,7 @@ void MainWindow::on_Button_search_clicked()
 }
 
 void MainWindow::ThreadFunc(int tp,QString word){
-   QString sname,id,api;
+   QString sname,id,api;int index;QStringList v;
      if (word=="")return;
       QEvent event (QEvent::Type(QEvent::User+tp));
 
@@ -550,10 +552,12 @@ void MainWindow::ThreadFunc(int tp,QString word){
          break;
 
       case 2:
-          sname=student_model->item(word.toInt(),1)->text();
-          id=student_model->item(word.toInt(),2)->text();
-          api=type.value(sname).api;
-          getvideo(tp,api,id);
+
+           //取关联数据
+           index=ui->comboBox_name->currentIndex();
+           v=ui->comboBox_name->itemData(index).toString().split("|");
+           api=v.value(0);id=v.value(1);
+           getvideo(tp,api,id);
 
           QApplication::postEvent(this ,new QEvent(event));
 
@@ -581,12 +585,42 @@ void MainWindow::ThreadFunc(int tp,QString word){
 //影片名被改变
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 {
+ QString sname,id,api,itemData;
 
-    on_listWidget_currentRowChanged(index);
-    //load.show();
-    //player->stop();
-    //ui->comboBox_part->clear();
-   // QtConcurrent::run(this,&MainWindow::ThreadFunc,2,ui->comboBox_name->itemData(index).toString());
+
+    if(index!=-1){
+       //取关联数据
+
+        QStringList v=ui->comboBox_name->itemData(index).toString().split("|");
+        api=v.value(0);id=v.value(1);
+
+        //检查id是否一致
+
+        if(vInfo.id.value(index).toInt()==id.toInt()){
+
+            ui->info_des->setHtml(todes(vInfo,index));
+            loadMedia(index);
+
+
+        }else{
+
+            QtConcurrent::run(this,&MainWindow::ThreadFunc,2,QString::number(index));
+
+
+        }
+
+
+        //设置预览图片
+
+        QString file="./cache/"+toHash(api)+"_"+id+".jpg";
+
+        if(!isFileExist(file)){file=nopic;}
+
+        QPixmap pixmap(file);ui->info_pic->setPixmap(pixmap);
+
+        ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
+
+   }
 
 }
 //剧集被改变
@@ -724,25 +758,8 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 //列表被选择
 void MainWindow::on_listWidget_currentRowChanged(int key)
 {
- //QString file=vInfo.id.value(200);
 
- if(key!=-1){
-
-     QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
-     if(!isFileExist(file)){file=nopic;}
-
-     QPixmap pixmap(file);ui->info_pic->setPixmap(pixmap);
-
-     ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
-
-      ui->info_des->setHtml(todes(vInfo,key));
-
-     loadMedia(key);
-
-
-}
-
-   // qDebug()<<currentRow;
+     ui->comboBox_name->setCurrentIndex(key);
 
 }
 
@@ -781,9 +798,11 @@ void MainWindow::getpageinfo (int page){
        ui->comboBox_name->clear();ui->comboBox_part->clear();
 
       for (int i=0;i<vInfo.id.size();i++) {
-        //qDebug()<<i;
 
-        ui->comboBox_name->addItem(vInfo.name.value(i),vInfo.id.value(i));
+
+        ui->comboBox_name->addItem(vInfo.name.value(i),vInfo.api+"|"+vInfo.id.value(i));
+
+
 
          QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
 
@@ -862,22 +881,44 @@ void MainWindow::on_info_play_clicked()
 //上一个视频
 void MainWindow::on_info_front_clicked()
 {
-    int index= ui->comboBox_name->currentIndex();
-    if(index>=0){
-         ui->comboBox_name->setCurrentIndex(index-1);
+    if(ui->comboBox_part->currentIndex()+1==0){
+
+        int index= ui->comboBox_name->currentIndex();
+        if(index>=0){
+             ui->comboBox_name->setCurrentIndex(index-1);
+        }
+
+
+    }else{
+
+       playlist->parent();
+
+
     }
+
+
+
 
 }
 
 //下一个视频
 void MainWindow::on_info_next_clicked()
 {
+   if(ui->comboBox_part->currentIndex()+1==ui->comboBox_part->count()){
+
     int index= ui->comboBox_name->currentIndex();
 
     if(index+1<ui->comboBox_name->count()){
 
          ui->comboBox_name->setCurrentIndex(index+1);
     }
+
+   }else{
+
+      playlist->next();
+
+   }
+
 }
 
 void MainWindow::on_search_ok_clicked()
@@ -893,17 +934,22 @@ void MainWindow::on_search_ok_clicked()
 void MainWindow::on_search_list_pressed(const QModelIndex &index)
 {
 
-    echoload(true);
-    ui->comboBox_name->setCurrentIndex(index.row());
-    QtConcurrent::run(this,&MainWindow::ThreadFunc,2,QString::number(index.row()));
+     echoload(true);
+     ui->info_des->clear();
+     ui->comboBox_part->clear();
+     ui->comboBox_name->setCurrentIndex(index.row());
 
 
 }
+
+
+
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     //浏览
     if(index==0){
+
          ui->box_page->show();
 
          if(ui->listWidget->count()!=ui->comboBox_name->count())getpageinfo(1);
@@ -915,6 +961,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
     //搜索
     }else if(index==2){
+
 
         ui->box_page->hide();
 

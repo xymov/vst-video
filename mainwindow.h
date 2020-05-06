@@ -232,6 +232,7 @@ private:
     QTimer *m_timer;
     void createListWidget(QListWidget *listWidget,int key,bool insert);
 
+
     //影片信息
 
      QStandardItemModel * model;
@@ -459,7 +460,7 @@ private:
  try
    {
 
-         QString  url,done;vInfo.clear();vInfo.api=api;
+         QString  url,done;vInfo.clear();
          switch (tp) {
           case 1 :
              url=api+"?wd="+word+"&pg="+page;
@@ -475,7 +476,7 @@ private:
               break;
          }
          done=UrlRequestGet(url);
-         listDom(xmltoDom(done),vInfo);
+         listDom(xmltoDom(done),vInfo);vInfo.api=api;
 
     }catch(int n)
 
@@ -547,14 +548,18 @@ private:
                 for ( it = type.begin(); it != type.end(); ++it) {
                     url=it->api+"?wd="+searchword;
                     done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
-                    cInfo.sname=it->name;vSearch.append(cInfo);
+                    cInfo.sname=it->name;cInfo.api=it->api;
+
+
+                    vSearch.append(cInfo);
                 }
 
             }else{
                  api=type.value(name).api;
                  url=api+"?wd="+searchword;
                  done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
-                  cInfo.sname=name;vSearch.append(cInfo);
+                 cInfo.sname=name;cInfo.api=api;
+                 vSearch.append(cInfo);
 
             }
        }
@@ -562,7 +567,7 @@ private:
 
        QString todes(VideoInfo cInfo,int index){
 
-           QString str =QString("<h3>《%1》</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
+           QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
                       .arg(cInfo.name.value(index))
                       .arg(cInfo.year.value(index))
                       .arg(cInfo.area.value(index))
