@@ -157,8 +157,6 @@ private slots:
 
      void on_sliderProgress_sliderMoved(int position);
 
-     void on_Button_search_clicked();
-
      void on_comboBox_name_currentIndexChanged(int index);
 
      void on_comboBox_part_currentIndexChanged(int index);
@@ -169,9 +167,7 @@ private slots:
      void volumeDown();
      void TimerTimeOut();
 
-
      void on_pushButton_playlist_clicked();
-
 
      void on_value_Slider_valueChanged(int value);
 
@@ -194,7 +190,6 @@ private slots:
      void loadMedia(int);
 
      void on_info_play_clicked();
-
 
      void on_info_front_clicked();
 
@@ -358,41 +353,16 @@ private:
       //xml文本转dom对象
         QDomElement xmltoDom(QString xmlText)
         {
-
-            //异常处理
-
-            try
-                {
-
-            QDomDocument doc; doc.setContent(xmlText.toUtf8());
+           QDomDocument doc; doc.setContent(xmlText.toUtf8());
 
             QDomElement  docElem = doc.documentElement();
 
             return docElem;
-
-            }catch(int n)
-
-            {
-
-                QDomElement  docElem;
-
-                qDebug()<<"num="<<n<<",xmltoDom() error!"<<endl;
-
-                return docElem;
-
-            }
-
         }
 
      //dom遍历xml获取影片信息
         void listDom(QDomElement docElem,VideoInfo &cInfo)
         {
-
-         //异常处理
-
-         try
-             {
-
 
             QDomNode node = docElem.firstChild();
             //if(node.toElement().isNull()){}
@@ -429,36 +399,15 @@ private:
                       listDom(element,cInfo);
                 }
 
-
-
-
                 node = node.nextSibling();
             }
-
-
-
-            }catch(int n)
-
-            {
-                qDebug()<<"num="<<n<<",listDom() error!"<<endl;
-
-                return;
-            }
-
 
             return;
         }
 
 
-
-
-
       //DOM遍历方式搜索显示影片信息
        void  getvideo(int tp,const QString api,const QString word="", const QString page=""){
-
- //异常处理
- try
-   {
 
          QString  url,done;vInfo.clear();
          switch (tp) {
@@ -477,42 +426,17 @@ private:
          }
          done=UrlRequestGet(url);
          listDom(xmltoDom(done),vInfo);vInfo.api=api;
-
-    }catch(int n)
-
-          {
-           qDebug()<<"num="<<n<<",getvideo() error!"<<endl;
-
-           return;
-          }
-
        }
 
        //本地编码转换为Unicode
         QString toUnicode(QString text){
-         //异常处理
-         try
-              {
-
             QTextCodec *codec = QTextCodec::codecForLocale();
             char* ch; QByteArray ba = text.toLatin1(); ch=ba.data();
             return codec->toUnicode(ch);
-
-            }catch(int n)
-
-              {
-                   qDebug()<<"num="<<n<<",toUnicode() error!"<<endl;
-                   return text;
-              }
     }
-
 
     //取所有资源类型
        void getclass(const QString pfile){
-
-           //异常处理
-           try
-             {
 
            QFile file(pfile);type.clear();
             if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
@@ -527,34 +451,25 @@ private:
                 }
               file.close();
              }
-
-           }catch(int n)
-
-                 {
-                  qDebug()<<"num="<<n<<",getclass() error!"<<endl;
-
-                  return;
-             }
-
          }
 
        //搜索资源站
        void  search(QString  searchword,QString name="全部"){
 
-           QString done,url,api;  VideoInfo cInfo;vSearch.clear();
+           QString done,url,api;vSearch.clear();
            if(name=="全部"){
                 QMap<QString,SourceInfo>::iterator it; //遍历map
 
                 for ( it = type.begin(); it != type.end(); ++it) {
+                    VideoInfo cInfo;                 //重要,清空数据
                     url=it->api+"?wd="+searchword;
                     done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
                     cInfo.sname=it->name;cInfo.api=it->api;
-
-
                     vSearch.append(cInfo);
                 }
 
             }else{
+                 VideoInfo cInfo;
                  api=type.value(name).api;
                  url=api+"?wd="+searchword;
                  done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
@@ -564,9 +479,8 @@ private:
             }
        }
 
-
+      //组合简介信息
        QString todes(VideoInfo cInfo,int index){
-
            QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
                       .arg(cInfo.name.value(index))
                       .arg(cInfo.year.value(index))
@@ -575,12 +489,11 @@ private:
                       .arg(cInfo.lang.value(index))
                       .arg(cInfo.director.value(index))
                       .arg(cInfo.actor.value(index))
-                       .arg(cInfo.des.value(index));
+                      .arg(cInfo.des.value(index));
             return str;
        }
 
-
-      //取MD5
+      //取文本MD5值
        QString toHash(const QString pwd){
            QString md5;
            QByteArray ba,bb;
@@ -608,7 +521,6 @@ private:
 
              bool isDirExist(QString fullPath,bool mk=false)
              {
-
                //异常处理
                  try
             {

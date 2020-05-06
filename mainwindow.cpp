@@ -33,8 +33,6 @@ MainWindow::~MainWindow()
 }
 
 
-
-
 //初始化工作
 void MainWindow::init(){
 
@@ -127,15 +125,9 @@ void MainWindow::init(){
            // m_timer->start(1000);
             connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
 
-           ui->value_Slider->hide();                  //音量调节隐藏
-           //ui->lineEdit_name->setFocus();         //搜索框获得焦点
-
+           ui->value_Slider->hide();                      //音量调节隐藏
            ui->info_pic->setAlignment(Qt::AlignCenter);  //视频信息图片居中
-
-           ui->page_info->setText("");
-
-
-
+           ui->page_info->setText("");                   //页数信息默认清空
 
 
             /*  各种信号 与 槽    */
@@ -194,8 +186,9 @@ void MainWindow::init(){
 }
 
 //
-void  MainWindow::createSource(QString sourcePath){
+void  MainWindow::createSource(QString sourcePath)
 
+{
       ui->tree_source->reset();
       getclass(sourcePath);
       model = new QStandardItemModel(ui->tree_source);//创建模型
@@ -203,14 +196,16 @@ void  MainWindow::createSource(QString sourcePath){
       model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
       QMap<QString,SourceInfo>::iterator it; //遍历map
       int i=0;
-      for ( it = type.begin(); it != type.end(); ++it,++i ) {
+      for ( it = type.begin(); it != type.end(); ++it,++i )
+      {
          ui->search_source->addItem(it->name,it->api);
           model->setItem(i,0,new QStandardItem(it.key()));
-           foreach (Nameinfo var,it.value().type) {
+           foreach (Nameinfo var,it.value().type)
+           {
                  model->item(i)->appendRow(new QStandardItem(var.name));
            }
 
-           }
+       }
 }
 
 
@@ -246,7 +241,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
             on_pushButton_full_clicked();
 
-          //  qDebug()<<"switchControl:";
+
 
   /*处理鼠标离开消息 */
     }else if(event->type() == QEvent::MouseButtonRelease){
@@ -255,13 +250,35 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
     }
 
-  //线程搜索影片列表结束
+
+   //线程搜索下载图片结束
+   }else if(event->type() ==QEvent::User){
+
+        //取关联数据
+         QStringList v=ui->comboBox_name->itemData(ui->comboBox_name->currentIndex()).toString().split("|");
+
+         qDebug()<<"图片下载："<<v;
+
+        //设置预览图片
+
+        QString file="./cache/"+toHash(v.value(0))+"_"+v.value(1)+".jpg";
+
+        if(!isFileExist(file)){file=nopic;}
+
+        QPixmap pixmap(file);
+
+        ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
+
+        ui->info_pic->setPixmap(pixmap);
+
+
+  //线程搜索影片列表结束      
   }else if(event->type() ==QEvent::User+1){
         int row=0;QString word;
         student_model->removeRows(0,student_model->rowCount()); ui->comboBox_name->clear();
-        for(int i=0;i<vSearch.size();i++){
+        for(int i=0;i<vSearch.size();i++)
+        {
             for(int i2=0;i2<vSearch.value(i).id.size();i2++,row++){
-
              word=vSearch.value(i).api+"|"+vSearch.value(i).id.value(i2);
              ui->comboBox_name->addItem(vSearch.value(i).name.value(i2),word);
              student_model->setItem(row, 0, new QStandardItem(vSearch.value(i).last.value(i2)));
@@ -271,7 +288,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
              student_model->setItem(row, 4, new QStandardItem(vSearch.value(i).name.value(i2)));
              student_model->item(row,4)->setForeground(QBrush(QColor(255, 0, 0)));
             }
-       }
+        }
 
         echoload(false);
 
@@ -281,39 +298,44 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
        ui->comboBox_part->clear(); ui->info_des->clear();
 
-       // ui->edit_des->clear();
-
         playlist->clear();
 
         for(int i=0;i<vInfo.video.size();i++){
             QStringList list =vInfo.video.value(i).split("#");
-            QStringList video;
+            QStringList v;
+
+            //下载图片
+
+            if(!isFileExist("./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg"))
+            {
+
+               QtConcurrent::run(this,&MainWindow::ThreadFunc,0,vInfo.pic.value(i)+"|"+vInfo.api+"|"+vInfo.id.value(i));
+
+            }
 
             foreach (QString s, list) {
                 //第30集$https://index.m3u8$ckm3u8
-                 video=s.split("$");
-                if(video.size()>1){
-                     playlist->addMedia(QUrl(video[1]));
-                     ui->comboBox_part->addItem(video[0],video[1]);
+                 v=s.split("$");
+                 if(v.size()==1){
+                      playlist->addMedia(QUrl(v.value(0)));
+                      ui->comboBox_part->addItem("高清",v.value(0));
+                 }else if(v.size()==2){
+                     playlist->addMedia(QUrl(v.value(0)));
+                     ui->comboBox_part->addItem("高清",v.value(0));
+                 }else if(v.size()==3){
+                     playlist->addMedia(QUrl(v.value(1)));
+                     ui->comboBox_part->addItem(v.value(0),v.value(1));
 
-                }else if(video.size()==1){
-                    playlist->addMedia(QUrl(s));
-                    ui->comboBox_part->addItem("高清",s);
-
-                }
+                 }
             }
             ui->info_des->setHtml(todes(vInfo,i));
-
-            //QtConcurrent::run(this,&MainWindow::ThreadFunc,1,vSearch.id.value(0));
 
 
         }
 
-        //循坏结束
-        echoload(false);
-        //ui->edit_des ->setHtml(vdes);
+       echoload(false);
 
-
+    //浏览下载图片结束
     }else if(event->type()>(QEvent::User+2)){
 
         int key=event->type()-QEvent::User-3;
@@ -526,57 +548,57 @@ void MainWindow::on_pushButton_full_clicked()
 
 
 }
-//搜索被单击
 
-void MainWindow::on_Button_search_clicked()
-{
-
-
-      //QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->lineEdit_name->text());
-
-      //QFuture<void> f1 ; f1.waitForFinished();
-
-}
 
 void MainWindow::ThreadFunc(int tp,QString word){
    QString sname,id,api;int index;QStringList v;
      if (word=="")return;
-      QEvent event (QEvent::Type(QEvent::User+tp));
 
-    switch(tp){
-      case 1:
+
+
+     //搜索下载图片
+     if(tp==0){
+
+         v=word.split("|");
+
+         UrlRequestImg(v.value(0),toHash(v.value(1))+"_"+v.value(2));
+
+         qDebug()<<word;
+
+
+
+         QEvent event (QEvent::Type(QEvent::User+0));
+
+         QApplication::postEvent(this ,new QEvent(event));
+
+     }else if(tp==1){
 
          search(word);
 
+         QEvent event (QEvent::Type(QEvent::User+1));
          QApplication::postEvent(this ,new QEvent(event));
-         break;
-
-      case 2:
-
-           //取关联数据
-           index=ui->comboBox_name->currentIndex();
-           v=ui->comboBox_name->itemData(index).toString().split("|");
-           api=v.value(0);id=v.value(1);
-           getvideo(tp,api,id);
-
-          QApplication::postEvent(this ,new QEvent(event));
-
-          break;
-
-    case 3:
-
-    UrlRequestImg(vInfo.pic.value(word.toInt()),toHash(vInfo.api)+"_"+vInfo.id.value(word.toInt()));
-
-    QEvent event (QEvent::Type(QEvent::User+tp+word.toInt()));
-
-    QApplication::postEvent(this ,new QEvent(event));
-
-    break;
 
 
+     }else if(tp==2){
+         //取关联数据
+         index=ui->comboBox_name->currentIndex();
+         v=ui->comboBox_name->itemData(index).toString().split("|");
+         api=v.value(0);id=v.value(1);
+         getvideo(tp,api,id);
 
-    }
+         QEvent event (QEvent::Type(QEvent::User+2));
+         QApplication::postEvent(this ,new QEvent(event));
 
+     }else if(tp==3){
+
+         UrlRequestImg(vInfo.pic.value(word.toInt()),toHash(vInfo.api)+"_"+vInfo.id.value(word.toInt()));
+
+         QEvent event (QEvent::Type(QEvent::User+tp+word.toInt()));
+
+         QApplication::postEvent(this ,new QEvent(event));
+
+
+     }
 
 }
 
@@ -595,6 +617,8 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
         api=v.value(0);id=v.value(1);
 
         //检查id是否一致
+
+        qDebug()<<v;
 
         if(vInfo.id.value(index).toInt()==id.toInt()){
 
@@ -859,13 +883,18 @@ void MainWindow::loadMedia(int key){
        QStringList list =vInfo.video.value(key).split("#");
         foreach (QString s, list) {
             //第30集$https://index.m3u8$ckm3u8
+            qDebug()<<s;
              QStringList v=s.split("$");
-            if(v.size()>1){
-                 playlist->addMedia(QUrl(v.value(1)));
-                 ui->comboBox_part->addItem(v.value(0),v.value(1));
-            }else if(v.size()==1){
-                playlist->addMedia(QUrl(s));
-                ui->comboBox_part->addItem("高清",s);
+            if(v.size()==1){
+                 playlist->addMedia(QUrl(v.value(0)));
+                 ui->comboBox_part->addItem("高清",v.value(0));
+            }else if(v.size()==2){
+                playlist->addMedia(QUrl(v.value(0)));
+                ui->comboBox_part->addItem("高清",v.value(0));
+            }else if(v.size()==3){
+                playlist->addMedia(QUrl(v.value(1)));
+                ui->comboBox_part->addItem(v.value(0),v.value(1));
+
             }
         }
 }
@@ -881,23 +910,18 @@ void MainWindow::on_info_play_clicked()
 //上一个视频
 void MainWindow::on_info_front_clicked()
 {
-    if(ui->comboBox_part->currentIndex()+1==0){
+    if(ui->comboBox_part->currentIndex()==0){
 
         int index= ui->comboBox_name->currentIndex();
-        if(index>=0){
+        if(index>0){
              ui->comboBox_name->setCurrentIndex(index-1);
         }
-
 
     }else{
 
        playlist->parent();
 
-
     }
-
-
-
 
 }
 
