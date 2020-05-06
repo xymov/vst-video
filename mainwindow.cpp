@@ -13,29 +13,22 @@ MainWindow::MainWindow(QWidget *parent)
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
      //默认大小
-     resize(QSize( 900, 600 ));
+     resize(QSize(800,600));
 
      //最大化
      setWindowState(Qt::WindowMaximized);
 
-
-     //ui->box_search->hide();
-
      //程序初始
 
-     init();
+    init();
 
-
-     //ui->toolButton->
-
-      createSource(sourcePath);
+     createSource(sourcePath);
 
 }
 
 
 MainWindow::~MainWindow()
 {
-   load.close();
     delete ui;
 }
 
@@ -142,10 +135,14 @@ void MainWindow::init(){
            ui->page_info->setText("");
 
 
+
+
+
             /*  各种信号 与 槽    */
 
-                        //关联退出
-                        connect(this,SIGNAL(quit()),&load,SLOT(hide()));
+                        //关联退出信号
+                        connect(this,SIGNAL(quit()),&load,SLOT(quit()));
+
 
                         //关联播放进度条
                         connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
@@ -228,12 +225,13 @@ void MainWindow::TimerTimeOut()
     }
 }
 
-//监视对象,处理回车消息
+//监视对象
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
     if(target == video){
 
-    /*处理鼠标消息 */
+    /*处理鼠标移动消息 */
+
     if (event->type() == QEvent::MouseMove){
          //重启定时器
          m_timer->start(5000);
@@ -242,17 +240,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
               ui->box_control->show();
           }
 
-
-        /*
-          QMouseEvent  *mouseEvent = static_cast<QMouseEvent *>(event);
-
-          if(mouseEvent->y()>video->height()-ui->box_control->height()){
-                ui->box_control->show();
-          }else{
-               if(isFullScreen())ui->box_control->hide();
-          }
-*/
-            //  qDebug()<<"switchControl:"<<mouseEvent->x()<<","<<mouseEvent->y();
+   /*处理鼠标双击消息 */
 
        }else if(event->type() == QEvent::MouseButtonDblClick){
 
@@ -260,7 +248,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
           //  qDebug()<<"switchControl:";
 
-
+  /*处理鼠标离开消息 */
     }else if(event->type() == QEvent::MouseButtonRelease){
 
         // ui->sliderProgress->setFocus();
@@ -285,19 +273,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
         echoload(false);
 
-   /*
-
-         int key= ui->listWidget->currentRow();
-        if(key!=-1){
-            qDebug()<<"id"<<vInfo.name.value(key);
-            QString file="./cache/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
-            if(!isFileExist(file)){file=nopic;}
-            QPixmap pixmap(file);
-           createListWidget(ui->listWidget,ui->listWidget->currentRow(),false);
-
-
-        }
- */
    //线程搜索影片详情结束
 
 }else if(event->type() ==QEvent::User+2){
@@ -374,7 +349,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
 void MainWindow::echoload(bool echo){
 
-    if(echo){load.show();}else{emit quit();}
+    if(echo){load.show();}else{load.hide();}
 }
 
 //播放器媒体状态被改变
@@ -387,7 +362,7 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");break;
     case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲..."); echoload(true);break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
-    case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);;break;
+    case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);break;
     case QMediaPlayer::EndOfMedia:ui->status->setText("媒体播放结束");break;
     case QMediaPlayer::InvalidMedia:ui->status->setText("无法播放当前媒体");break;
     }
@@ -517,37 +492,36 @@ void MainWindow::on_pushButton_full_clicked()
     QString general="QPushButton{border-image:url(://rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
 
  if(isFullScreen()){
-
+       showNormal();
        ui->box_control->show();
-       ui->box_source->show();
-       ui->box_info->show();
-       ui->box_page->show();
-       ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
        m_timer->stop();
        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
        ui->pushButton_full->setStyleSheet(full);
-      ui->tabWidget->setStyleSheet("");
-       showNormal();
+      // ui->tabWidget->setStyleSheet("");
+
+
+        on_pushButton_playlist_clicked();
+        on_pushButton_playlist_clicked();
 
 
  }else{
-         video->setFocus();
-         ui->box_control->hide();
-         ui->box_source->hide();
-         ui->box_info->hide();
+        video->setFocus();
+        ui->box_control->hide();
+        ui->box_source->hide();
+        ui->box_info->hide();
         ui->box_page->hide();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
-        ui->tabWidget->setStyleSheet("border:0;");
-
 
  //ui->tabWidget->set
 
          m_timer->start(5000);
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
+         ui->tabWidget->setStyleSheet("border:0;");
          showFullScreen();
 
  }
+
 
 }
 //搜索被单击
@@ -623,10 +597,27 @@ void MainWindow::on_comboBox_part_currentIndexChanged(int index)
      player->play();
 }
 
+//切换列表显示
 void MainWindow::on_pushButton_playlist_clicked()
 {
 
+    if(ui->box_source->isHidden()){
 
+        ui->box_control->show();
+        ui->box_source->show();
+        ui->box_info->show();
+        ui->box_page->show();
+        ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
+        ui->tabWidget->setStyleSheet("");
+
+    }else{
+
+        ui->box_source->hide();
+        ui->box_info->hide();
+        ui->box_page->hide();
+        ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
+        ui->tabWidget->setStyleSheet("border:0;");
+   }
 }
 
 void MainWindow::volumeChange(int value){
@@ -813,7 +804,7 @@ void MainWindow::getpageinfo (int page){
 
     //connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
 
-      QString str=QString("视频：%2/%4，页数：%1/%3").arg(vInfo.page).arg(vInfo.pagesize).arg(vInfo.pagecount).arg(vInfo.recordcount);
+      QString str=QString("页数：%1/%3，视频：%2/%4").arg(vInfo.page).arg(vInfo.pagesize).arg(vInfo.pagecount).arg(vInfo.recordcount);
 
       ui->page_info->setText(str);
 

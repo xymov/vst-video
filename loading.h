@@ -20,7 +20,7 @@ public:
 
  private slots:
 
-    //void quit();
+     void quit();
 
 private:
     Ui::loading *ui;

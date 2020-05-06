@@ -26,6 +26,11 @@ loading::loading(QWidget *parent) :
         movie->start();
 }
 
+void loading::quit(){
+
+   exit(0);
+}
+
 loading::~loading()
 {
     //delete ui->lbl_gif;

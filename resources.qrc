@@ -19,9 +19,9 @@
         <file>rc/sound_on.png</file>
         <file>rc/sound_out.png</file>
         <file>rc/loading.gif</file>
-        <file>favicon.ico</file>
         <file>rc/playlist _out.png</file>
         <file>rc/playlist _on.png</file>
         <file>rc/timg.jpeg</file>
+        <file>icon.png</file>
     </qresource>
 </RCC>
