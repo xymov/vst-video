@@ -19,6 +19,9 @@
     <height>16777215</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="contextMenuPolicy">
    <enum>Qt::NoContextMenu</enum>
   </property>
@@ -28,6 +31,9 @@
   <property name="windowIcon">
    <iconset resource="resources.qrc">
     <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -39,6 +45,9 @@
    <enum>Qt::ToolButtonFollowStyle</enum>
   </property>
   <property name="animated">
+   <bool>false</bool>
+  </property>
+  <property name="documentMode">
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -723,7 +732,11 @@ border:none;
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="search_list"/>
+           <widget class="QTableView" name="search_list">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

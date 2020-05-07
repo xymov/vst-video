@@ -2,7 +2,9 @@
 #define LOADING_H
 
 #include <QWidget>
-
+#include <QEvent>
+#include <QKeyEvent>
+#include <QShortcut>
 #include <QDesktopWidget>
 #include <QMovie>
 
@@ -19,6 +21,7 @@ public:
     ~loading();
 
  private slots:
+
      void quit();
 
 private:

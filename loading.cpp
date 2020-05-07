@@ -1,6 +1,7 @@
 #include "loading.h"
 #include "ui_loading.h"
 
+
 loading::loading(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::loading)
@@ -23,17 +24,15 @@ loading::loading(QWidget *parent) :
         //加载gif图片
         QMovie *movie = new QMovie("://rc/loading.gif");
         ui->lbl_gif->setMovie(movie);
+        movie->start();
 
-
+       connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(close()));
 
 }
 
-
-
-
 void loading::quit(){
 
-   //exit(0);
+   exit(0);
 }
 
 loading::~loading()

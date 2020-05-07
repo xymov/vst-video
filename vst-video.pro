@@ -39,6 +39,7 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    live.txt \
     source.txt \
     vst-video \
     install.sh \

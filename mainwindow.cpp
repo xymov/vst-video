@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
      //配置设置
      set.sourcePath=QCoreApplication::applicationDirPath()+"/source.txt";
 
+     set.livePath=QCoreApplication::applicationDirPath()+"/live.txt";
+
      set.cache=QCoreApplication::applicationDirPath()+"/cache/";
 
      set.nopic="://rc/timg.jpeg";
@@ -27,11 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
      //最大化
      setWindowState(Qt::WindowMaximized);
 
+
+
+
+      //this->i
      //程序初始
 
     init();
 
-     createSource(set.sourcePath);
+     createSource();
 
 }
 
@@ -142,7 +148,7 @@ void MainWindow::init(){
             /*  各种信号 与 槽    */
 
                         //关联退出信号
-                        connect(this,SIGNAL(quit()),&load,SLOT(quit()));
+                        connect(this,SIGNAL(quit()),&load,SLOT(close()));
 
                         //关联播放进度条
                         connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
@@ -176,27 +182,30 @@ void MainWindow::init(){
 }
 
 //
-void  MainWindow::createSource(QString sourcePath)
+void  MainWindow::createSource()
 
 {
       ui->tree_source->reset();
       ui->tree_source->setEditTriggers(QAbstractItemView::NoEditTriggers);   //不可编辑
-      getclass(sourcePath);
+      getclass(set.sourcePath);getlive(set.livePath);
       model = new QStandardItemModel(ui->tree_source);//创建模型
       ui->tree_source->setModel(model);
       model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
-      QMap<QString,SourceInfo>::iterator it; //遍历map
-      int i=0;
-      for ( it = type.begin(); it != type.end(); ++it,++i )
+
+      for ( int i=0; i<type.size(); i++ )
+
       {
-         ui->search_source->addItem(it->name,it->api);
-          model->setItem(i,0,new QStandardItem(it.key()));
-           foreach (Nameinfo var,it.value().type)
+           model->setItem(i,0,new QStandardItem(type[i].name));
+           foreach (Nameinfo var,type[i].type)
            {
                  model->item(i)->appendRow(new QStandardItem(var.name));
            }
 
        }
+
+
+
+
 }
 
 
@@ -284,14 +293,28 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
 
       //处理搜索回车消息
-      }else if(event->type() ==QEvent::KeyPress && target ==ui->search_name ){
+      }else if(event->type() ==QEvent::KeyPress && (target ==ui->search_name) ){
 
                            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
                             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
                             {
                                     on_search_ok_clicked();
+                                    return true;
                             }
+
+       //处理浏览器或搜索表格回车消息
+       }else if(event->type() ==QEvent::KeyPress && (target ==ui->listWidget || target ==ui->search_list)){
+
+                                                 QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+                                                  if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
+                                                  {
+                                                             on_info_play_clicked();
+                                                             return true;
+                                                   }
+
+
 
    //线程搜索下载图片结束
    }else if(event->type() ==QEvent::User){
@@ -562,6 +585,8 @@ void  MainWindow::switchFullScreen(bool cfull){
          //保存全屏前状态
          set.playlist=!ui->box_source->isHidden();
 
+         set.windowState=this->windowState();
+
 
         ui->box_source->hide();
         ui->box_info->hide();
@@ -583,11 +608,14 @@ void  MainWindow::switchFullScreen(bool cfull){
     }else{
         showNormal();
 
+
         if(set.playlist){
             ui->box_source->show();
             ui->box_info->show();
              ui->box_page->show();
              ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
+             setWindowState(set.windowState);
+
         }
 
         ui->box_control->show();
@@ -772,7 +800,30 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
         Q_UNUSED(index);
-       getpageinfo(1);
+
+    if(index.parent().data().toString()=="直播列表"){
+
+        ui->tabWidget->setCurrentIndex(1);
+
+        int row=index.parent().row(); if(row==-1){row=index.row();}
+
+        playlist->clear();
+
+         playlist->addMedia(QUrl(type.value(row).type.value(index.row()).id));
+
+         //player->setMedia(QUrl(type.value(row).type.value(index.row()).id));
+
+         ui->page_info->setText("直播模式");
+         player->play();
+
+    }else{
+
+         getpageinfo(1);
+
+    }
+
+
+
 
 }
 
@@ -863,29 +914,29 @@ void MainWindow::on_listWidget_currentRowChanged(int key)
 
 //取分页信息
 void MainWindow::getpageinfo (int page){
-    echoload(true);
 
-     QString id,row,api;
+    int row;QString id,api;
 
-     //取当前选择项
-     QModelIndex index=ui->tree_source->currentIndex();
+    //取当前选择项
+    QModelIndex index=ui->tree_source->currentIndex();if(index.row()<0){return;}
 
-     if(index.row()<0){return;}
+     echoload(true);
 
-    //取选择项目文本
-     row=index.parent().data().toString().trimmed();
+    //取选择项目序号
+
+     row=index.parent().row();
 
      //取关联分类ID
-     if(row==""){
+     if(row==-1){
          id="";
-         row=index.data().toString().trimmed();
+         row=index.row();
      }else{
 
-         id=type.value(row).type.value(index.row()).id;
+       id=type.value(row).type.value(index.row()).id;
      }
 
      //取关联api地址
-     api=type.value(row).api;
+      api=type.value(row).api;
 
       ui->listWidget->clear(); isDirExist(set.cache,true);
 
@@ -896,18 +947,15 @@ void MainWindow::getpageinfo (int page){
 
       for (int i=0;i<vInfo.id.size();i++) {
 
+          ui->comboBox_name->addItem(vInfo.name.value(i),vInfo.api+"|"+vInfo.id.value(i));
 
-        ui->comboBox_name->addItem(vInfo.name.value(i),vInfo.api+"|"+vInfo.id.value(i));
+           QString file=set.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
 
-
-
-         QString file=set.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
-
-         createListWidget(ui->listWidget,i,true);
+           createListWidget(ui->listWidget,i,true);
 
          if(!isFileExist(file)){
 
-           QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+            QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
 
          }
 
@@ -915,7 +963,7 @@ void MainWindow::getpageinfo (int page){
 
       if(ui->comboBox_name->count()==0){
          //echoload(false);
-         QMessageBox::warning(nullptr, "提示", "未找到任何资源!",QMessageBox::Yes);
+         //QMessageBox::warning(nullptr, "提示", "未找到任何资源!",QMessageBox::Yes);
       }
 
     //connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
@@ -980,10 +1028,9 @@ void  MainWindow:: loadPlay(bool play){
    if(play)
   {
 
-     if(player->state()!=QMediaPlayer::PausedState)
-     {
 
-       playlist->clear();
+        player->stop();
+        playlist->clear();
 
           for (int i=0;i<ui->comboBox_part->count();i++)
           {
@@ -991,8 +1038,8 @@ void  MainWindow:: loadPlay(bool play){
           playlist->addMedia(QUrl(ui->comboBox_part->itemData(i).toString()));
 
           }
-    }
-       player->play();
+
+        player->play();
 
    }else{
 
@@ -1097,7 +1144,8 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 void MainWindow::on_source_re_clicked()
 {
     echoload(true);
-    createSource(set.sourcePath);
+    createSource();
     echoload(false);
 
 }
+

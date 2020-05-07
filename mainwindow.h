@@ -66,10 +66,15 @@ typedef struct Appinfo
 
    QString sourcePath;
 
+   QString livePath;
+
    QString cache;
 
    QString nopic;
 
+
+
+   Qt::WindowStates windowState;
 
 }Appinfo;
 Q_DECLARE_METATYPE(Appinfo);
@@ -219,6 +224,8 @@ private slots:
 
      void on_source_re_clicked();
 
+
+
 signals:
      void quit();
 
@@ -227,7 +234,7 @@ private:
     Ui::MainWindow *ui;
 
 
-    void  createSource(QString sourcePath);
+    void  createSource();
 
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
@@ -257,10 +264,13 @@ private:
 
      //资源分类信息
 
-     QMap<QString,SourceInfo>type;
+    // QMap<QString,SourceInfo>type;
+
+     QQueue<SourceInfo>type;
 
 
      //搜索资源信息
+
      QQueue<VideoInfo>vSearch;
 
      //播放资源信息
@@ -469,104 +479,126 @@ private:
                      if(str!=""){
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
-                     getvideo(3,info.api);info.type=vInfo.type;type.insert(info.name,info);
+                     getvideo(3,info.api);info.type=vInfo.type;type.insert(i,info);
                      }
                 }
               file.close();
              }
          }
 
-       //搜索资源站
-       void  search(QString  searchword,QString name="全部"){
+       //取直播
+       void getlive(const QString pfile){
+            QFile file(pfile);
+              if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
+                  SourceInfo info; info.name="直播列表";
+                  for(int i=0;!file.atEnd();i++){
+                       QByteArray line = file.readLine().trimmed();
+                       QString str(line);
+                       if(str!=""){
+                        QStringList list =str.split(",");
+                        Nameinfo var; var.name=list.value(0);var.id=list.value(1);
+                        info.type.insert(i,var);;
 
-           QString done,url,api;vSearch.clear();
-           if(name=="全部"){
-                QMap<QString,SourceInfo>::iterator it; //遍历map
+                        //info.type[i].name=list.value(0);info.type[i].id=list.value(1);
+                       }
+                  }
+                 file.close();
 
-                for ( it = type.begin(); it != type.end(); ++it) {
-                    VideoInfo cInfo;                 //重要,清空数据
-                    url=it->api+"?wd="+searchword;
-                    done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
-                    cInfo.sname=it->name;cInfo.api=it->api;
-                    vSearch.append(cInfo);
-                }
+                 if(info.type.size()>0){type.append(info);}
+              }
+          }
 
-            }else{
-                 VideoInfo cInfo;
-                 api=type.value(name).api;
-                 url=api+"?wd="+searchword;
-                 done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
-                 cInfo.sname=name;cInfo.api=api;
-                 vSearch.append(cInfo);
+                     //搜索资源站
+                     void  search(QString  searchword,int ctype=0){
 
-            }
-       }
+                         QString done,url,api;vSearch.clear();
+                         if(ctype==0){
 
-      //组合简介信息
-       QString todes(VideoInfo cInfo,int index){
-           QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
-                      .arg(cInfo.name.value(index))
-                      .arg(cInfo.year.value(index))
-                      .arg(cInfo.area.value(index))
-                      .arg(cInfo.tname.value(index))
-                      .arg(cInfo.lang.value(index))
-                      .arg(cInfo.director.value(index))
-                      .arg(cInfo.actor.value(index))
-                      .arg(cInfo.des.value(index));
-            return str;
-       }
-
-      //取文本MD5值
-       QString toHash(const QString pwd){
-           QString md5;
-           QByteArray ba,bb;
-           QCryptographicHash md(QCryptographicHash::Md5);
-           ba.append(pwd);
-           md.addData(ba);
-           bb = md.result();
-           md5.append(bb.toHex());
-           return md5;
-       }
+                             foreach (SourceInfo it, type) {
+                                 VideoInfo cInfo;                 //重要,清空数据
+                                 url=it.api+"?wd="+searchword;
+                                 done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
+                                 cInfo.sname=it.name;cInfo.api=it.api;
+                                 vSearch.append(cInfo);
+                             }
 
 
-       /* 判断文件是不是存在 */
-       bool isFileExist(QString fullFileName)
-       {
-           QFileInfo fileInfo(fullFileName);
-           if(fileInfo.isFile())
-           {
-               return true;
-           }
-           return false;
-       }
+                          }else{
+                               VideoInfo cInfo;
+                               api=type.value(ctype).api;
+                               url=api+"?wd="+searchword;
+                               done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
+                               cInfo.sname=type.value(ctype).name;cInfo.api=api;
+                               vSearch.append(cInfo);
 
-       //判断文件夹是否存在,不存在则创建，默认假
+                          }
+                     }
 
-             bool isDirExist(QString fullPath,bool mk=false)
-             {
-               //异常处理
-                 try
-            {
-                 QDir dir(fullPath);
-                 if(dir.exists())
-                 {
-                   return true;
-                 }
-                 else
-                 {
-                   if (mk){qDebug()<<dir.mkdir(fullPath);return dir.mkdir(fullPath);}else{return false;}
-                 }
+                    //组合简介信息
+                     QString todes(VideoInfo cInfo,int index){
+                         QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
+                                    .arg(cInfo.name.value(index))
+                                    .arg(cInfo.year.value(index))
+                                    .arg(cInfo.area.value(index))
+                                    .arg(cInfo.tname.value(index))
+                                    .arg(cInfo.lang.value(index))
+                                    .arg(cInfo.director.value(index))
+                                    .arg(cInfo.actor.value(index))
+                                    .arg(cInfo.des.value(index));
+                          return str;
+                     }
+
+                    //取文本MD5值
+                     QString toHash(const QString pwd){
+                         QString md5;
+                         QByteArray ba,bb;
+                         QCryptographicHash md(QCryptographicHash::Md5);
+                         ba.append(pwd);
+                         md.addData(ba);
+                         bb = md.result();
+                         md5.append(bb.toHex());
+                         return md5;
+                     }
 
 
-             }catch(int n)
+                     /* 判断文件是不是存在 */
+                     bool isFileExist(QString fullFileName)
+                     {
+                         QFileInfo fileInfo(fullFileName);
+                         if(fileInfo.isFile())
+                         {
+                             return true;
+                         }
+                         return false;
+                     }
 
-                    {
-                       qDebug()<<"num="<<n<<",isDirExist() error!"<<endl;
+                     //判断文件夹是否存在,不存在则创建，默认假
 
-                        return false;
-                   }
+                           bool isDirExist(QString fullPath,bool mk=false)
+                           {
+                             //异常处理
+                               try
+                          {
+                               QDir dir(fullPath);
+                               if(dir.exists())
+                               {
+                                 return true;
+                               }
+                               else
+                               {
+                                 if (mk){qDebug()<<dir.mkdir(fullPath);return dir.mkdir(fullPath);}else{return false;}
+                               }
 
-             }
 
-};
-#endif // MAINWINDOW_H
+                           }catch(int n)
+
+                                  {
+                                     qDebug()<<"num="<<n<<",isDirExist() error!"<<endl;
+
+                                      return false;
+                                 }
+
+                           }
+
+              };
+              #endif // MAINWINDOW_H
