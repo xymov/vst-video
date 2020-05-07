@@ -19,7 +19,6 @@ public:
     ~loading();
 
  private slots:
-
      void quit();
 
 private:

@@ -59,6 +59,22 @@
 #include <QScrollBar>
 
 
+//运行信息
+typedef struct Appinfo
+{
+   bool  playlist;
+
+   QString sourcePath;
+
+   QString cache;
+
+   QString nopic;
+
+
+}Appinfo;
+Q_DECLARE_METATYPE(Appinfo);
+
+
 
 //名称信息
 typedef struct Nameinfo
@@ -201,6 +217,8 @@ private slots:
 
      void on_tabWidget_currentChanged(int index);
 
+     void on_source_re_clicked();
+
 signals:
      void quit();
 
@@ -208,14 +226,12 @@ private:
 
     Ui::MainWindow *ui;
 
-    QString cache,sourcePath;
 
     void  createSource(QString sourcePath);
 
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
     QStandardItemModel *student_model;
-
     QString STimeDuration="00:00:00";
     QMediaPlaylist *playlist;
     QMediaPlayer *player;
@@ -226,6 +242,13 @@ private:
     loading load;
     QTimer *m_timer;
     void createListWidget(QListWidget *listWidget,int key,bool insert);
+
+    void  switchFullScreen(bool);
+
+    void  loadPlay(bool play);
+
+    //运行信息
+    Appinfo set;
 
 
     //影片信息

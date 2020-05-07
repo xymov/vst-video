@@ -93,21 +93,13 @@
        <string>资源</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="spacing">
-        <number>7</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
+       <item>
+        <widget class="QPushButton" name="source_re">
+         <property name="text">
+          <string>刷新</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QTreeView" name="tree_source">
          <property name="minimumSize">
@@ -141,7 +133,7 @@
          <string notr="true"/>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -907,7 +899,20 @@ border:none;
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="info_des"/>
+        <widget class="QTextEdit" name="info_des">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhMultiLine</set>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
