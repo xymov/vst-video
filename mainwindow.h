@@ -72,8 +72,6 @@ typedef struct Appinfo
 
    QString nopic;
 
-
-
    Qt::WindowStates windowState;
 
 }Appinfo;
@@ -223,6 +221,8 @@ private slots:
      void on_tabWidget_currentChanged(int index);
 
      void on_source_re_clicked();
+
+     void on_search_source_currentIndexChanged(int index);
 
 
 
@@ -525,10 +525,10 @@ private:
 
                           }else{
                                VideoInfo cInfo;
-                               api=type.value(ctype).api;
+                               api=type.value(ctype-1).api;
                                url=api+"?wd="+searchword;
                                done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
-                               cInfo.sname=type.value(ctype).name;cInfo.api=api;
+                               cInfo.sname=type.value(ctype-1).name;cInfo.api=api;
                                vSearch.append(cInfo);
 
                           }

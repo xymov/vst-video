@@ -30,12 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
      setWindowState(Qt::WindowMaximized);
 
 
-
-
-      //this->i
      //程序初始
 
-    init();
+     init();
 
      createSource();
 
@@ -45,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    exit(0);
 }
 
 
@@ -141,8 +139,6 @@ void MainWindow::init(){
            ui->info_pic->setAlignment(Qt::AlignCenter);  //视频信息图片居中
            ui->page_info->setText("");                   //页数信息默认清空
 
-           //ui->info_des->set
-
 
 
             /*  各种信号 与 槽    */
@@ -195,7 +191,11 @@ void  MainWindow::createSource()
       for ( int i=0; i<type.size(); i++ )
 
       {
-           model->setItem(i,0,new QStandardItem(type[i].name));
+
+          model->setItem(i,0,new QStandardItem(type.value(i).name));
+
+          if(type.value(i).name!="直播列表"){ui->search_source->addItem(type[i].name);}
+
            foreach (Nameinfo var,type[i].type)
            {
                  model->item(i)->appendRow(new QStandardItem(var.name));
@@ -475,9 +475,11 @@ void MainWindow::durationChange(qint64 playtime)
 //播放器进度被改变
 void MainWindow::positionChange(qint64 p)
 {
-    if (!ui->sliderProgress->isSliderDown()) {
+
+     if (!ui->sliderProgress->isSliderDown()) {
      ui->sliderProgress->setValue(p);
-     setSTime(p);
+      setSTime(p);
+
     }
 }
 
@@ -503,9 +505,16 @@ void MainWindow::setSTime(qint64 v)
     t = t.addMSecs(v);
     QString STimeElapse = t.toString("HH:mm:ss");
     //设置进度标签
+
+    QModelIndex index= ui->tree_source->currentIndex();
+    if(index.data().toString()=="直播列表" || index.parent().data().toString()=="直播列表"){
+        ui->labelTimeVideo->setText("直播模式");
+    }else{
     ui->labelTimeVideo->setText(STimeElapse + "/" + STimeDuration);
     //设置提示文本
     ui->sliderProgress->setToolTip(STimeElapse);
+
+    }
 }
 
 //音量+-
@@ -596,8 +605,6 @@ void  MainWindow::switchFullScreen(bool cfull){
         ui->box_control->hide();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
 
- //ui->tabWidget->set
-
          m_timer->start(5000);
          //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
@@ -606,8 +613,14 @@ void  MainWindow::switchFullScreen(bool cfull){
 
 
     }else{
-        showNormal();
 
+        ui->tabWidget->setStyleSheet("");
+        ui->pushButton_full->setStyleSheet(full);
+        ui->box_control->show();
+        m_timer->stop();
+        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
+
+        showNormal();
 
         if(set.playlist){
             ui->box_source->show();
@@ -615,25 +628,10 @@ void  MainWindow::switchFullScreen(bool cfull){
              ui->box_page->show();
              ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
              setWindowState(set.windowState);
-
         }
-
-        ui->box_control->show();
-        m_timer->stop();
-        video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
-        ui->pushButton_full->setStyleSheet(full);
-
-
-
-       // ui->tabWidget->setStyleSheet("");
-
-
-         on_pushButton_playlist_clicked();
-         on_pushButton_playlist_clicked();
 
 
     }
-
 
 
 }
@@ -674,8 +672,10 @@ void MainWindow::ThreadFunc(int tp,QString word){
 
      }else if(tp==1){
 
-         search(word);
 
+
+           v=word.split("|");
+           search(v.value(0),v.value(1).toInt());
          QEvent event (QEvent::Type(QEvent::User+1));
          QApplication::postEvent(this ,new QEvent(event));
 
@@ -718,8 +718,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
         api=v.value(0);id=v.value(1);
 
         //检查id是否一致
-
-        qDebug()<<v;
+        //qDebug()<<v;
 
         if(vInfo.id.value(index).toInt()==id.toInt()){
 
@@ -761,13 +760,13 @@ void MainWindow::on_pushButton_playlist_clicked()
 {
 
     if(ui->box_source->isHidden()){
-
+       ui->tabWidget->setStyleSheet("");
         ui->box_control->show();
         ui->box_source->show();
         ui->box_info->show();
         ui->box_page->show();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
-        ui->tabWidget->setStyleSheet("");
+
 
     }else{
 
@@ -801,29 +800,46 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
         Q_UNUSED(index);
 
-    if(index.parent().data().toString()=="直播列表"){
+    if(index.data().toString()=="直播列表" || index.parent().data().toString()=="直播列表"){
 
-        ui->tabWidget->setCurrentIndex(1);
+       int row=index.row();
 
-        int row=index.parent().row(); if(row==-1){row=index.row();}
+       ui->tabWidget->setCurrentIndex(1);
 
-        playlist->clear();
+       if(index.parent().data().toString()=="直播列表"){ row=index.parent().row();}
 
-         playlist->addMedia(QUrl(type.value(row).type.value(index.row()).id));
+       //qDebug()<<playlist->mediaCount()<<row;
 
-         //player->setMedia(QUrl(type.value(row).type.value(index.row()).id));
+       if(playlist->mediaCount()!=type.value(row).type.size())
+       {
+            playlist->clear();
+            foreach(Nameinfo var,type.value(row).type)
+            {
+                playlist->addMedia(QUrl(var.id));
+            }
+            player->play();
 
-         ui->page_info->setText("直播模式");
-         player->play();
+        }else{
+
+              playlist->setCurrentIndex(index.row());
+
+        }
+
+         video->setUpdatesEnabled(false);
+
+         ui->page_info->setText("频道："+QString::number(index.row()+1)+"/"+QString::number(playlist->mediaCount()));
+
+         ui->labelTimeVideo->setText("直播模式");
+
+         ui->sliderProgress->setEnabled(false);
+
+
 
     }else{
-
+         video->setUpdatesEnabled(true);
+          ui->sliderProgress->setEnabled(true);
          getpageinfo(1);
-
     }
-
-
-
 
 }
 
@@ -1007,7 +1023,7 @@ void MainWindow::loadMedia(int key){
        QStringList list =vInfo.video.value(key).split("#");
         foreach (QString s, list) {
             //第30集$https://index.m3u8$ckm3u8
-            qDebug()<<s;
+
              QStringList v=s.trimmed().split("$");
             if(v.size()==1){
                  ui->comboBox_part->addItem("高清",v.value(0));
@@ -1099,7 +1115,7 @@ void MainWindow::on_search_ok_clicked()
 
     }else{
        echoload(true);
-       QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->search_name->text());
+       QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->search_name->text()+"|"+QString::number(ui->search_source->currentIndex()));
     }
 
 }
@@ -1149,3 +1165,10 @@ void MainWindow::on_source_re_clicked()
 
 }
 
+
+void MainWindow::on_search_source_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
+    on_search_ok_clicked();
+
+}
