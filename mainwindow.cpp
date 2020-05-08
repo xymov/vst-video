@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
      set.nopic="://rc/timg.jpeg";
 
 
-
      //窗口居中
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
@@ -28,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
      //最大化
      setWindowState(Qt::WindowMaximized);
+
 
 
      //程序初始
@@ -322,8 +322,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         //取关联数据
          QStringList v=ui->comboBox_name->itemData(ui->comboBox_name->currentIndex()).toString().split("|");
 
-         qDebug()<<"图片下载："<<v;
-
         //设置预览图片
 
         QString file=set.cache+toHash(v.value(0))+"_"+v.value(1)+".jpg";
@@ -416,11 +414,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         ui->value_Slider->hide();
 
 
- //图标列表框双击
-    }else if(event->type() == QEvent::MouseButtonDblClick and target == ui->listWidget){
-
-       qDebug()<<"图标列表框双击";
-
 
   //end
     }
@@ -466,6 +459,7 @@ void MainWindow::stateChanged(QMediaPlayer::State state)
 //播放器视频长度状态发生改变
 void MainWindow::durationChange(qint64 playtime)
 {
+    if(set.live)return;
     ui->sliderProgress->setMaximum(playtime);
     QTime t(0,0,0);
     t = t.addMSecs(playtime);
@@ -476,6 +470,7 @@ void MainWindow::durationChange(qint64 playtime)
 void MainWindow::positionChange(qint64 p)
 {
 
+    if(set.live)return;
      if (!ui->sliderProgress->isSliderDown()) {
      ui->sliderProgress->setValue(p);
       setSTime(p);
@@ -500,21 +495,16 @@ void MainWindow::sliderProgressReleased()
 //设置进度标签
 void MainWindow::setSTime(qint64 v)
 {
+    if(set.live)return;
     //时间转换
     QTime t(0,0,0);
     t = t.addMSecs(v);
     QString STimeElapse = t.toString("HH:mm:ss");
     //设置进度标签
-
-    QModelIndex index= ui->tree_source->currentIndex();
-    if(index.data().toString()=="直播列表" || index.parent().data().toString()=="直播列表"){
-        ui->labelTimeVideo->setText("直播模式");
-    }else{
     ui->labelTimeVideo->setText(STimeElapse + "/" + STimeDuration);
     //设置提示文本
     ui->sliderProgress->setToolTip(STimeElapse);
 
-    }
 }
 
 //音量+-
@@ -533,14 +523,15 @@ void MainWindow::volumeDown()
 //快退快进
 void MainWindow::decseek()
 {
+    if(set.live)return;
     player->setPosition(player->position() - 5000);
 }
 
 void MainWindow::addseek()
 {
+    if(set.live)return;
     player->setPosition(player->position() + 5000);
 }
-
 
 //播放按钮被单击
 void MainWindow::on_pushButton_paly_clicked()
@@ -563,7 +554,6 @@ void MainWindow::on_pushButton_next_clicked()
    playlist->next();
 }
 
-
 //控制条静音按钮被单击
 void MainWindow::on_pushButton_sound_clicked()
 {
@@ -582,8 +572,6 @@ void MainWindow::on_pushButton_sound_clicked()
 //切换全屏状态
 void  MainWindow::switchFullScreen(bool cfull){
 
-
-
     QString full="QPushButton{border-image:url(://rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
     QString general="QPushButton{border-image:url(://rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
 
@@ -593,35 +581,26 @@ void  MainWindow::switchFullScreen(bool cfull){
 
          //保存全屏前状态
          set.playlist=!ui->box_source->isHidden();
-
          set.windowState=this->windowState();
-
-
         ui->box_source->hide();
         ui->box_info->hide();
-
-
         ui->box_page->hide();
         ui->box_control->hide();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
-
          m_timer->start(5000);
-         //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
+        //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
          ui->tabWidget->setStyleSheet("border:0;");
          showFullScreen();
 
-
     }else{
 
-        ui->tabWidget->setStyleSheet("");
+        ui->tabWidget->setStyleSheet(set.playlist?"":"border:0;");
         ui->pushButton_full->setStyleSheet(full);
         ui->box_control->show();
         m_timer->stop();
         video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
-
         showNormal();
-
         if(set.playlist){
             ui->box_source->show();
             ui->box_info->show();
@@ -629,22 +608,15 @@ void  MainWindow::switchFullScreen(bool cfull){
              ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
              setWindowState(set.windowState);
         }
-
-
     }
 
-
 }
-
-
 
 //控制条全屏按钮被单击
 void MainWindow::on_pushButton_full_clicked()
 {
 
-
-switchFullScreen(!isFullScreen());
-
+  switchFullScreen(!isFullScreen());
 
 }
 
@@ -704,7 +676,6 @@ void MainWindow::ThreadFunc(int tp,QString word){
 }
 
 
-
 //影片名被改变
 void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 {
@@ -751,10 +722,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 void MainWindow::on_comboBox_part_currentIndexChanged(int index)
 {
    if(index>0)playlist->setCurrentIndex(index);
-
-
 }
-
 //切换列表显示
 void MainWindow::on_pushButton_playlist_clicked()
 {
@@ -766,7 +734,8 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->box_info->show();
         ui->box_page->show();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
-
+        //取消置顶
+        hide();setWindowFlags(Qt::Widget);show();
 
     }else{
 
@@ -775,13 +744,16 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->box_page->hide();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
         ui->tabWidget->setStyleSheet("border:0;");
+        //窗口置顶
+        hide();setWindowFlags(Qt::WindowStaysOnTopHint);show();
+
+
    }
 }
 
 void MainWindow::volumeChange(int value){
 
  ui->value_Slider->setValue(value);
-
 }
 
 void MainWindow::on_value_Slider_valueChanged(int value)
@@ -789,11 +761,6 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 
     player->setVolume(value);
 }
-
-
-
-
-
 //树形框项目被选择
 
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
@@ -808,8 +775,6 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
        if(index.parent().data().toString()=="直播列表"){ row=index.parent().row();}
 
-       //qDebug()<<playlist->mediaCount()<<row;
-
        if(playlist->mediaCount()!=type.value(row).type.size())
        {
             playlist->clear();
@@ -817,32 +782,26 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
             {
                 playlist->addMedia(QUrl(var.id));
             }
-            player->play();
-
-        }else{
-
-              playlist->setCurrentIndex(index.row());
-
+          player->play();
         }
-
-         video->setUpdatesEnabled(false);
+         if(index.parent().data().toString()=="直播列表"){ playlist->setCurrentIndex(index.row());}
 
          ui->page_info->setText("频道："+QString::number(index.row()+1)+"/"+QString::number(playlist->mediaCount()));
 
-         ui->labelTimeVideo->setText("直播模式");
+         set.live=true; ui->labelTimeVideo->setText("直播模式");
 
-         ui->sliderProgress->setEnabled(false);
-
-
+         ui->sliderProgress->setEnabled(false); video->setUpdatesEnabled(false);
 
     }else{
-         video->setUpdatesEnabled(true);
-          ui->sliderProgress->setEnabled(true);
+
+         set.live=false;
+
+         if(!ui->tree_source->isHidden()){ui->box_info->show();ui->box_page->show();}
+
          getpageinfo(1);
     }
 
 }
-
 
 void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=false){
 
@@ -917,16 +876,11 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 
 };
 
-
-
 //列表被选择
 void MainWindow::on_listWidget_currentRowChanged(int key)
 {
-
      ui->comboBox_name->setCurrentIndex(key);
-
 }
-
 
 //取分页信息
 void MainWindow::getpageinfo (int page){
@@ -1044,6 +998,8 @@ void  MainWindow:: loadPlay(bool play){
    if(play)
   {
 
+        video->setUpdatesEnabled(true);
+        ui->sliderProgress->setEnabled(true);
 
         player->stop();
         playlist->clear();
@@ -1068,30 +1024,26 @@ void  MainWindow:: loadPlay(bool play){
 //进入播放选项卡并播放视频
 void MainWindow::on_info_play_clicked()
 {
+    if(set.live)return;
     ui->tabWidget->setCurrentIndex(1);
+    set.live=false;
     loadPlay(true);
 }
 
 //上一个视频
 void MainWindow::on_info_front_clicked()
 {
-
         int index= ui->comboBox_name->currentIndex();
         if(index>0){
              player->stop();
              ui->comboBox_name->setCurrentIndex(index-1);
              loadPlay(true);
         }
-
-
-
 }
 
 //下一个视频
 void MainWindow::on_info_next_clicked()
 {
-
-
     int index= ui->comboBox_name->currentIndex();
 
     if(index+1<ui->comboBox_name->count()){
@@ -1099,20 +1051,13 @@ void MainWindow::on_info_next_clicked()
          ui->comboBox_name->setCurrentIndex(index+1);
          loadPlay(true);
     }
-
-
-
-
 }
-
 
 
 void MainWindow::on_search_ok_clicked()
 {
     if(ui->search_name->text().trimmed()==""){
-
        student_model->removeRows(0,student_model->rowCount());
-
     }else{
        echoload(true);
        QtConcurrent::run(this,&MainWindow::ThreadFunc,1,ui->search_name->text()+"|"+QString::number(ui->search_source->currentIndex()));
@@ -1122,38 +1067,28 @@ void MainWindow::on_search_ok_clicked()
 
 void MainWindow::on_search_list_pressed(const QModelIndex &index)
 {
-
      echoload(true);
+     set.live=false;
      ui->info_des->clear();
      ui->comboBox_part->clear();
      ui->comboBox_name->setCurrentIndex(index.row());
-
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     //浏览
     if(index==0){
-
-         emit show();
-
+         //echoload(true);
          ui->box_page->show();
-
          if(ui->listWidget->count()!=ui->comboBox_name->count())getpageinfo(1);
-
     //播放
     }else if(index==1){
         video->setFocus();
         ui->box_page->show();
-
     //搜索
     }else if(index==2){
-
-
         ui->box_page->hide();
-
         if(student_model->rowCount()!=ui->comboBox_name->count())on_search_ok_clicked();
-
     }
 }
 
@@ -1162,7 +1097,6 @@ void MainWindow::on_source_re_clicked()
     echoload(true);
     createSource();
     echoload(false);
-
 }
 
 
@@ -1172,3 +1106,4 @@ void MainWindow::on_search_source_currentIndexChanged(int index)
     on_search_ok_clicked();
 
 }
+

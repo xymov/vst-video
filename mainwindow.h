@@ -72,6 +72,9 @@ typedef struct Appinfo
 
    QString nopic;
 
+   bool live;
+
+
    Qt::WindowStates windowState;
 
 }Appinfo;
