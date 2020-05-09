@@ -187,11 +187,8 @@ void  MainWindow::createSource()
       model = new QStandardItemModel(ui->tree_source);//创建模型
       ui->tree_source->setModel(model);
       model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
-
       for ( int i=0; i<type.size(); i++ )
-
       {
-
           model->setItem(i,0,new QStandardItem(type.value(i).name));
 
           if(type.value(i).name!="直播列表"){ui->search_source->addItem(type[i].name);}
@@ -202,10 +199,6 @@ void  MainWindow::createSource()
            }
 
        }
-
-
-
-
 }
 
 
@@ -223,9 +216,7 @@ void MainWindow::TimerTimeOut()
 //监视对象
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
-
      if(target == video)
-
    {
 
       /*处理播放器鼠标移动消息 */
@@ -551,7 +542,16 @@ void MainWindow::on_pushButton_paly_clicked()
 //控制条下集按钮被单击
 void MainWindow::on_pushButton_next_clicked()
 {
-   playlist->next();
+    if(playlist->currentIndex()+1==playlist->mediaCount()){
+
+        on_info_next_clicked();
+
+    }else{
+
+       playlist->next();
+
+    }
+
 }
 
 //控制条静音按钮被单击
@@ -620,11 +620,9 @@ void MainWindow::on_pushButton_full_clicked()
 
 }
 
-
 void MainWindow::ThreadFunc(int tp,QString word){
    QString sname,id,api;int index;QStringList v;
      if (word=="")return;
-
 
 
      //搜索下载图片
@@ -793,10 +791,6 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
          ui->sliderProgress->setEnabled(false); video->setUpdatesEnabled(false);
 
     }else{
-
-         set.live=false;
-
-         if(!ui->tree_source->isHidden()){ui->box_info->show();ui->box_page->show();}
 
          getpageinfo(1);
     }
@@ -1024,11 +1018,13 @@ void  MainWindow:: loadPlay(bool play){
 //进入播放选项卡并播放视频
 void MainWindow::on_info_play_clicked()
 {
-    if(set.live)return;
-    ui->tabWidget->setCurrentIndex(1);
-    set.live=false;
-    loadPlay(true);
-}
+    if(ui->comboBox_part->count()>0){
+        ui->tabWidget->setCurrentIndex(1);
+        set.live=false;
+        loadPlay(true);
+    }
+
+    }
 
 //上一个视频
 void MainWindow::on_info_front_clicked()

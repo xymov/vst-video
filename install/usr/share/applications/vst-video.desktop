@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=AudioVideo;Qt;
+Comment=vst-video player
+Exec=/usr/src/vst-video/vst-video %u
+Icon=/usr/share/icons/vst-video.png
+Name=全聚合影视
+Path=/usr/src/vst-video
+Terminal=false
+Type=Application
+X-Deepin-Vendor=user-custom

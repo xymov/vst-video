@@ -1,0 +1,10 @@
+Package: vst-video
+Version: 2.2.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends:libqt5multimedia5,libqt5multimediawidgets5
+Recommends:gst123
+Installed-Size: 512
+Maintainer: nohacks@vip.qq.com
+Description: 全聚合影视 打造linux云播放平台,项目地址：https://github.com/xymov/vst-video
