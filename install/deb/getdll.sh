@@ -6,6 +6,4 @@ des="./usr/lib/vst-video" #你的路径
 deplist=$(ldd $exe | awk  '{if (match($3,"/")){ printf("%s "),$3 } }')  
 cp $deplist $des  
 
-#开始打包
-sudo chmod 755 * -R
-dpkg -b . vst-video.deb
+

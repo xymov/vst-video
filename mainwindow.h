@@ -160,6 +160,7 @@ public:
 
 private slots:
 
+
     void on_pushButton_paly_clicked();
 
     void on_pushButton_next_clicked();

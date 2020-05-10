@@ -337,10 +337,10 @@ border:none;
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton{
-    border-image:url(://rc/play_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/play_out.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://rc/play_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/play_on.png) -0px 0px no-repeat;
 }
 </string>
                  </property>
@@ -368,10 +368,10 @@ QPushButton:hover{
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton{
-    border-image:url(://rc/fashf_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/fashf_out.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://rc/fashf_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/fashf_on.png) -0px 0px no-repeat;
 }
 </string>
                  </property>
@@ -599,11 +599,11 @@ QPushButton:hover{
                   <string notr="true">
 
 QPushButton{
-    border-image:url(://rc/sound_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/sound_out.png) 0px 0px no-repeat;
 filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
 }
 QPushButton:hover{
-     border-image:url(://rc/sound_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/sound_on.png) -0px 0px no-repeat;
 border:none;
 }
 </string>
@@ -634,11 +634,11 @@ border:none;
                   <string notr="true">
 
 QPushButton{
-    border-image:url(://rc/playlist _out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/playlist _out.png) 0px 0px no-repeat;
 filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
 }
 QPushButton:hover{
-     border-image:url(://rc/playlist _on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/playlist _on.png) -0px 0px no-repeat;
 border:none;
 }
 </string>
@@ -669,11 +669,11 @@ border:none;
                   <string notr="true">
 
 QPushButton{
-    border-image:url(://rc/full_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/full_out.png) 0px 0px no-repeat;
 filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
 }
 QPushButton:hover{
-     border-image:url(://rc/full_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/full_on.png) -0px 0px no-repeat;
 border:none;
 }
 </string>

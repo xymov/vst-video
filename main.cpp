@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    a.addLibraryPath("/usr/lib/vst-video/");
+    //a.addLibraryPath("/usr/lib/vst-video/");
 
     qRegisterMetaType<SourceInfo>("SourceInfo");
     qSetMessagePattern("[ %{file}: %{line} ] %{message}");

@@ -82,7 +82,7 @@ void MainWindow::init(){
 
                   // video->setUpdatesEnabled(false);
 
-                   //图片列表框
+                  //图片列表框
 
             ui->listWidget->setIconSize(QSize(210,210));//设置图标大小
              ui->listWidget->setGridSize(QSize(240,240));       //设置item大小
@@ -143,13 +143,23 @@ void MainWindow::init(){
                         connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
                         connect(player,SIGNAL(positionChanged(qint64)),this,SLOT(positionChange(qint64)));
 
+
+                        //媒体已更改
+                        connect(player,SIGNAL(mediaChanged(QMediaContent)),this,SLOT(mediaChanged(QMediaContent)));
+
+
                         //视频长度状态发生改变
                         connect(player,SIGNAL(durationChanged(qint64)),this,SLOT(durationChange(qint64)));
 
                         //表示当前媒体的打开状态已更改
                         connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
+
+
+
                         connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
+
+
 
 
                         //表示当前媒体的播放状态已更改
@@ -417,8 +427,19 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     switch (status) {
     case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");break;
     case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
-    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());break;
-    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");break;
+    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
+
+
+        qDebug()<<"加载完毕"<<player->currentMedia().canonicalUrl().toString()<<player->currentMedia().canonicalResource().mimeType();
+
+       if(isFullScreen()){echoload(true);}
+
+        break;
+
+    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");
+
+        echoload(false);
+        break;
     case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲..."); if(isFullScreen()){echoload(true);}break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
     case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);break;
@@ -429,23 +450,23 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
 //播放器媒体状态被改变
 void MainWindow::stateChanged(QMediaPlayer::State state)
 {
-    QString play="QPushButton{border-image:url(:/pic/rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/play_on.png) -0px 0px no-repeat;}";
-    QString pause="QPushButton{border-image:url(:/pic/rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/pause_on.png) -0px 0px no-repeat;}";
+    QString play="QPushButton{border-image:url(:/pic/rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/play_on.png) -0px 0px no-repeat;}";
+    QString pause="QPushButton{border-image:url(:/pic/rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/pause_on.png) -0px 0px no-repeat;}";
 
     switch (state) {
-     case QMediaPlayer::PlayingState:ui->status->setText("正在播放"); ui->pushButton_paly->setStyleSheet(pause);break;
+     case QMediaPlayer::PlayingState:ui->status->setText("正在播放"); ui->pushButton_paly->setStyleSheet(pause);
+
+        break;
      case QMediaPlayer::PausedState:ui->status->setText("已暂停");ui->pushButton_paly->setStyleSheet(play);break;
      case QMediaPlayer::StoppedState:ui->status->setText("已停止");ui->pushButton_paly->setStyleSheet(play);break;
     }
 }
 
 
-
-
 //播放器视频长度状态发生改变
 void MainWindow::durationChange(qint64 playtime)
 {
-    if(set.live)return;
+    set.live=false;
     ui->sliderProgress->setMaximum(playtime);
     QTime t(0,0,0);
     t = t.addMSecs(playtime);
@@ -552,8 +573,8 @@ void MainWindow::on_pushButton_next_clicked()
 //控制条静音按钮被单击
 void MainWindow::on_pushButton_sound_clicked()
 {
-    QString sound="QPushButton{border-image:url(:/pic/rc/sound_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/sound_on.png) -0px 0px no-repeat;}";
-    QString mute="QPushButton{border-image:url(:/pic/rc/mute_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/mute_on.png) -0px 0px no-repeat;}";
+    QString sound="QPushButton{border-image:url(:/pic/rc/sound_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/sound_on.png) -0px 0px no-repeat;}";
+    QString mute="QPushButton{border-image:url(:/pic/rc/mute_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/mute_on.png) -0px 0px no-repeat;}";
 
     if(player->isMuted()){
         player->setMuted(false);
@@ -567,8 +588,8 @@ void MainWindow::on_pushButton_sound_clicked()
 //切换全屏状态
 void  MainWindow::switchFullScreen(bool cfull){
 
-    QString full="QPushButton{border-image:url(:/pic/rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
-    QString general="QPushButton{border-image:url(:/pic/rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
+    QString full="QPushButton{border-image:url(:/pic/rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/full_on.png) -0px 0px no-repeat;}";
+    QString general="QPushButton{border-image:url(:/pic/rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(:/pic/rc/general_on.png) -0px 0px no-repeat;}";
 
      video->setFocus();
 
@@ -658,11 +679,8 @@ void MainWindow::ThreadFunc(int tp,QString word){
      }else if(tp==3){
 
          UrlRequestImg(vInfo.pic.value(word.toInt()),toHash(vInfo.api)+"_"+vInfo.id.value(word.toInt()));
-
          QEvent event (QEvent::Type(QEvent::User+tp+word.toInt()));
-
          QApplication::postEvent(this ,new QEvent(event));
-
 
      }
 
@@ -681,9 +699,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
         QStringList v=ui->comboBox_name->itemData(index).toString().split("|");
         api=v.value(0);id=v.value(1);
 
-        //检查id是否一致
-        //qDebug()<<v;
-
+        //检查是否一致
         if(vInfo.id.value(index).toInt()==id.toInt()){
 
             ui->info_des->setHtml(todes(vInfo,index));
@@ -696,7 +712,6 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 
 
         }
-
 
         //设置预览图片
 

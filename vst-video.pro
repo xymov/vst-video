@@ -48,8 +48,29 @@ DISTFILES += \
     deb/usr/src/vst-video/vst-video \
     deb/usr/src/vst-video/vst-video.sh \
     install/DEBIAN/control \
+    install/QIFW/README \
+    install/QIFW/config/config.xml \
+    install/QIFW/packages/net.xymov.ifw/data/LICENSE \
+    install/QIFW/packages/net.xymov.ifw/data/vst-video \
+    install/QIFW/packages/net.xymov.ifw/meta/installscript.qs \
+    install/QIFW/packages/net.xymov.ifw/meta/package.xml \
     install/README \
+    install/appimage/bin/appimagetool \
+    install/appimage/bin/linuxdeployqt \
+    install/appimage/bin/patchelf \
+    install/appimage/icon.png.png \
+    install/appimage/install.sh \
+    install/appimage/vst-video.desktop \
     install/config/config.xml \
+    install/deb/DEBIAN/control \
+    install/deb/getdll.sh \
+    install/deb/install.sh \
+    install/deb/usr/share/applications/vst-video.desktop \
+    install/deb/usr/share/icons/vst-video.png \
+    install/deb/usr/src/vst-video/ico.png \
+    install/deb/usr/src/vst-video/install.sh \
+    install/deb/usr/src/vst-video/vst-video \
+    install/deb/usr/src/vst-video/vst-video.sh \
     install/install.sh \
     install/packages/net.xymov.ifw/data/LICENSE \
     install/packages/net.xymov.ifw/data/vst-video \
@@ -130,4 +151,5 @@ DISTFILES += \
     icon.png
 
 SUBDIRS += \
+    install/QIFW/vst-video.pro \
     install/vst-video.pro
