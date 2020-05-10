@@ -29,7 +29,7 @@
    <string>全聚合影视   v2.2</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
   </property>
   <property name="autoFillBackground">
@@ -142,7 +142,7 @@
          <string notr="true"/>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -234,10 +234,10 @@ border:none;
             <property name="title">
              <string/>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout">
-             <property name="bottomMargin">
-              <number>20</number>
-             </property>
              <item>
               <widget class="QLabel" name="status">
                <property name="minimumSize">
@@ -275,27 +275,48 @@ border:none;
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>22</height>
+                 <height>30</height>
                 </size>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>22</height>
-                </size>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::NoContextMenu</enum>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border:10;</string>
+               </property>
+               <property name="inputMethodHints">
+                <set>Qt::ImhNone</set>
+               </property>
+               <property name="tracking">
+                <bool>true</bool>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+               <property name="invertedControls">
+                <bool>false</bool>
+               </property>
                <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
+                <enum>QSlider::NoTicks</enum>
+               </property>
+               <property name="tickInterval">
+                <number>10</number>
                </property>
               </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <property name="spacing">
-                <number>10</number>
+                <number>7</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
                </property>
                <item>
                 <widget class="QPushButton" name="pushButton_paly">
@@ -553,7 +574,7 @@ QPushButton:hover{
                   <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="tickPosition">
-                  <enum>QSlider::TicksBothSides</enum>
+                  <enum>QSlider::NoTicks</enum>
                  </property>
                 </widget>
                </item>
@@ -878,7 +899,7 @@ border:none;
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources.qrc">:/rc/timg.jpeg</pixmap>
+          <pixmap resource="resources.qrc">:/pic/rc/timg.jpeg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -945,10 +966,10 @@ border:none;
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton{
-    border-image:url(://rc/fashr_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/fashr_out.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://rc/fashr_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/fashr_on.png) -0px 0px no-repeat;
 }
 </string>
            </property>
@@ -976,10 +997,10 @@ QPushButton:hover{
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton{
-    border-image:url(://rc/play_on.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/play_on.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://rc/play_out.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/play_out.png) -0px 0px no-repeat;
 }
 </string>
            </property>
@@ -1004,10 +1025,10 @@ QPushButton:hover{
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton{
-    border-image:url(://rc/fashf_out.png) 0px 0px no-repeat;
+    border-image:url(:/pic/rc/fashf_out.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://rc/fashf_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/fashf_on.png) -0px 0px no-repeat;
 }
 </string>
            </property>

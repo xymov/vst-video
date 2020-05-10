@@ -39,8 +39,22 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    deb/DEBIAN/control \
+    deb/install.sh \
+    deb/usr/share/applications/vst-video.desktop \
+    deb/usr/share/icons/vst-video.png \
+    deb/usr/src/vst-video/ico.png \
+    deb/usr/src/vst-video/install.sh \
+    deb/usr/src/vst-video/vst-video \
+    deb/usr/src/vst-video/vst-video.sh \
     install/DEBIAN/control \
+    install/README \
+    install/config/config.xml \
     install/install.sh \
+    install/packages/net.xymov.ifw/data/LICENSE \
+    install/packages/net.xymov.ifw/data/vst-video \
+    install/packages/net.xymov.ifw/meta/installscript.qs \
+    install/packages/net.xymov.ifw/meta/package.xml \
     install/usr/lib/vst-video/libFLAC.so.8 \
     install/usr/lib/vst-video/libGL.so.1 \
     install/usr/lib/vst-video/libGLX.so.0 \
@@ -112,7 +126,8 @@ DISTFILES += \
     install/usr/src/vst-video/vst-video \
     install/usr/src/vst-video/vst-video.sh \
     live.txt \
-    source.txt \
     vst-video \
-    install.sh \
     icon.png
+
+SUBDIRS += \
+    install/vst-video.pro

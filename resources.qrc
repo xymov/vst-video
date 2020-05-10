@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/pic">
         <file>rc/fashf_on.png</file>
         <file>rc/fashf_out.png</file>
         <file>rc/fashr_on.png</file>
@@ -23,5 +23,9 @@
         <file>rc/playlist _on.png</file>
         <file>rc/timg.jpeg</file>
         <file>icon.png</file>
+    </qresource>
+    <qresource prefix="/source">
+        <file>live.txt</file>
+        <file>source.txt</file>
     </qresource>
 </RCC>

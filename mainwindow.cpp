@@ -1,23 +1,27 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
      ui->setupUi(this);
 
+     QDir::setCurrent("./");
+
      //配置设置
-     set.sourcePath=QCoreApplication::applicationDirPath()+"/source.txt";
+     set.sourcePath=QDir::currentPath()+"/source.txt";
 
-     set.livePath=QCoreApplication::applicationDirPath()+"/live.txt";
 
-     set.cache=QCoreApplication::applicationDirPath()+"/cache/";
+     set.livePath=QDir::currentPath()+"/live.txt";
 
-     set.nopic="://rc/timg.jpeg";
 
+     set.cache=QDir::currentPath()+"/cache/";
+
+
+     set.nopic=":/pic/rc/timg.jpeg";
+
+     set.live=false;
 
      //窗口居中
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
@@ -28,8 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
      //最大化
      setWindowState(Qt::WindowMaximized);
 
-
-
      //程序初始
 
      init();
@@ -38,34 +40,27 @@ MainWindow::MainWindow(QWidget *parent)
 
 }
 
-
 MainWindow::~MainWindow()
 {
     delete ui;
-    exit(0);
-}
 
+}
 
 //初始化工作
 void MainWindow::init(){
 
-
     //检查资源文件
-    if(!isFileExist(set.sourcePath)){
-                QFile file(set.sourcePath);
-                 file.open(QIODevice::ReadWrite);
-                 file.write("OK资源,https://api.iokzy.com/inc/ldg_seackm3u8s.php\n最大资源,http://www.zdziyuan.com/inc/s_ldgm3u8_sea.php");
-                 file.close();
-            }
+    if(!isFileExist(set.sourcePath)){QFile soucre(":/source/source.txt");soucre.copy(set.sourcePath);}
+
+    if(!isFileExist(set.livePath)){QFile soucre(":/source/live.txt");soucre.copy(set.livePath);}
+
     //检查缓存目录
      if(!isDirExist(set.cache,true)){
-         //QMessageBox::warning(nullptr, "提示", "创建缓存目录(cache)失败!",QMessageBox::Yes);
+         QMessageBox::warning(nullptr, "提示", "创建缓存目录cache失败，图片显示可能异常，请手工建立!",QMessageBox::Yes);
+
      }
 
-     //qDebug()<<sourcePath<<cache;
-
   /*       控件初始化     */
-
 
                   //动态添加播放控件
                   video = new QVideoWidget;
@@ -79,8 +74,6 @@ void MainWindow::init(){
 
                   //初始化播放器
                    player = new QMediaPlayer;
-
-
                    player->setVideoOutput(video);
                    playlist = new QMediaPlaylist;
                    playlist->playbackModeChanged(QMediaPlaylist::Sequential);   //顺序播放模式
@@ -280,9 +273,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
                 }
 
-
-
-
       //处理搜索回车消息
       }else if(event->type() ==QEvent::KeyPress && (target ==ui->search_name) ){
 
@@ -388,7 +378,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
         int key=event->type()-QEvent::User-3;
 
-         createListWidget(ui->listWidget,key,false);
+        QString file=set.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
+
+        if(isFileExist(file)){createListWidget(ui->listWidget,key,false);}
 
        // qDebug()<<key;
 
@@ -437,8 +429,8 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
 //播放器媒体状态被改变
 void MainWindow::stateChanged(QMediaPlayer::State state)
 {
-    QString play="QPushButton{border-image:url(://rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/play_on.png) -0px 0px no-repeat;}";
-    QString pause="QPushButton{border-image:url(://rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/pause_on.png) -0px 0px no-repeat;}";
+    QString play="QPushButton{border-image:url(:/pic/rc/play_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/play_on.png) -0px 0px no-repeat;}";
+    QString pause="QPushButton{border-image:url(:/pic/rc/pause_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/pause_on.png) -0px 0px no-repeat;}";
 
     switch (state) {
      case QMediaPlayer::PlayingState:ui->status->setText("正在播放"); ui->pushButton_paly->setStyleSheet(pause);break;
@@ -446,6 +438,9 @@ void MainWindow::stateChanged(QMediaPlayer::State state)
      case QMediaPlayer::StoppedState:ui->status->setText("已停止");ui->pushButton_paly->setStyleSheet(play);break;
     }
 }
+
+
+
 
 //播放器视频长度状态发生改变
 void MainWindow::durationChange(qint64 playtime)
@@ -557,8 +552,8 @@ void MainWindow::on_pushButton_next_clicked()
 //控制条静音按钮被单击
 void MainWindow::on_pushButton_sound_clicked()
 {
-    QString sound="QPushButton{border-image:url(://rc/sound_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/sound_on.png) -0px 0px no-repeat;}";
-    QString mute="QPushButton{border-image:url(://rc/mute_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/mute_on.png) -0px 0px no-repeat;}";
+    QString sound="QPushButton{border-image:url(:/pic/rc/sound_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/sound_on.png) -0px 0px no-repeat;}";
+    QString mute="QPushButton{border-image:url(:/pic/rc/mute_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/mute_on.png) -0px 0px no-repeat;}";
 
     if(player->isMuted()){
         player->setMuted(false);
@@ -572,8 +567,8 @@ void MainWindow::on_pushButton_sound_clicked()
 //切换全屏状态
 void  MainWindow::switchFullScreen(bool cfull){
 
-    QString full="QPushButton{border-image:url(://rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
-    QString general="QPushButton{border-image:url(://rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
+    QString full="QPushButton{border-image:url(:/pic/rc/full_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/full_on.png) -0px 0px no-repeat;}";
+    QString general="QPushButton{border-image:url(:/pic/rc/general_out.png) 0px 0px no-repeat;}QPushButton:hover{border-image:url(://rc/general_on.png) -0px 0px no-repeat;}";
 
      video->setFocus();
 
@@ -788,7 +783,9 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
          set.live=true; ui->labelTimeVideo->setText("直播模式");
 
-         ui->sliderProgress->setEnabled(false); video->setUpdatesEnabled(false);
+         //ui->sliderProgress->setEnabled(false);
+
+         video->setUpdatesEnabled(false);
 
     }else{
 

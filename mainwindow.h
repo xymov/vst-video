@@ -589,7 +589,14 @@ private:
                                }
                                else
                                {
-                                 if (mk){qDebug()<<dir.mkdir(fullPath);return dir.mkdir(fullPath);}else{return false;}
+                                 if (mk){;
+
+                                       bool ref=  dir.mkdir(fullPath);
+
+                                       return ref;
+
+
+                                 }else{return false;}
                                }
 
 
