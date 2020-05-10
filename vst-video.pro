@@ -65,6 +65,13 @@ DISTFILES += \
     install/deb/DEBIAN/control \
     install/deb/getdll.sh \
     install/deb/install.sh \
+    install/deb/output/DEBIAN/control \
+    install/deb/output/usr/share/applications/vst-video.desktop \
+    install/deb/output/usr/share/icons/vst-video.png \
+    install/deb/output/usr/src/vst-video/ico.png \
+    install/deb/output/usr/src/vst-video/install.sh \
+    install/deb/output/usr/src/vst-video/vst-video \
+    install/deb/output/usr/src/vst-video/vst-video.sh \
     install/deb/usr/share/applications/vst-video.desktop \
     install/deb/usr/share/icons/vst-video.png \
     install/deb/usr/src/vst-video/ico.png \
