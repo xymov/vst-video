@@ -81,6 +81,7 @@ typedef struct Appinfo
 
    bool live;
 
+   bool liveload;
 
    Qt::WindowStates windowState;
 

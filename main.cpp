@@ -16,12 +16,9 @@ int main(int argc, char *argv[])
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
     qRegisterMetaType<SourceInfo>("SourceInfo");
-    qRegisterMetaType<Appinfo>("Appinfo");
+   // qRegisterMetaType<Appinfo>("Appinfo");
     qSetMessagePattern("[ %{file}: %{line} ] %{message}");
     MainWindow w;
-    //w.set.arguments=QCoreApplication::arguments();
-    //MainWindo
-    //w.arguments = QCoreApplication::arguments();
 
    ///qDebug()<<w.set
 

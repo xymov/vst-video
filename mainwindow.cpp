@@ -57,20 +57,14 @@ void MainWindow:: getCommond(){
         playlist->clear();
         for (int i=1; i<set.arguments.count();i++)
          {
-
-        if (filename.contains("://")) {
-            player->setMedia(QUrl(set.arguments.value(i)));
-
-        } else {
-            player->setMedia(QUrl::fromLocalFile(set.arguments.value(i)));
-
+             playlist->addMedia(QUrl(set.arguments.value(i)));
         }
-
-       }
 
         ui->tabWidget->setCurrentIndex(1);
         on_pushButton_playlist_clicked();
         player->play();
+
+
 
     }else{
                  //最大化
@@ -109,21 +103,10 @@ void MainWindow::init(){
                   ui->box_video->addWidget(video);
                   video->setMouseTracking(true);
                   video->setAttribute(Qt::WA_OpaquePaintEvent);
-
-                  video->setContextMenuPolicy(Qt::CustomContextMenu);
-
-                  video->show();
-
+                  video->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
                   connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ContextMenu(const QPoint&)));
 
-
-
-
-
-
-
-        //鼠标右键点击控件时会发送一个void QWidget::customContextMenuRequested(const QPoint &pos)信号
-
+                  video->show();
 
                   //初始化播放器
                    player = new QMediaPlayer;
@@ -268,12 +251,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
               video->setCursor(Qt::ArrowCursor);
               ui->box_control->show();
           }
-
-      //}else if(event->type() == QEvent::){
-
-
-
-
 
       /*处理播放器鼠标双击消息 */
 
@@ -471,7 +448,7 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
     case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");
         ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
-        //qDebug()<<"正在加载："<<player->currentMedia().canonicalUrl().toString();
+        qDebug()<<"openUrl："<<player->currentMedia().canonicalUrl().toString();
         if(isFullScreen()){echoload(true);}
         break;
     case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");echoload(false);break;
@@ -807,17 +784,10 @@ void MainWindow::on_value_Slider_valueChanged(int value)
 
 void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
-        Q_UNUSED(index);
-
-
-
 
     if(index.data().toString()=="直播列表" || index.parent().data().toString()=="直播列表"){
 
-      player->stop();
-
        int row=index.row();
-
 
        ui->tabWidget->setCurrentIndex(1);
 
@@ -837,8 +807,7 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
          if(index.parent().data().toString()=="直播列表"){ playlist->setCurrentIndex(index.row());}
 
-         player->play();
-
+          player->play();
 
          ui->page_info->setText("频道："+QString::number(index.row()+1)+"/"+QString::number(playlist->mediaCount()));
 

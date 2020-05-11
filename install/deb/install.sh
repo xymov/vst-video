@@ -9,4 +9,5 @@
 
 #开始打包
 sudo chmod 755 * -R
-dpkg -b output vst-video.deb
+
+ dpkg -b output vst-video.deb
