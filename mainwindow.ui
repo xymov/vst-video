@@ -26,7 +26,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视   v2.21</string>
+   <string>全聚合影视   v2.3</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -142,7 +142,7 @@
          <string notr="true"/>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -1044,6 +1044,116 @@ QPushButton:hover{
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1099</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <widget class="QMenu" name="menu_5">
+     <property name="title">
+      <string>打开</string>
+     </property>
+     <addaction name="action_open"/>
+     <addaction name="action_openurl"/>
+    </widget>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>亮度</string>
+     </property>
+     <addaction name="action_brightness_add"/>
+     <addaction name="action_brightness_sub"/>
+    </widget>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>对比度</string>
+     </property>
+     <addaction name="action_contrast_add"/>
+     <addaction name="action_contrast_sub"/>
+    </widget>
+    <widget class="QMenu" name="menu_2">
+     <property name="title">
+      <string>饱和度</string>
+     </property>
+     <addaction name="action_Saturation_add"/>
+     <addaction name="action_Saturation_sub"/>
+    </widget>
+    <addaction name="menu_5"/>
+    <addaction name="menu_6"/>
+    <addaction name="menu_7"/>
+    <addaction name="menu_2"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <action name="action_3">
+   <property name="text">
+    <string>亮度</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>对比度</string>
+   </property>
+  </action>
+  <action name="action_open">
+   <property name="text">
+    <string>打开本地文件</string>
+   </property>
+  </action>
+  <action name="action_openurl">
+   <property name="text">
+    <string>打开远程地址</string>
+   </property>
+  </action>
+  <action name="action_brightness_add">
+   <property name="text">
+    <string>亮度+</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Up</string>
+   </property>
+  </action>
+  <action name="action_brightness_sub">
+   <property name="text">
+    <string>亮度-</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Down</string>
+   </property>
+  </action>
+  <action name="action_contrast_add">
+   <property name="text">
+    <string>对比度+</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Up</string>
+   </property>
+  </action>
+  <action name="action_contrast_sub">
+   <property name="text">
+    <string>对比度-</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Down</string>
+   </property>
+  </action>
+  <action name="action_Saturation_add">
+   <property name="text">
+    <string>饱和度+</string>
+   </property>
+  </action>
+  <action name="action_Saturation_sub">
+   <property name="text">
+    <string>饱和度-</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>

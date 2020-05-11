@@ -29,15 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
      //默认大小
      resize(QSize(800,600));
 
-     //最大化
-     setWindowState(Qt::WindowMaximized);
-
      //程序初始
 
      init();
 
      createSource();
 
+     getCommond();
 }
 
 MainWindow::~MainWindow()
@@ -46,17 +44,54 @@ MainWindow::~MainWindow()
 
 }
 
+//检查命令行
+
+void MainWindow:: getCommond(){
+
+    set.arguments=QCoreApplication::arguments();
+
+    QString filename ;
+
+    if(set.arguments.count()>1){
+
+        playlist->clear();
+        for (int i=1; i<set.arguments.count();i++)
+         {
+
+        if (filename.contains("://")) {
+            player->setMedia(QUrl(set.arguments.value(i)));
+
+        } else {
+            player->setMedia(QUrl::fromLocalFile(set.arguments.value(i)));
+
+        }
+
+       }
+
+        ui->tabWidget->setCurrentIndex(1);
+        on_pushButton_playlist_clicked();
+        player->play();
+
+    }else{
+                 //最大化
+        setWindowState(Qt::WindowMaximized);
+    }
+
+
+}
+
+
 //初始化工作
 void MainWindow::init(){
 
     //检查资源文件
     if(!isFileExist(set.sourcePath)){
-        QFile soucre(":/source/source.txt");soucre.copy(set.sourcePath);
+        QFile soucre(":/source/rc/source.txt");soucre.copy(set.sourcePath);
          QFile(set.sourcePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
     }
 
     if(!isFileExist(set.livePath)){
-        QFile soucre(":/source/live.txt");soucre.copy(set.livePath);
+        QFile soucre(":/source/rc/live.txt");soucre.copy(set.livePath);
         QFile(set.livePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
       }
 
@@ -75,7 +110,19 @@ void MainWindow::init(){
                   video->setMouseTracking(true);
                   video->setAttribute(Qt::WA_OpaquePaintEvent);
 
+                  video->setContextMenuPolicy(Qt::CustomContextMenu);
+
                   video->show();
+
+                  connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ContextMenu(const QPoint&)));
+
+
+
+
+
+
+
+        //鼠标右键点击控件时会发送一个void QWidget::customContextMenuRequested(const QPoint &pos)信号
 
 
                   //初始化播放器
@@ -126,22 +173,16 @@ void MainWindow::init(){
                 ui->search_list->setSelectionBehavior(QAbstractItemView::SelectRows);   //设置选中时为整行选中
                 ui->search_list->setEditTriggers(QAbstractItemView::NoEditTriggers);     //不可编辑
 
-
-
            //定时器
             m_timer = new QTimer;
             m_timer->setSingleShot(false);
            // m_timer->start(1000);
             connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
-
            ui->value_Slider->hide();                      //音量调节隐藏
            ui->info_pic->setAlignment(Qt::AlignCenter);  //视频信息图片居中
            ui->page_info->setText("");                   //页数信息默认清空
-
-
-
+           ui->menuBar->hide();       //隐藏菜单
             /*  各种信号 与 槽    */
-
                         //关联退出信号
                         connect(this,SIGNAL(quit()),&load,SLOT(close()));
 
@@ -155,9 +196,7 @@ void MainWindow::init(){
                         //表示当前媒体的打开状态已更改
                         connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
-
                         connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
-
 
                         //表示当前媒体的播放状态已更改
                         connect(player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(stateChanged(QMediaPlayer::State)));
@@ -174,10 +213,9 @@ void MainWindow::init(){
                             ui->pushButton_sound->installEventFilter(this);
 
                             ui->value_Slider->installEventFilter(this);
-
 }
 
-//
+//刷新资源列表
 void  MainWindow::createSource()
 
 {
@@ -213,6 +251,8 @@ void MainWindow::TimerTimeOut()
     }
 }
 
+
+
 //监视对象
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
@@ -228,6 +268,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
               video->setCursor(Qt::ArrowCursor);
               ui->box_control->show();
           }
+
+      //}else if(event->type() == QEvent::){
+
+
+
 
 
       /*处理播放器鼠标双击消息 */
@@ -1116,3 +1161,85 @@ void MainWindow::on_search_source_currentIndexChanged(int index)
 
 }
 
+
+
+void MainWindow::ContextMenu(const QPoint &pos){
+
+     Q_UNUSED(pos);
+     ui->menu->exec(QCursor::pos());
+
+}
+
+//打开 本地
+void MainWindow::on_action_open_triggered()
+{
+        //选择多个文件
+        QString curPath=QDir::currentPath();//获取系统当前目录
+        QString dlgTitle="选择多个文件"; //对话框标题
+        QString filter="视频文件(*.mp4 *.avi *.wmv *.mpg *.mpeg *.m3u8 *.rmvb *.3gp *.mov *.swf *.flv);;音频文件(*.mp3 *. *.wav *.flac *.ogg *.ape *.cda *.mid *.voc);;所有文件(*.*)"; //文件过滤器
+        QStringList fileList=QFileDialog::getOpenFileNames(this,dlgTitle,curPath,filter);
+        if(fileList.count()>0)
+        {
+           playlist->clear();
+           for (int i=0; i<fileList.count();i++)
+            {
+               playlist->addMedia(QUrl::fromLocalFile(fileList.value(i)));
+             }
+           player->play();
+        }
+}
+
+void MainWindow::on_action_openurl_triggered()
+{
+
+      QString dlgTitle="输入对话框";
+      QString txtLabel="请输入远程地址";
+      QString defaultInput="";
+        QLineEdit::EchoMode echoMode=QLineEdit::Normal;//正常文字输入
+
+        //QLineEdit::EchoMode echoMode=QLineEdit::Password;//密码输入
+        bool ok=false;
+
+        QString text = QInputDialog::getText(this, dlgTitle,txtLabel, echoMode,defaultInput, &ok);
+
+
+        if (ok && !text.isEmpty()&&!text.isEmpty()){
+          player->setMedia(QUrl(text));
+          player->play();
+
+
+          //qDebug()<<filename;
+      }
+
+}
+//亮度+-
+void MainWindow::on_action_brightness_add_triggered()
+{
+
+    video->setBrightness(video->brightness()+10);
+}
+
+void MainWindow::on_action_brightness_sub_triggered()
+{
+    video->setBrightness(video->brightness()-10);
+}
+//对比度 +-
+void MainWindow::on_action_contrast_add_triggered()
+{
+    video->setContrast(video->contrast()+10);
+}
+
+void MainWindow::on_action_contrast_sub_triggered()
+{
+    video->setContrast(video->contrast()-10);
+}
+//饱和度
+void MainWindow::on_action_Saturation_add_triggered()
+{
+    video->setSaturation(video->saturation()+10);
+}
+
+void MainWindow::on_action_Saturation_sub_triggered()
+{
+    video->setSaturation(video->saturation()-10);
+}

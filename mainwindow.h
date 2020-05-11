@@ -50,13 +50,18 @@
 #include <QListWidget>
 
 
-
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QtConcurrent>
 #include <QListWidgetItem>
 #include <QScrollBar>
+#include <QFileDialog>
+#include <QInputDialog>
+
+
+
+
 
 
 //运行信息
@@ -71,6 +76,8 @@ typedef struct Appinfo
    QString cache;
 
    QString nopic;
+
+   QStringList arguments;
 
    bool live;
 
@@ -158,6 +165,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
 private slots:
 
 
@@ -228,6 +236,23 @@ private slots:
 
      void on_search_source_currentIndexChanged(int index);
 
+     void ContextMenu(const QPoint &pos);
+
+     void on_action_open_triggered();
+
+     void on_action_openurl_triggered();
+
+     void on_action_brightness_add_triggered();
+
+     void on_action_brightness_sub_triggered();
+
+     void on_action_contrast_add_triggered();
+
+     void on_action_contrast_sub_triggered();
+
+     void on_action_Saturation_add_triggered();
+
+     void on_action_Saturation_sub_triggered();
 
 signals:
      void quit();
@@ -236,7 +261,7 @@ private:
 
     Ui::MainWindow *ui;
 
-
+   void  getCommond();
     void  createSource();
 
     bool eventFilter(QObject *target, QEvent *event);
@@ -251,6 +276,7 @@ private:
     QString API;
     loading load;
     QTimer *m_timer;
+
     void createListWidget(QListWidget *listWidget,int key,bool insert);
 
     void  switchFullScreen(bool);

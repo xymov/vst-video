@@ -85,6 +85,7 @@ DISTFILES += \
     install/deb/usr/src/vst-video/vst-video \
     install/deb/usr/src/vst-video/vst-video.sh \
     install/install.sh \
+    install/install.sh \
     install/packages/net.xymov.ifw/data/LICENSE \
     install/packages/net.xymov.ifw/data/vst-video \
     install/packages/net.xymov.ifw/meta/installscript.qs \

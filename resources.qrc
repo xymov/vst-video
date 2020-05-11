@@ -25,7 +25,7 @@
         <file>icon.png</file>
     </qresource>
     <qresource prefix="/source">
-        <file>live.txt</file>
-        <file>source.txt</file>
+        <file>rc/live.txt</file>
+        <file>rc/source.txt</file>
     </qresource>
 </RCC>
