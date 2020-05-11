@@ -55,12 +55,18 @@ DISTFILES += \
     install/QIFW/packages/net.xymov.ifw/meta/installscript.qs \
     install/QIFW/packages/net.xymov.ifw/meta/package.xml \
     install/README \
+    install/README.md \
     install/appimage/bin/appimagetool \
     install/appimage/bin/linuxdeployqt \
     install/appimage/bin/patchelf \
     install/appimage/icon.png.png \
     install/appimage/install.sh \
     install/appimage/vst-video.desktop \
+    install/bin/README.md \
+    install/bin/appimagetool \
+    install/bin/install.sh \
+    install/bin/linuxdeployqt \
+    install/bin/patchelf \
     install/config/config.xml \
     install/deb/DEBIAN/control \
     install/deb/getdll.sh \
@@ -157,5 +163,6 @@ DISTFILES += \
     icon.png
 
 SUBDIRS += \
+    install/QIFW/vst-video.pro \
     install/QIFW/vst-video.pro \
     install/vst-video.pro
