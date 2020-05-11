@@ -153,7 +153,6 @@ DISTFILES += \
     install/usr/src/vst-video/source.txt \
     install/usr/src/vst-video/vst-video \
     install/usr/src/vst-video/vst-video.sh \
-    live.txt \
     vst-video \
     icon.png
 

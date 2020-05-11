@@ -229,7 +229,6 @@ private slots:
      void on_search_source_currentIndexChanged(int index);
 
 
-
 signals:
      void quit();
 
@@ -383,8 +382,25 @@ private:
                     ba += "     " + data + "\n";
                     file.write( ba );
                     file.close();
+
+
                 }
             }
+
+       QByteArray Readfile(const QString &file)
+       {
+           QByteArray ba;
+           QFile cfile(file);
+                  if( cfile.open(QIODevice::ReadOnly|QIODevice::Text) ){
+                      QByteArray ba =cfile.readAll();
+                      cfile.close();
+                  }
+                 return ba;
+        }
+
+
+
+
 
 
       //xml文本转dom对象
@@ -511,6 +527,13 @@ private:
                  if(info.type.size()>0){type.append(info);}
               }
           }
+
+
+
+
+
+
+
 
                      //搜索资源站
                      void  search(QString  searchword,int ctype=0){

@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    //a.addLibraryPath("/usr/lib/vst-video/");
+    //解决汉字乱码问题
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForLocale(codec);
 
     qRegisterMetaType<SourceInfo>("SourceInfo");
     qSetMessagePattern("[ %{file}: %{line} ] %{message}");

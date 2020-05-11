@@ -50,9 +50,15 @@ MainWindow::~MainWindow()
 void MainWindow::init(){
 
     //检查资源文件
-    if(!isFileExist(set.sourcePath)){QFile soucre(":/source/source.txt");soucre.copy(set.sourcePath);}
+    if(!isFileExist(set.sourcePath)){
+        QFile soucre(":/source/source.txt");soucre.copy(set.sourcePath);
+         QFile(set.sourcePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    }
 
-    if(!isFileExist(set.livePath)){QFile soucre(":/source/live.txt");soucre.copy(set.livePath);}
+    if(!isFileExist(set.livePath)){
+        QFile soucre(":/source/live.txt");soucre.copy(set.livePath);
+        QFile(set.livePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+      }
 
     //检查缓存目录
      if(!isDirExist(set.cache,true)){
@@ -143,11 +149,6 @@ void MainWindow::init(){
                         connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
                         connect(player,SIGNAL(positionChanged(qint64)),this,SLOT(positionChange(qint64)));
 
-
-                        //媒体已更改
-                        connect(player,SIGNAL(mediaChanged(QMediaContent)),this,SLOT(mediaChanged(QMediaContent)));
-
-
                         //视频长度状态发生改变
                         connect(player,SIGNAL(durationChanged(qint64)),this,SLOT(durationChange(qint64)));
 
@@ -155,11 +156,7 @@ void MainWindow::init(){
                         connect(player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
 
-
-
                         connect(player,SIGNAL(volumeChanged(int)),this,SLOT(volumeChange(int)));
-
-
 
 
                         //表示当前媒体的播放状态已更改
@@ -427,19 +424,12 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
     switch (status) {
     case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");break;
     case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
-    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
-
-
-        qDebug()<<"加载完毕"<<player->currentMedia().canonicalUrl().toString()<<player->currentMedia().canonicalResource().mimeType();
-
-       if(isFullScreen()){echoload(true);}
-
+    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");
+        ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
+        //qDebug()<<"正在加载："<<player->currentMedia().canonicalUrl().toString();
+        if(isFullScreen()){echoload(true);}
         break;
-
-    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");
-
-        echoload(false);
-        break;
+    case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");echoload(false);break;
     case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲..."); if(isFullScreen()){echoload(true);}break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
     case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);break;
@@ -755,7 +745,6 @@ void MainWindow::on_pushButton_playlist_clicked()
         //窗口置顶
         hide();setWindowFlags(Qt::WindowStaysOnTopHint);show();
 
-
    }
 }
 
@@ -775,24 +764,36 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 {
         Q_UNUSED(index);
 
+
+
+
     if(index.data().toString()=="直播列表" || index.parent().data().toString()=="直播列表"){
 
+      player->stop();
+
        int row=index.row();
+
 
        ui->tabWidget->setCurrentIndex(1);
 
        if(index.parent().data().toString()=="直播列表"){ row=index.parent().row();}
 
-       if(playlist->mediaCount()!=type.value(row).type.size())
+       //if(playlist->mediaCount()!=type.value(row).type.size())
+
+       if(!set.live)
        {
             playlist->clear();
             foreach(Nameinfo var,type.value(row).type)
             {
                 playlist->addMedia(QUrl(var.id));
             }
-          player->play();
+            set.live=true;
         }
+
          if(index.parent().data().toString()=="直播列表"){ playlist->setCurrentIndex(index.row());}
+
+         player->play();
+
 
          ui->page_info->setText("频道："+QString::number(index.row()+1)+"/"+QString::number(playlist->mediaCount()));
 

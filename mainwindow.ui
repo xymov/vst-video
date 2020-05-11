@@ -26,7 +26,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视   v2.2</string>
+   <string>全聚合影视   v2.21</string>
   </property>
   <property name="windowIcon">
    <iconset>
