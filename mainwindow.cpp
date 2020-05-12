@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 
      QDir::setCurrent("./");
 
+
      //配置设置
      set.sourcePath=QDir::currentPath()+"/source.txt";
 
@@ -31,15 +32,17 @@ MainWindow::MainWindow(QWidget *parent)
 
      //程序初始
 
-     init();
 
-     createSource();
+     init();
 
      getCommond();
 }
 
 MainWindow::~MainWindow()
 {
+
+    player->stop();
+    video->close();
     delete ui;
 
 }
@@ -64,13 +67,10 @@ void MainWindow:: getCommond(){
         on_pushButton_playlist_clicked();
         player->play();
 
-
-
     }else{
-                 //最大化
-        setWindowState(Qt::WindowMaximized);
+         setWindowState(Qt::WindowMaximized);
+         on_source_re_clicked();
     }
-
 
 }
 
@@ -118,6 +118,16 @@ void MainWindow::init(){
 
                   // video->setUpdatesEnabled(false);
 
+
+                //资源列表
+                  ui->tree_source->setEditTriggers(QAbstractItemView::NoEditTriggers);   //不可编辑
+                  model = new QStandardItemModel(ui->tree_source);//创建模型
+                  ui->tree_source->setModel(model);
+                model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
+               // model->setItem(0,0,new QStandardItem("正在刷新.."));
+
+
+
                   //图片列表框
 
             ui->listWidget->setIconSize(QSize(210,210));//设置图标大小
@@ -155,6 +165,11 @@ void MainWindow::init(){
                 ui->search_list->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection); // 只能单选
                 ui->search_list->setSelectionBehavior(QAbstractItemView::SelectRows);   //设置选中时为整行选中
                 ui->search_list->setEditTriggers(QAbstractItemView::NoEditTriggers);     //不可编辑
+
+
+
+
+
 
            //定时器
             m_timer = new QTimer;
@@ -198,29 +213,6 @@ void MainWindow::init(){
                             ui->value_Slider->installEventFilter(this);
 }
 
-//刷新资源列表
-void  MainWindow::createSource()
-
-{
-      ui->tree_source->reset();
-      ui->tree_source->setEditTriggers(QAbstractItemView::NoEditTriggers);   //不可编辑
-      getclass(set.sourcePath);getlive(set.livePath);
-      model = new QStandardItemModel(ui->tree_source);//创建模型
-      ui->tree_source->setModel(model);
-      model->setHorizontalHeaderLabels(QStringList()<<QStringLiteral("资源列表"));
-      for ( int i=0; i<type.size(); i++ )
-      {
-          model->setItem(i,0,new QStandardItem(type.value(i).name));
-
-          if(type.value(i).name!="直播列表"){ui->search_source->addItem(type[i].name);}
-
-           foreach (Nameinfo var,type[i].type)
-           {
-                 model->item(i)->appendRow(new QStandardItem(var.name));
-           }
-
-       }
-}
 
 
 void MainWindow::TimerTimeOut()
@@ -326,24 +318,22 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
 
 
-   //线程搜索下载图片结束
+   //获取资源数据结束
    }else if(event->type() ==QEvent::User){
 
-        //取关联数据
-         QStringList v=ui->comboBox_name->itemData(ui->comboBox_name->currentIndex()).toString().split("|");
+         model->removeRows(0,model->rowCount());
+         model->setItem(0,0,new QStandardItem("正在刷新..."));
+         for ( int i=0; i<type.size(); i++ )
+         {
+             model->setItem(i,0,new QStandardItem(type.value(i).name));
+             if(type.value(i).name!="直播列表"){ui->search_source->addItem(type[i].name);}
+              foreach (Nameinfo var,type[i].type)
+              {
+                    model->item(i)->appendRow(new QStandardItem(var.name));
+              }
 
-        //设置预览图片
-
-        QString file=set.cache+toHash(v.value(0))+"_"+v.value(1)+".jpg";
-
-        if(!isFileExist(file)){file=set.nopic;}
-
-        QPixmap pixmap(file);
-
-        ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
-
-        ui->info_pic->setPixmap(pixmap);
-
+          }
+         //qDebug()<<"type size:"<<type.size();
 
   //线程搜索影片列表结束      
   }else if(event->type() ==QEvent::User+1){
@@ -380,7 +370,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
             if(!isFileExist(set.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg"))
             {
 
-               QtConcurrent::run(this,&MainWindow::ThreadFunc,0,vInfo.pic.value(i)+"|"+vInfo.api+"|"+vInfo.id.value(i));
+               QtConcurrent::run(this,&MainWindow::ThreadFunc,3,vInfo.pic.value(i)+"|"+vInfo.api+"|"+vInfo.id.value(i));
 
             }
 
@@ -402,10 +392,31 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
        echoload(false);
 
-    //浏览下载图片结束
-    }else if(event->type()>(QEvent::User+2)){
 
-        int key=event->type()-QEvent::User-3;
+    //线程搜索下载图片结束
+   }else if(event->type()==QEvent::User+3){
+
+         //取关联数据
+          QStringList v=ui->comboBox_name->itemData(ui->comboBox_name->currentIndex()).toString().split("|");
+
+         //设置预览图片
+
+         QString file=set.cache+toHash(v.value(0))+"_"+v.value(1)+".jpg";
+
+         if(!isFileExist(file)){file=set.nopic;}
+
+         QPixmap pixmap(file);
+
+         ui->info_pic->setAlignment(Qt::AlignCenter);  //图片居中
+
+         ui->info_pic->setPixmap(pixmap);
+
+
+
+    //浏览下载图片结束
+    }else if(event->type()>(QEvent::User+3)){
+
+        int key=event->type()-QEvent::User-4;
 
         QString file=set.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
 
@@ -564,7 +575,6 @@ void MainWindow::on_pushButton_paly_clicked()
      player->play();
 
   }
-  // qApp->processEvents();
 
 }
 //控制条下集按钮被单击
@@ -653,43 +663,51 @@ void MainWindow::ThreadFunc(int tp,QString word){
      if (word=="")return;
 
 
-     //搜索下载图片
+     //下载搜索资源图片
      if(tp==0){
 
-         v=word.split("|");
+        //取资源数据
+         // type.clear();
+          QMutexLocker locker(&mtx);
+          getclass(set.sourcePath);getlive(set.livePath);
+          QEvent event (QEvent::Type(QEvent::User+tp));
+          QApplication::postEvent(this ,new QEvent(event));
 
-         UrlRequestImg(v.value(0),toHash(v.value(1))+"_"+v.value(2));
 
-         qDebug()<<word;
-
-
-
-         QEvent event (QEvent::Type(QEvent::User+0));
-
-         QApplication::postEvent(this ,new QEvent(event));
 
      }else if(tp==1){
-
-
-
-           v=word.split("|");
-           search(v.value(0),v.value(1).toInt());
-         QEvent event (QEvent::Type(QEvent::User+1));
+       //获取搜索影片数据
+         v=word.split("|");
+         search(v.value(0),v.value(1).toInt());
+         QEvent event (QEvent::Type(QEvent::User+tp));
          QApplication::postEvent(this ,new QEvent(event));
 
 
      }else if(tp==2){
-         //取关联数据
+        //获取浏览影片数据
          index=ui->comboBox_name->currentIndex();
          v=ui->comboBox_name->itemData(index).toString().split("|");
          api=v.value(0);id=v.value(1);
          getvideo(tp,api,id);
 
-         QEvent event (QEvent::Type(QEvent::User+2));
+         QEvent event (QEvent::Type(QEvent::User+tp));
          QApplication::postEvent(this ,new QEvent(event));
 
-     }else if(tp==3){
+      }else if(tp==3){
 
+         //下载搜索图片
+
+          v=word.split("|");
+
+         UrlRequestImg(v.value(0),toHash(v.value(1))+"_"+v.value(2));
+
+         QEvent event (QEvent::Type(QEvent::User+tp));
+
+         QApplication::postEvent(this ,new QEvent(event));
+
+
+     }else if(tp==4){
+        //下载浏览图片
          UrlRequestImg(vInfo.pic.value(word.toInt()),toHash(vInfo.api)+"_"+vInfo.id.value(word.toInt()));
          QEvent event (QEvent::Type(QEvent::User+tp+word.toInt()));
          QApplication::postEvent(this ,new QEvent(event));
@@ -828,6 +846,8 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 
     if(!create && listWidget->count()<=key)return;
 
+    QMutexLocker locker(&mtx);
+
     if(key>=vInfo.id.size() || key>=vInfo.name.size())return;
 
 
@@ -875,7 +895,7 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 
             item->setSizeHint(QSize(240,240));
 
-           mutex.lock();
+          // mutex.lock();
 
            if(create){
 
@@ -893,7 +913,7 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
 
            }
 
-          mutex.unlock();
+//          mutex.unlock();
 
 };
 
@@ -931,7 +951,8 @@ void MainWindow::getpageinfo (int page){
 
       ui->listWidget->clear(); isDirExist(set.cache,true);
 
-      getvideo(4,api,id,QString::number(page));
+       getvideo(4,api,id,QString::number(page));
+
 
 
        ui->comboBox_name->clear();ui->comboBox_part->clear();
@@ -946,15 +967,15 @@ void MainWindow::getpageinfo (int page){
 
          if(!isFileExist(file)){
 
-            QtConcurrent::run(this,&MainWindow::ThreadFunc,3,QString::number(i));
+            QtConcurrent::run(this,&MainWindow::ThreadFunc,4,QString::number(i));
 
          }
 
      }
 
       if(ui->comboBox_name->count()==0){
-         //echoload(false);
-         //QMessageBox::warning(nullptr, "提示", "未找到任何资源!",QMessageBox::Yes);
+         echoload(false);
+         QMessageBox::warning(nullptr, "提示", "当前分类无资源!",QMessageBox::Yes);
       }
 
     //connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(On_listWidgetItem(QListWidgetItem*)));
@@ -1011,7 +1032,6 @@ void MainWindow::loadMedia(int key){
 }
 
 
-
 //加载播放
 
 void  MainWindow:: loadPlay(bool play){
@@ -1039,8 +1059,6 @@ void  MainWindow:: loadPlay(bool play){
         player->pause();
    }
 }
-
-
 
 //进入播放选项卡并播放视频
 void MainWindow::on_info_play_clicked()
@@ -1117,11 +1135,10 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 void MainWindow::on_source_re_clicked()
 {
-    echoload(true);
-    createSource();
-    echoload(false);
+    model->removeRows(0,model->rowCount());
+    model->setItem(0,0,new QStandardItem("正在刷新..."));
+    QtConcurrent::run(this,&MainWindow::ThreadFunc,0,QString::number(1));
 }
-
 
 void MainWindow::on_search_source_currentIndexChanged(int index)
 {
@@ -1129,8 +1146,6 @@ void MainWindow::on_search_source_currentIndexChanged(int index)
     on_search_ok_clicked();
 
 }
-
-
 
 void MainWindow::ContextMenu(const QPoint &pos){
 

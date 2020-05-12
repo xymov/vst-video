@@ -1000,7 +1000,7 @@ QPushButton:hover{
     border-image:url(:/pic/rc/play_on.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(:/pic/rc/play_out.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/play_on.png) -0px 0px no-repeat;
 }
 </string>
            </property>

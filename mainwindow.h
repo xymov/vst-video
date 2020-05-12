@@ -255,6 +255,7 @@ private slots:
 
      void on_action_Saturation_sub_triggered();
 
+
 signals:
      void quit();
 
@@ -263,7 +264,7 @@ private:
     Ui::MainWindow *ui;
 
    void  getCommond();
-    void  createSource();
+
 
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
@@ -277,6 +278,8 @@ private:
     QString API;
     loading load;
     QTimer *m_timer;
+    QMutex mtx;
+
 
     void createListWidget(QListWidget *listWidget,int key,bool insert);
 
@@ -518,6 +521,8 @@ private:
     //取所有资源类型
        void getclass(const QString pfile){
 
+          //QQueue<Nameinfo>type;
+
            QFile file(pfile);type.clear();
             if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
                 for(int i=0;!file.atEnd();i++){
@@ -527,6 +532,12 @@ private:
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
                      getvideo(3,info.api);info.type=vInfo.type;type.insert(i,info);
+
+
+
+
+
+                     //type.insert(i,info);
                      }
                 }
               file.close();
@@ -544,7 +555,7 @@ private:
                        if(str!=""){
                         QStringList list =str.split(",");
                         Nameinfo var; var.name=list.value(0);var.id=list.value(1);
-                        info.type.insert(i,var);;
+                        info.type.insert(i,var);
 
                         //info.type[i].name=list.value(0);info.type[i].id=list.value(1);
                        }

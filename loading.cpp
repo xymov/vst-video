@@ -26,6 +26,7 @@ loading::loading(QWidget *parent) :
         ui->lbl_gif->setMovie(movie);
         movie->start();
 
+
        connect(new QShortcut(QKeySequence(Qt::Key_Escape),this), SIGNAL(activated()), this, SLOT(close()));
 
 }
