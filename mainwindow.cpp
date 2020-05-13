@@ -44,6 +44,7 @@ MainWindow::~MainWindow()
     player->stop();
     video->close();
     delete ui;
+    exit(0);
 
 }
 
@@ -103,8 +104,13 @@ void MainWindow::init(){
                   ui->box_video->addWidget(video);
                   video->setMouseTracking(true);
                   video->setAttribute(Qt::WA_OpaquePaintEvent);
+                  //播放器右键菜单关联
                   video->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
-                  connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ContextMenu(const QPoint&)));
+                  connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(PlayMenu(const QPoint&)));
+                  //浏览器右键菜单管理
+                  ui->listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+                  connect(ui->listWidget,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ExploreMenu(const QPoint&)));
+
                   video->show();
 
                   // 缩放 Qt::KeepAspectRatio,铺满 Qt::IgnoreAspectRatio ，拉伸 Qt::KeepAspectRatioByExpanding  不缩放  Default
@@ -1150,12 +1156,7 @@ void MainWindow::on_search_source_currentIndexChanged(int index)
 
 }
 
-void MainWindow::ContextMenu(const QPoint &pos){
 
-     Q_UNUSED(pos);
-     ui->menu->exec(QCursor::pos());
-
-}
 
 //打开 本地
 void MainWindow::on_action_open_triggered()
@@ -1268,10 +1269,62 @@ void MainWindow::setVideoMode(Qt::AspectRatioMode mode){
 
 }
 
-
+//打开设置窗口
 void MainWindow::on_source_set_clicked()
 {
-    //seting=new set;
+  emit setshow();
+}
 
-emit setshow();
+//播放器弹出菜单
+void MainWindow::PlayMenu(const QPoint &pos){
+
+     Q_UNUSED(pos);
+
+     ui->menu_play->exec(QCursor::pos());
+
+}
+
+//浏览器弹出菜单
+void MainWindow::ExploreMenu(const QPoint &pos){
+
+    Q_UNUSED(pos);
+    ui->menu_explore->exec(QCursor::pos());
+
+}
+
+void MainWindow::on_action_explore_play_triggered()
+{
+    on_info_play_clicked();
+}
+
+
+void MainWindow::on_action_explore_xopen_triggered()
+{
+    if(ui->comboBox_part->count()>0){
+    open(ui->comboBox_part->itemData(ui->comboBox_part->currentIndex()).toString());
+    }
+}
+
+
+void MainWindow::on_action_explore_xplay_triggered()
+{
+
+    if(ui->comboBox_part->count()>0){
+        echoload(true);
+        OpenM3u8(ui->comboBox_part->itemData(ui->comboBox_part->currentIndex()).toString());
+        echoload(false);
+    }
+
+}
+
+void MainWindow::on_action_explore_xnew_triggered()
+{
+    if(ui->comboBox_part->count()>0){
+
+    open(QDir::currentPath()+"/vst-video ",ui->comboBox_part->itemData(ui->comboBox_part->currentIndex()).toString());
+
+    qDebug()<<QDir::currentPath()+"/vst-video";
+
+
+    }
 }

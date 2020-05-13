@@ -231,7 +231,9 @@ private slots:
 
      void on_search_source_currentIndexChanged(int index);
 
-     void ContextMenu(const QPoint &pos);
+     void PlayMenu(const QPoint &pos);
+
+     void ExploreMenu(const QPoint &pos);
 
      void on_action_open_triggered();
 
@@ -257,6 +259,14 @@ private slots:
      void on_action_videosize_KeepAspectRatioByExpanding_triggered();
 
      void on_source_set_clicked();
+
+     void on_action_explore_play_triggered();
+
+     void on_action_explore_xopen_triggered();
+
+     void on_action_explore_xplay_triggered();
+
+     void on_action_explore_xnew_triggered();
 
 signals:
      void quit();
@@ -643,5 +653,76 @@ private:
 
                            }
 
-              };
+                 //调用默认程序打开命令行
+                  void open(QString url,QString shell="xdg-open"){
+
+                     #ifdef Q_OS_WIN32
+
+                       QString m_szHelpDoc = QString("file:///") + url;
+                       bool is_open = QDesktopServices::openUrl(QUrl(m_szHelpDoc, QUrl::TolerantMode));
+                       if(!is_open)
+                       {
+                           LogWriter::getLogCenter()->PrintLog(LOG_ERROR,"open help doc failed" );
+                           LogWriter::getLogCenter()->SaveFileLog(LOG_ERROR,"open help doc failed" );
+                           return;
+                       }
+                   #else
+
+                       QString  cmd= shell+QString(" ")+ url; //在linux下，可以通过system来xdg-open命令调用默认程序打开文件；
+
+                       system(cmd.toStdString().c_str());
+                   #endif
+
+                     }
+
+                 //调用默认程序打开M3U8格式
+                  void OpenM3u8(QString url){
+                         QFileInfo fi(url); QString tmp="/tmp/"+fi.fileName();
+                         QFile file(tmp);
+                         if( file.open(QIODevice::WriteOnly|QIODevice::Text) ){
+                             file.write(localtom3u8(url).toUtf8());
+                             file.close();
+                         }
+                         open(tmp);
+                     }
+
+                 //本地化m3u8,返回内容
+                   QString localtom3u8(const QString url)
+                   {
+                       QString done=UrlRequestGet(url);
+                      qDebug()<<done;
+                       QStringList lists=done.split("\n");
+                       QString m3u8="";
+
+                       foreach (QString list,lists)
+                         {
+                             //判断是文件信息
+                           if( list!="" && list.mid(0,1)!="#"){
+                                m3u8+=put_url(url,list.trimmed());
+                              }else{
+                                 m3u8+=list.trimmed()+"\n";
+                              }
+                       }
+                        qDebug()<<m3u8;
+                       return m3u8;
+                   }
+
+                 //相对路径转绝对路径
+                  QString put_url(QString path,QString url)
+                  {
+                       QFileInfo fi(path);QString cpath;
+                         if(url.mid(0,4)=="http"){
+                             return url;
+                          }else if(url.mid(0,1)=="/"){
+                             QStringList list=path.split("/");
+                             cpath=list.value(0)+list.value(1)+"//"+list.value(2);
+                             return cpath+url;
+                          }else{
+                             //cpath=path.mid(0,path.size()-fi.fileName().size());
+                             return fi.path()+"/"+url;
+                          }
+                   }
+
+   };
+
               #endif // MAINWINDOW_H

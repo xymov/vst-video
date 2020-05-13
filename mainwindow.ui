@@ -1017,7 +1017,7 @@ QPushButton:hover{
     border-image:url(:/pic/rc/play_on.png) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(:/pic/rc/play_on.png) -0px 0px no-repeat;
+     border-image:url(:/pic/rc/play_en.png) -0px 0px no-repeat;
 }
 </string>
            </property>
@@ -1070,7 +1070,7 @@ QPushButton:hover{
      <height>28</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menu_play">
     <property name="title">
      <string>文件</string>
     </property>
@@ -1116,7 +1116,18 @@ QPushButton:hover{
     <addaction name="menu_2"/>
     <addaction name="menu_4"/>
    </widget>
-   <addaction name="menu"/>
+   <widget class="QMenu" name="menu_explore">
+    <property name="title">
+     <string>视频</string>
+    </property>
+    <addaction name="action_explore_play"/>
+    <addaction name="separator"/>
+    <addaction name="action_explore_xopen"/>
+    <addaction name="action_explore_xplay"/>
+    <addaction name="action_explore_xnew"/>
+   </widget>
+   <addaction name="menu_play"/>
+   <addaction name="menu_explore"/>
   </widget>
   <action name="action_3">
    <property name="text">
@@ -1202,6 +1213,32 @@ QPushButton:hover{
    </property>
    <property name="text">
     <string>拉伸</string>
+   </property>
+  </action>
+  <action name="action_explore_play">
+   <property name="text">
+    <string>播放</string>
+   </property>
+  </action>
+  <action name="action_explore_xopen">
+   <property name="text">
+    <string>打开</string>
+   </property>
+   <property name="toolTip">
+    <string>调用默认应用打开</string>
+   </property>
+  </action>
+  <action name="action_explore_xplay">
+   <property name="text">
+    <string>用播放器打开</string>
+   </property>
+   <property name="toolTip">
+    <string>用播放器打开</string>
+   </property>
+  </action>
+  <action name="action_explore_xnew">
+   <property name="text">
+    <string>用新窗口打开</string>
    </property>
   </action>
  </widget>

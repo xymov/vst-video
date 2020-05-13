@@ -23,6 +23,7 @@
         <file>rc/playlist _on.png</file>
         <file>rc/timg.jpeg</file>
         <file>icon.png</file>
+        <file>rc/play_en.png</file>
     </qresource>
     <qresource prefix="/source">
         <file>rc/live.txt</file>
