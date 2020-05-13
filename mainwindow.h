@@ -417,27 +417,8 @@ private:
                     ba += "     " + data + "\n";
                     file.write( ba );
                     file.close();
-
-
                 }
             }
-
-       QByteArray Readfile(const QString &file)
-       {
-           QByteArray ba;
-           QFile cfile(file);
-                  if( cfile.open(QIODevice::ReadOnly|QIODevice::Text) ){
-                      QByteArray ba =cfile.readAll();
-                      cfile.close();
-                  }
-                 return ba;
-        }
-
-
-
-
-
-
       //xml文本转dom对象
         QDomElement xmltoDom(QString xmlText)
         {
@@ -532,7 +513,7 @@ private:
             if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
                 for(int i=0;!file.atEnd();i++){
                      QByteArray line = file.readLine().trimmed();
-                     QString str(line);
+                     QString str(line);str=str.toUtf8();
                      if(str!=""){
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
@@ -550,7 +531,7 @@ private:
                   SourceInfo info; info.name="直播列表";
                   for(int i=0;!file.atEnd();i++){
                        QByteArray line = file.readLine().trimmed();
-                       QString str(line);
+                       QString str(line);str=str.toUtf8();
                        if(str!=""){
                         QStringList list =str.split(",");
                         Nameinfo var; var.name=list.value(0);var.id=list.value(1);

@@ -322,9 +322,10 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
    //获取资源数据结束
    }else if(event->type() ==QEvent::User){
-
-         model->removeRows(0,model->rowCount());
-         model->setItem(0,0,new QStandardItem("正在刷新..."));
+        model->removeRows(0,model->rowCount());
+        model->setItem(0,0,new QStandardItem("正在刷新..."));
+        ui->search_source->clear();
+        ui->search_source->addItem("全部");
          for ( int i=0; i<type.size(); i++ )
          {
              model->setItem(i,0,new QStandardItem(type.value(i).name));
