@@ -2,8 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include "loading.h"
-
-
+#include "set.h"
 
 
 //QMediaPlayer
@@ -40,7 +39,6 @@
 #include <QMutex>
 
 
-
 #include <QEvent>
 #include <QTime>
 #include <QTextEdit>
@@ -58,9 +56,6 @@
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QInputDialog>
-
-
-
 
 
 
@@ -97,7 +92,6 @@ typedef struct Nameinfo
     QString name;
 }Nameinfo;
 Q_DECLARE_METATYPE(Nameinfo);
-
 
 
 
@@ -256,15 +250,25 @@ private slots:
      void on_action_Saturation_sub_triggered();
 
 
+     void on_action_videosize_IgnoreAspectRatio_triggered();
+
+     void on_action_videosize_KeepAspectRatio_triggered();
+
+     void on_action_videosize_KeepAspectRatioByExpanding_triggered();
+
+     void on_source_set_clicked();
+
 signals:
      void quit();
+
+     void setshow();
 
 private:
 
     Ui::MainWindow *ui;
 
    void  getCommond();
-
+   void  setVideoMode(Qt::AspectRatioMode mode);
 
     bool eventFilter(QObject *target, QEvent *event);
     void ThreadFunc(int,QString);
@@ -277,6 +281,7 @@ private:
     void echoload(bool);
     QString API;
     loading load;
+    set seting;
     QTimer *m_timer;
     QMutex mtx;
 
@@ -288,7 +293,7 @@ private:
     void  loadPlay(bool play);
 
     //运行信息
-    Appinfo set;
+    Appinfo app;
 
 
     //影片信息
@@ -315,7 +320,6 @@ private:
       //取网页数据
       QString UrlRequestGet( const QString url )
         {
-
           //异常处理
 
           try
@@ -325,11 +329,10 @@ private:
             QNetworkRequest qnr( aurl );
             qnr.setRawHeader("Content-Type","application/json");
             QNetworkReply *reply = qnam.get( qnr );
-
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit())); //超时20秒
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
-
             QTextCodec *codec = QTextCodec::codecForName("utf8");
             QString replyData = codec->toUnicode( reply->readAll() );
 
@@ -361,6 +364,7 @@ private:
             QNetworkAccessManager qnam;
             QNetworkReply *reply=qnam.get(QNetworkRequest(QUrl(url)));
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit()));
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
             QPixmap currentPicture;
@@ -390,6 +394,7 @@ private:
             QNetworkReply *reply = qnam.post( qnr, data.toLocal8Bit() );
 
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit()));
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
 
@@ -532,12 +537,6 @@ private:
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
                      getvideo(3,info.api);info.type=vInfo.type;type.insert(i,info);
-
-
-
-
-
-                     //type.insert(i,info);
                      }
                 }
               file.close();
@@ -556,8 +555,6 @@ private:
                         QStringList list =str.split(",");
                         Nameinfo var; var.name=list.value(0);var.id=list.value(1);
                         info.type.insert(i,var);
-
-                        //info.type[i].name=list.value(0);info.type[i].id=list.value(1);
                        }
                   }
                  file.close();
@@ -565,13 +562,6 @@ private:
                  if(info.type.size()>0){type.append(info);}
               }
           }
-
-
-
-
-
-
-
 
                      //搜索资源站
                      void  search(QString  searchword,int ctype=0){

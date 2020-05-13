@@ -11,18 +11,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 
      //配置设置
-     set.sourcePath=QDir::currentPath()+"/source.txt";
+     app.sourcePath=QDir::currentPath()+"/source.txt";
 
 
-     set.livePath=QDir::currentPath()+"/live.txt";
+     app.livePath=QDir::currentPath()+"/live.txt";
 
 
-     set.cache=QDir::currentPath()+"/cache/";
+     app.cache=QDir::currentPath()+"/cache/";
 
 
-     set.nopic=":/pic/rc/timg.jpeg";
+     app.nopic=":/pic/rc/timg.jpeg";
 
-     set.live=false;
+     app.live=false;
 
      //窗口居中
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
@@ -32,9 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
 
      //程序初始
 
-
      init();
 
+     //检查命令行参数
      getCommond();
 }
 
@@ -51,16 +51,16 @@ MainWindow::~MainWindow()
 
 void MainWindow:: getCommond(){
 
-    set.arguments=QCoreApplication::arguments();
+    app.arguments=QCoreApplication::arguments();
 
     QString filename ;
 
-    if(set.arguments.count()>1){
+    if(app.arguments.count()>1){
 
         playlist->clear();
-        for (int i=1; i<set.arguments.count();i++)
+        for (int i=1; i<app.arguments.count();i++)
          {
-             playlist->addMedia(QUrl(set.arguments.value(i)));
+             playlist->addMedia(QUrl(app.arguments.value(i)));
         }
 
         ui->tabWidget->setCurrentIndex(1);
@@ -79,18 +79,18 @@ void MainWindow:: getCommond(){
 void MainWindow::init(){
 
     //检查资源文件
-    if(!isFileExist(set.sourcePath)){
-        QFile soucre(":/source/rc/source.txt");soucre.copy(set.sourcePath);
-         QFile(set.sourcePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    if(!isFileExist(app.sourcePath)){
+        QFile soucre(":/source/rc/source.txt");soucre.copy(app.sourcePath);
+         QFile(app.sourcePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
     }
 
-    if(!isFileExist(set.livePath)){
-        QFile soucre(":/source/rc/live.txt");soucre.copy(set.livePath);
-        QFile(set.livePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    if(!isFileExist(app.livePath)){
+        QFile soucre(":/source/rc/live.txt");soucre.copy(app.livePath);
+        QFile(app.livePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
       }
 
     //检查缓存目录
-     if(!isDirExist(set.cache,true)){
+     if(!isDirExist(app.cache,true)){
          QMessageBox::warning(nullptr, "提示", "创建缓存目录cache失败，图片显示可能异常，请手工建立!",QMessageBox::Yes);
 
      }
@@ -105,8 +105,11 @@ void MainWindow::init(){
                   video->setAttribute(Qt::WA_OpaquePaintEvent);
                   video->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
                   connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ContextMenu(const QPoint&)));
-
                   video->show();
+
+                  // 缩放 Qt::KeepAspectRatio,铺满 Qt::IgnoreAspectRatio ，拉伸 Qt::KeepAspectRatioByExpanding  不缩放  Default
+
+                  setVideoMode(Qt::KeepAspectRatio);
 
                   //初始化播放器
                    player = new QMediaPlayer;
@@ -167,10 +170,6 @@ void MainWindow::init(){
                 ui->search_list->setEditTriggers(QAbstractItemView::NoEditTriggers);     //不可编辑
 
 
-
-
-
-
            //定时器
             m_timer = new QTimer;
             m_timer->setSingleShot(false);
@@ -180,9 +179,14 @@ void MainWindow::init(){
            ui->info_pic->setAlignment(Qt::AlignCenter);  //视频信息图片居中
            ui->page_info->setText("");                   //页数信息默认清空
            ui->menuBar->hide();       //隐藏菜单
-            /*  各种信号 与 槽    */
+
+
+           /*  各种信号 与 槽    */
                         //关联退出信号
-                        connect(this,SIGNAL(quit()),&load,SLOT(close()));
+                        connect(this,SIGNAL(quit()),&load,SLOT(quit()));
+
+                        connect(this,SIGNAL(setshow()),&seting,SLOT(reshow()));
+
 
                         //关联播放进度条
                         connect(ui->sliderProgress,SIGNAL(sliderReleased()),this,SLOT(sliderProgressReleased()));
@@ -212,7 +216,6 @@ void MainWindow::init(){
 
                             ui->value_Slider->installEventFilter(this);
 }
-
 
 
 void MainWindow::TimerTimeOut()
@@ -317,7 +320,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
                                                    }
 
 
-
    //获取资源数据结束
    }else if(event->type() ==QEvent::User){
 
@@ -367,7 +369,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
             //下载图片
 
-            if(!isFileExist(set.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg"))
+            if(!isFileExist(app.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg"))
             {
 
                QtConcurrent::run(this,&MainWindow::ThreadFunc,3,vInfo.pic.value(i)+"|"+vInfo.api+"|"+vInfo.id.value(i));
@@ -401,9 +403,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
          //设置预览图片
 
-         QString file=set.cache+toHash(v.value(0))+"_"+v.value(1)+".jpg";
+         QString file=app.cache+toHash(v.value(0))+"_"+v.value(1)+".jpg";
 
-         if(!isFileExist(file)){file=set.nopic;}
+         if(!isFileExist(file)){file=app.nopic;}
 
          QPixmap pixmap(file);
 
@@ -418,7 +420,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
         int key=event->type()-QEvent::User-4;
 
-        QString file=set.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
+        QString file=app.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
 
         if(isFileExist(file)){createListWidget(ui->listWidget,key,false);}
 
@@ -489,7 +491,7 @@ void MainWindow::stateChanged(QMediaPlayer::State state)
 //播放器视频长度状态发生改变
 void MainWindow::durationChange(qint64 playtime)
 {
-    set.live=false;
+    app.live=false;
     ui->sliderProgress->setMaximum(playtime);
     QTime t(0,0,0);
     t = t.addMSecs(playtime);
@@ -500,7 +502,7 @@ void MainWindow::durationChange(qint64 playtime)
 void MainWindow::positionChange(qint64 p)
 {
 
-    if(set.live)return;
+    if(app.live)return;
      if (!ui->sliderProgress->isSliderDown()) {
      ui->sliderProgress->setValue(p);
       setSTime(p);
@@ -525,7 +527,7 @@ void MainWindow::sliderProgressReleased()
 //设置进度标签
 void MainWindow::setSTime(qint64 v)
 {
-    if(set.live)return;
+    if(app.live)return;
     //时间转换
     QTime t(0,0,0);
     t = t.addMSecs(v);
@@ -553,13 +555,13 @@ void MainWindow::volumeDown()
 //快退快进
 void MainWindow::decseek()
 {
-    if(set.live)return;
+    if(app.live)return;
     player->setPosition(player->position() - 5000);
 }
 
 void MainWindow::addseek()
 {
-    if(set.live)return;
+    if(app.live)return;
     player->setPosition(player->position() + 5000);
 }
 
@@ -618,8 +620,8 @@ void  MainWindow::switchFullScreen(bool cfull){
     if(cfull){
 
          //保存全屏前状态
-         set.playlist=!ui->box_source->isHidden();
-         set.windowState=this->windowState();
+         app.playlist=!ui->box_source->isHidden();
+         app.windowState=this->windowState();
         ui->box_source->hide();
         ui->box_info->hide();
         ui->box_page->hide();
@@ -633,18 +635,18 @@ void  MainWindow::switchFullScreen(bool cfull){
 
     }else{
 
-        ui->tabWidget->setStyleSheet(set.playlist?"":"border:0;");
+        ui->tabWidget->setStyleSheet(app.playlist?"":"border:0;");
         ui->pushButton_full->setStyleSheet(full);
         ui->box_control->show();
         m_timer->stop();
         video->setCursor(Qt::ArrowCursor);  //显示正常鼠标
         showNormal();
-        if(set.playlist){
+        if(app.playlist){
             ui->box_source->show();
             ui->box_info->show();
              ui->box_page->show();
              ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
-             setWindowState(set.windowState);
+             setWindowState(app.windowState);
         }
     }
 
@@ -669,7 +671,7 @@ void MainWindow::ThreadFunc(int tp,QString word){
         //取资源数据
          // type.clear();
           QMutexLocker locker(&mtx);
-          getclass(set.sourcePath);getlive(set.livePath);
+          getclass(app.sourcePath);getlive(app.livePath);
           QEvent event (QEvent::Type(QEvent::User+tp));
           QApplication::postEvent(this ,new QEvent(event));
 
@@ -745,9 +747,9 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 
         //设置预览图片
 
-        QString file=set.cache+toHash(api)+"_"+id+".jpg";
+        QString file=app.cache+toHash(api)+"_"+id+".jpg";
 
-        if(!isFileExist(file)){file=set.nopic;}
+        if(!isFileExist(file)){file=app.nopic;}
 
         QPixmap pixmap(file);ui->info_pic->setPixmap(pixmap);
 
@@ -813,14 +815,14 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
        //if(playlist->mediaCount()!=type.value(row).type.size())
 
-       if(!set.live)
+       if(!app.live)
        {
             playlist->clear();
             foreach(Nameinfo var,type.value(row).type)
             {
                 playlist->addMedia(QUrl(var.id));
             }
-            set.live=true;
+            app.live=true;
         }
 
          if(index.parent().data().toString()=="直播列表"){ playlist->setCurrentIndex(index.row());}
@@ -829,7 +831,7 @@ void MainWindow::on_tree_source_pressed(const QModelIndex &index)
 
          ui->page_info->setText("频道："+QString::number(index.row()+1)+"/"+QString::number(playlist->mediaCount()));
 
-         set.live=true; ui->labelTimeVideo->setText("直播模式");
+         app.live=true; ui->labelTimeVideo->setText("直播模式");
 
          //ui->sliderProgress->setEnabled(false);
 
@@ -851,9 +853,9 @@ void MainWindow::createListWidget(QListWidget *listWidget,int key,bool create=fa
     if(key>=vInfo.id.size() || key>=vInfo.name.size())return;
 
 
-    QString file=set.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
+    QString file=app.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(key)+".jpg";
 
-    if(!isFileExist(file)){file=set.nopic;}
+    if(!isFileExist(file)){file=app.nopic;}
 
     QPixmap pixmap(file); QMutex mutex;
 
@@ -949,7 +951,7 @@ void MainWindow::getpageinfo (int page){
      //取关联api地址
       api=type.value(row).api;
 
-      ui->listWidget->clear(); isDirExist(set.cache,true);
+      ui->listWidget->clear(); isDirExist(app.cache,true);
 
        getvideo(4,api,id,QString::number(page));
 
@@ -961,7 +963,7 @@ void MainWindow::getpageinfo (int page){
 
           ui->comboBox_name->addItem(vInfo.name.value(i),vInfo.api+"|"+vInfo.id.value(i));
 
-           QString file=set.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
+           QString file=app.cache+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg";
 
            createListWidget(ui->listWidget,i,true);
 
@@ -1065,7 +1067,7 @@ void MainWindow::on_info_play_clicked()
 {
     if(ui->comboBox_part->count()>0){
         ui->tabWidget->setCurrentIndex(1);
-        set.live=false;
+        app.live=false;
         loadPlay(true);
     }
 
@@ -1109,7 +1111,7 @@ void MainWindow::on_search_ok_clicked()
 void MainWindow::on_search_list_pressed(const QModelIndex &index)
 {
      echoload(true);
-     set.live=false;
+     app.live=false;
      ui->info_des->clear();
      ui->comboBox_part->clear();
      ui->comboBox_name->setCurrentIndex(index.row());
@@ -1176,8 +1178,8 @@ void MainWindow::on_action_open_triggered()
 void MainWindow::on_action_openurl_triggered()
 {
 
-      QString dlgTitle="输入对话框";
-      QString txtLabel="请输入远程地址";
+      QString dlgTitle="打开URL";
+      QString txtLabel="请输入URL地址";
       QString defaultInput="";
         QLineEdit::EchoMode echoMode=QLineEdit::Normal;//正常文字输入
 
@@ -1186,15 +1188,11 @@ void MainWindow::on_action_openurl_triggered()
 
         QString text = QInputDialog::getText(this, dlgTitle,txtLabel, echoMode,defaultInput, &ok);
 
-
         if (ok && !text.isEmpty()&&!text.isEmpty()){
           player->setMedia(QUrl(text));
           player->play();
 
-
-          //qDebug()<<filename;
       }
-
 }
 //亮度+-
 void MainWindow::on_action_brightness_add_triggered()
@@ -1226,4 +1224,53 @@ void MainWindow::on_action_Saturation_add_triggered()
 void MainWindow::on_action_Saturation_sub_triggered()
 {
     video->setSaturation(video->saturation()-10);
+}
+
+
+// 视频缩放处理
+void MainWindow::on_action_videosize_IgnoreAspectRatio_triggered()
+{
+     setVideoMode(Qt::IgnoreAspectRatio);
+}
+
+void MainWindow::on_action_videosize_KeepAspectRatio_triggered()
+{
+      setVideoMode(Qt::KeepAspectRatio);
+}
+
+void MainWindow::on_action_videosize_KeepAspectRatioByExpanding_triggered()
+{
+    setVideoMode(Qt::KeepAspectRatioByExpanding);
+
+}
+
+void MainWindow::setVideoMode(Qt::AspectRatioMode mode){
+  switch (mode) {
+    case Qt::IgnoreAspectRatio:  //铺满
+         ui->action_videosize_IgnoreAspectRatio->setChecked(true);
+         ui->action_videosize_KeepAspectRatio->setChecked(false);
+         ui->action_videosize_KeepAspectRatioByExpanding->setChecked(false);
+         break;
+    case Qt::KeepAspectRatio:  // 缩放
+        ui->action_videosize_IgnoreAspectRatio->setChecked(false);
+        ui->action_videosize_KeepAspectRatio->setChecked(true);
+        ui->action_videosize_KeepAspectRatioByExpanding->setChecked(false);
+        break;
+    case Qt::KeepAspectRatioByExpanding: // 拉伸
+        ui->action_videosize_IgnoreAspectRatio->setChecked(false);
+        ui->action_videosize_KeepAspectRatio->setChecked(false);
+        ui->action_videosize_KeepAspectRatioByExpanding->setChecked(true);
+        break;
+    }
+
+    video->setAspectRatioMode(mode);
+
+}
+
+
+void MainWindow::on_source_set_clicked()
+{
+    //seting=new set;
+
+emit setshow();
 }

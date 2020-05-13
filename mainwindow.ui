@@ -26,7 +26,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视   v2.3</string>
+   <string>全聚合影视   v2.4</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -103,11 +103,28 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QPushButton" name="source_re">
-         <property name="text">
-          <string>刷新</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QPushButton" name="source_re">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="text">
+            <string>刷新</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="source_set">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="text">
+            <string>设置</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QTreeView" name="tree_source">
@@ -1085,10 +1102,19 @@ QPushButton:hover{
      <addaction name="action_Saturation_add"/>
      <addaction name="action_Saturation_sub"/>
     </widget>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>缩放</string>
+     </property>
+     <addaction name="action_videosize_IgnoreAspectRatio"/>
+     <addaction name="action_videosize_KeepAspectRatio"/>
+     <addaction name="action_videosize_KeepAspectRatioByExpanding"/>
+    </widget>
     <addaction name="menu_5"/>
     <addaction name="menu_6"/>
     <addaction name="menu_7"/>
     <addaction name="menu_2"/>
+    <addaction name="menu_4"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -1152,6 +1178,30 @@ QPushButton:hover{
   <action name="action_Saturation_sub">
    <property name="text">
     <string>饱和度-</string>
+   </property>
+  </action>
+  <action name="action_videosize_IgnoreAspectRatio">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>填满</string>
+   </property>
+  </action>
+  <action name="action_videosize_KeepAspectRatio">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>缩放</string>
+   </property>
+  </action>
+  <action name="action_videosize_KeepAspectRatioByExpanding">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>拉伸</string>
    </property>
   </action>
  </widget>
