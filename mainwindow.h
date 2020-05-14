@@ -268,6 +268,8 @@ private slots:
 
      void on_action_explore_xnew_triggered();
 
+     void on_action_about_triggered();
+
 signals:
      void quit();
 

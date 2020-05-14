@@ -26,7 +26,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>全聚合影视   v2.4</string>
+   <string>全聚合影视 </string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -244,7 +244,7 @@
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">background:rgb(182, 169, 255);
+             <string notr="true">background:rgb(116,60,127);
 border:none;
 </string>
             </property>
@@ -442,27 +442,27 @@ QPushButton:hover{
                     <colorrole role="Button">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Base">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Window">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -489,27 +489,27 @@ QPushButton:hover{
                     <colorrole role="Button">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Base">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Window">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -536,27 +536,27 @@ QPushButton:hover{
                     <colorrole role="Button">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Base">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
                     <colorrole role="Window">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">
-                       <red>182</red>
-                       <green>169</green>
-                       <blue>255</blue>
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -1115,6 +1115,8 @@ QPushButton:hover{
     <addaction name="menu_7"/>
     <addaction name="menu_2"/>
     <addaction name="menu_4"/>
+    <addaction name="separator"/>
+    <addaction name="action_about"/>
    </widget>
    <widget class="QMenu" name="menu_explore">
     <property name="title">
@@ -1123,8 +1125,8 @@ QPushButton:hover{
     <addaction name="action_explore_play"/>
     <addaction name="separator"/>
     <addaction name="action_explore_xopen"/>
-    <addaction name="action_explore_xplay"/>
     <addaction name="action_explore_xnew"/>
+    <addaction name="action_explore_xplay"/>
    </widget>
    <addaction name="menu_play"/>
    <addaction name="menu_explore"/>
@@ -1228,17 +1230,22 @@ QPushButton:hover{
     <string>调用默认应用打开</string>
    </property>
   </action>
-  <action name="action_explore_xplay">
-   <property name="text">
-    <string>用播放器打开</string>
-   </property>
-   <property name="toolTip">
-    <string>用播放器打开</string>
-   </property>
-  </action>
   <action name="action_explore_xnew">
    <property name="text">
     <string>用新窗口打开</string>
+   </property>
+   <property name="toolTip">
+    <string>用新窗口打开</string>
+   </property>
+  </action>
+  <action name="action_explore_xplay">
+   <property name="text">
+    <string>用默认应用打开</string>
+   </property>
+  </action>
+  <action name="action_about">
+   <property name="text">
+    <string>关于</string>
    </property>
   </action>
  </widget>

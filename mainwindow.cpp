@@ -7,8 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
      ui->setupUi(this);
 
-     QDir::setCurrent("./");
-
+     QDir::setCurrent("./");  //为了兼容单文件打包工具appimage，使用QDir::currentPath(),不然会找不到配置文件
 
      //配置设置
      app.sourcePath=QDir::currentPath()+"/source.txt";
@@ -1297,7 +1296,7 @@ void MainWindow::on_action_explore_play_triggered()
     on_info_play_clicked();
 }
 
-
+//调用关联应用直接打开，一般会是浏览器
 void MainWindow::on_action_explore_xopen_triggered()
 {
     if(ui->comboBox_part->count()>0){
@@ -1305,7 +1304,7 @@ void MainWindow::on_action_explore_xopen_triggered()
     }
 }
 
-
+//下载到本地再调用关联应用打开
 void MainWindow::on_action_explore_xplay_triggered()
 {
 
@@ -1316,15 +1315,22 @@ void MainWindow::on_action_explore_xplay_triggered()
     }
 
 }
-
+//新窗口打开
 void MainWindow::on_action_explore_xnew_triggered()
 {
     if(ui->comboBox_part->count()>0){
-
-    open(QDir::currentPath()+"/vst-video ",ui->comboBox_part->itemData(ui->comboBox_part->currentIndex()).toString());
-
-    qDebug()<<QDir::currentPath()+"/vst-video";
-
+        QStringList list;
+        for (int i=0;i<ui->comboBox_part->count();i++) {
+            list.append(ui->comboBox_part->itemData(i).toString());
+        }
+         QProcess::startDetached(QDir::currentPath()+"/vst-video",list);
 
     }
+}
+//关于窗口
+void MainWindow::on_action_about_triggered()
+{
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.41\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
+    aboutMB.setIconPixmap(QPixmap(":/pic/icon.png"));
+    aboutMB.exec();
 }
