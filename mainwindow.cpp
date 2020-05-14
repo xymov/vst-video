@@ -174,6 +174,13 @@ void MainWindow::init(){
                 ui->search_list->setSelectionBehavior(QAbstractItemView::SelectRows);   //设置选中时为整行选中
                 ui->search_list->setEditTriggers(QAbstractItemView::NoEditTriggers);     //不可编辑
 
+              //设置加载
+
+             //video->setFullScreen(true);
+
+
+
+
 
            //定时器
             m_timer = new QTimer;
@@ -185,7 +192,7 @@ void MainWindow::init(){
            ui->page_info->setText("");                   //页数信息默认清空
            ui->menuBar->hide();       //隐藏菜单
 
-
+           //ui->status->hide();
            /*  各种信号 与 槽    */
                         //关联退出信号
                         connect(this,SIGNAL(quit()),&load,SLOT(quit()));
@@ -454,28 +461,25 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
     return QWidget::eventFilter(target, event);
 }
 
-void MainWindow::echoload(bool echo){
-
-    if(echo){load.show();}else{load.hide();}
-}
 
 //播放器媒体状态被改变
 void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
     switch (status) {
-    case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");break;
-    case QMediaPlayer::NoMedia:ui->status->setText("没有打开媒体");break;
-    case QMediaPlayer::LoadingMedia :ui->status->setText("正在加载...");
-        ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
-        qDebug()<<"openUrl："<<player->currentMedia().canonicalUrl().toString();
-        if(isFullScreen()){echoload(true);}
-        break;
+    case QMediaPlayer::UnknownMediaStatus:ui->status->setText("状态未知");echoload(false);break;
+    case QMediaPlayer::NoMedia:ui->status->setText("无效视频");echoload(false);break;
+    case QMediaPlayer::LoadingMedia :
+         ui->status->setText("正在加载...");
+         if(isFullScreen()){echoload(true);}
+         ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
+         qDebug()<<"openUrl："<<player->currentMedia().canonicalUrl().toString();
+         break;
     case QMediaPlayer::LoadedMedia:ui->status->setText("准备就绪");echoload(false);break;
-    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲..."); if(isFullScreen()){echoload(true);}break;
+    case QMediaPlayer::StalledMedia:ui->status->setText("正在缓冲...");if(isFullScreen()){echoload(true);}break;
     case QMediaPlayer::BufferingMedia:ui->status->setText("正在缓冲...");break;
-    case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放"); echoload(false);break;
-    case QMediaPlayer::EndOfMedia:ui->status->setText("媒体播放结束");break;
-    case QMediaPlayer::InvalidMedia:ui->status->setText("无法播放当前媒体");break;
+    case QMediaPlayer::BufferedMedia:ui->status->setText("正在播放");echoload(false);break;
+    case QMediaPlayer::EndOfMedia:ui->status->setText("播放结束");echoload(false);break;
+    case QMediaPlayer::InvalidMedia:ui->status->setText("加载失败");echoload(false);break;
     }
 }
 //播放器媒体状态被改变
@@ -636,12 +640,12 @@ void  MainWindow::switchFullScreen(bool cfull){
          m_timer->start(5000);
         //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
-         ui->tabWidget->setStyleSheet("border:0;");
+         ui->tabWidget->setStyleSheet("border:none;");
          showFullScreen();
 
     }else{
 
-        ui->tabWidget->setStyleSheet(app.playlist?"":"border:0;");
+        ui->tabWidget->setStyleSheet(app.playlist?"":"border:none;");
         ui->pushButton_full->setStyleSheet(full);
         ui->box_control->show();
         m_timer->stop();
@@ -1330,7 +1334,7 @@ void MainWindow::on_action_explore_xnew_triggered()
 //关于窗口
 void MainWindow::on_action_about_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.41\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.42\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
     aboutMB.setIconPixmap(QPixmap(":/pic/icon.png"));
     aboutMB.exec();
 }

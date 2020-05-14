@@ -3,7 +3,7 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -234,7 +234,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>110</height>
+              <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -255,85 +255,238 @@ border:none;
              <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout">
-             <item>
-              <widget class="QLabel" name="status">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::RightToLeft</enum>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"> color:#FFF; 
-</string>
-               </property>
-               <property name="text">
-                <string>准备</string>
-               </property>
-               <property name="textFormat">
-                <enum>Qt::AutoText</enum>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="margin">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="sliderProgress">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="contextMenuPolicy">
-                <enum>Qt::NoContextMenu</enum>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">border:10;</string>
-               </property>
-               <property name="inputMethodHints">
-                <set>Qt::ImhNone</set>
-               </property>
-               <property name="tracking">
-                <bool>true</bool>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="invertedAppearance">
-                <bool>false</bool>
-               </property>
-               <property name="invertedControls">
-                <bool>false</bool>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::NoTicks</enum>
-               </property>
-               <property name="tickInterval">
-                <number>10</number>
-               </property>
-              </widget>
-             </item>
+             <property name="spacing">
+              <number>5</number>
+             </property>
+             <property name="leftMargin">
+              <number>11</number>
+             </property>
+             <property name="topMargin">
+              <number>11</number>
+             </property>
+             <property name="rightMargin">
+              <number>11</number>
+             </property>
+             <property name="bottomMargin">
+              <number>11</number>
+             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <property name="spacing">
-                <number>7</number>
-               </property>
-               <property name="topMargin">
                 <number>0</number>
+               </property>
+               <item>
+                <widget class="QSlider" name="sliderProgress">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="palette">
+                  <palette>
+                   <active>
+                    <colorrole role="Button">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                   </active>
+                   <inactive>
+                    <colorrole role="Button">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                   </inactive>
+                   <disabled>
+                    <colorrole role="Button">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                    <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>116</red>
+                       <green>60</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </colorrole>
+                   </disabled>
+                  </palette>
+                 </property>
+                 <property name="cursor">
+                  <cursorShape>PointingHandCursor</cursorShape>
+                 </property>
+                 <property name="mouseTracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="tabletTracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::TabFocus</enum>
+                 </property>
+                 <property name="contextMenuPolicy">
+                  <enum>Qt::NoContextMenu</enum>
+                 </property>
+                 <property name="acceptDrops">
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">
+QSlider::groove:horizontal {
+border: 1px solid #4A708B;
+background: #C0C0C0;
+height: 2px;
+border-radius: 1px;
+padding-left:-1px;
+padding-right:-1px;
+}
+
+QSlider::sub-page:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+    stop:0 #B1B1B1, stop:1 #c4c4c4);
+background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,
+    stop: 0 #5DCCFF, stop: 1 #1874CD);
+border: 1px solid #4A708B;
+height: 10px;
+border-radius: 2px;
+}
+
+QSlider::add-page:horizontal {
+background: #bbb;
+border: 1px solid #4A708B;
+border-radius:1px;
+}
+
+QSlider::handle:horizontal 
+{
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, 
+    stop:0.6 #45ADED, stop:0.778409 rgba(255, 255, 255, 255));
+    width: 13px;
+    margin-top: -5px;
+    margin-bottom: -4px;
+    border-radius: 5px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0.6 #2A8BDA, 
+    stop:0.778409 rgba(255, 255, 255, 255));
+    width: 13px;
+    margin-top: -5px;
+    margin-bottom: -4px;
+    border-radius: 5px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+background: #00009C;
+border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: #eee;
+border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled {
+background: #eee;
+border: 1px solid #aaa;
+border-radius: 4px;
+}
+</string>
+                 </property>
+                 <property name="tracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="invertedAppearance">
+                  <bool>false</bool>
+                 </property>
+                 <property name="invertedControls">
+                  <bool>false</bool>
+                 </property>
+                 <property name="tickPosition">
+                  <enum>QSlider::NoTicks</enum>
+                 </property>
+                 <property name="tickInterval">
+                  <number>10</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <property name="spacing">
+                <number>10</number>
                </property>
                <item>
                 <widget class="QPushButton" name="pushButton_paly">
@@ -407,7 +560,7 @@ QPushButton:hover{
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>16777215</width>
+                   <width>123</width>
                    <height>30</height>
                   </size>
                  </property>
@@ -419,6 +572,38 @@ QPushButton:hover{
                  </property>
                  <property name="text">
                   <string>00:00:00/00:00:00</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="status">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"> color:#FFF; </string>
+                 </property>
+                 <property name="text">
+                  <string>准备</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -580,6 +765,71 @@ QPushButton:hover{
                     </colorrole>
                    </disabled>
                   </palette>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QSlider::groove:horizontal {
+border: 1px solid #4A708B;
+background: #C0C0C0;
+height: 5px;
+border-radius: 1px;
+padding-left:-1px;
+padding-right:-1px;
+}
+
+QSlider::sub-page:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+    stop:0 #B1B1B1, stop:1 #c4c4c4);
+background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,
+    stop: 0 #5DCCFF, stop: 1 #1874CD);
+border: 1px solid #4A708B;
+height: 10px;
+border-radius: 2px;
+}
+
+QSlider::add-page:horizontal {
+background: #bbb;
+border: 0px solid #777;
+height: 10px;
+border-radius: 2px;
+}
+
+QSlider::handle:horizontal 
+{
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, 
+    stop:0.6 #45ADED, stop:0.778409 rgba(255, 255, 255, 255));
+
+    width: 11px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+    border-radius: 5px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0.6 #2A8BDA, 
+    stop:0.778409 rgba(255, 255, 255, 255));
+
+    width: 11px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+    border-radius: 5px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+background: #00009C;
+border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: #eee;
+border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled {
+background: #eee;
+border: 1px solid #aaa;
+border-radius: 4px;
+}
+</string>
                  </property>
                  <property name="pageStep">
                   <number>2</number>

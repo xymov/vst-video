@@ -290,7 +290,6 @@ private:
     QMediaPlayer *player;
     QVideoWidget *video;
     void setSTime(qint64);
-    void echoload(bool);
     QString API;
     loading load;
     set seting;
@@ -725,6 +724,19 @@ private:
                           }
                    }
 
-   };
+
+
+                  void echoload(bool echo,int timeout=20000){
+
+                      if(echo){
+                          load.show();
+                          QTimer::singleShot(timeout, &load, SLOT(hide())); //超时
+                      }else{load.hide();}
+                  }
+
+
+
+
+};
 
               #endif // MAINWINDOW_H
