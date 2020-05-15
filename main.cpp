@@ -16,16 +16,11 @@ int main(int argc, char *argv[])
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForLocale(codec);
     qRegisterMetaType<SourceInfo>("SourceInfo");
-   // qRegisterMetaType<Appinfo>("Appinfo");
+    qRegisterMetaType<Appinfo>("Appinfo");
     qSetMessagePattern("[ %{file}: %{line} ] %{message}");
     MainWindow w;
-
-   ///qDebug()<<w.set
-
-
-
-    //loading load;
-    //load.show();
+    a.connect(&a, SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
+    //a.setQuitOnLastWindowClosed(true);
     w.show();
     return a.exec();
 }

@@ -22,7 +22,7 @@ loading::loading(QWidget *parent) :
         move(movePoint);
 
         //加载gif图片
-        QMovie *movie = new QMovie(":/pic/rc/loading.gif");
+        QMovie *movie = new QMovie("://resource/img/loading.gif");
         ui->lbl_gif->setMovie(movie);
         movie->start();
 
@@ -33,7 +33,7 @@ loading::loading(QWidget *parent) :
 
 void loading::quit(){
 
-   exit(0);
+   close();
 }
 
 loading::~loading()

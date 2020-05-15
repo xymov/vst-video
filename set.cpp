@@ -11,8 +11,6 @@ set::set(QWidget *parent) :
     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
 
-
-
     this->setAttribute(Qt::WA_DeleteOnClose,0);
 
 

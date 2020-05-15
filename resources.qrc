@@ -1,32 +1,39 @@
 <RCC>
-    <qresource prefix="/pic">
-        <file>rc/fashf_on.png</file>
-        <file>rc/fashf_out.png</file>
-        <file>rc/fashr_on.png</file>
-        <file>rc/fashr_out.png</file>
-        <file>rc/full_on.png</file>
-        <file>rc/full_out.png</file>
-        <file>rc/general_out.png</file>
-        <file>rc/general_on.png</file>
-        <file>rc/mute_on.png</file>
-        <file>rc/mute_out.png</file>
-        <file>rc/pause_on.png</file>
-        <file>rc/pause_out.png</file>
-        <file>rc/pause_scgedyke_on.png</file>
-        <file>rc/pause_scgedyke_out.png</file>
-        <file>rc/play_on.png</file>
-        <file>rc/play_out.png</file>
-        <file>rc/sound_on.png</file>
-        <file>rc/sound_out.png</file>
-        <file>rc/loading.gif</file>
-        <file>rc/playlist _out.png</file>
-        <file>rc/playlist _on.png</file>
-        <file>rc/timg.jpeg</file>
-        <file>icon.png</file>
-        <file>rc/play_en.png</file>
-    </qresource>
-    <qresource prefix="/source">
-        <file>rc/live.txt</file>
-        <file>rc/source.txt</file>
+    <qresource prefix="/">
+        <file>resource/img/camera_on.svg</file>
+        <file>resource/img/camera_out.svg</file>
+        <file>resource/img/front_on.svg</file>
+        <file>resource/img/front_out.svg</file>
+        <file>resource/img/full_on.svg</file>
+        <file>resource/img/full_out.svg</file>
+        <file>resource/img/general_on.svg</file>
+        <file>resource/img/general_out.svg</file>
+        <file>resource/img/next_on.svg</file>
+        <file>resource/img/next_out.svg</file>
+        <file>resource/img/pallette.svg</file>
+        <file>resource/img/pause_on.svg</file>
+        <file>resource/img/pause_out.svg</file>
+        <file>resource/img/play_on.svg</file>
+        <file>resource/img/play_out.svg</file>
+        <file>resource/img/subtitle.svg</file>
+        <file>resource/img/timg.jpeg</file>
+        <file>resource/img/volume-down_on.svg</file>
+        <file>resource/img/volume-down_out.svg</file>
+        <file>resource/img/volume-off_on.svg</file>
+        <file>resource/img/volume-off_out.svg</file>
+        <file>resource/img/volume-up_on.svg</file>
+        <file>resource/img/volume-up_out.svg</file>
+        <file>resource/img/ico.svg</file>
+        <file>resource/source/live.txt</file>
+        <file>resource/source/source.txt</file>
+        <file>resource/img/list_on.svg</file>
+        <file>resource/img/list_out.svg</file>
+        <file>resource/img/next_off.svg</file>
+        <file>resource/img/front_off.svg</file>
+        <file>resource/img/play_at.svg</file>
+        <file>resource/img/icon.png</file>
+        <file>resource/img/setting_out.svg</file>
+        <file>resource/img/setting_on.svg</file>
+        <file>resource/img/loading.gif</file>
     </qresource>
 </RCC>

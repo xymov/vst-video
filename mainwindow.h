@@ -160,7 +160,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-
 private slots:
 
 
@@ -186,7 +185,7 @@ private slots:
      void on_comboBox_name_currentIndexChanged(int index);
 
      void on_comboBox_part_currentIndexChanged(int index);
-
+     //bool close();
      void addseek();
      void decseek();
      void volumeUp();
@@ -222,8 +221,6 @@ private slots:
      void on_info_next_clicked();
 
      void on_search_ok_clicked();
-
-     void on_search_list_pressed(const QModelIndex &index);
 
      void on_tabWidget_currentChanged(int index);
 
@@ -269,6 +266,12 @@ private slots:
      void on_action_explore_xnew_triggered();
 
      void on_action_about_triggered();
+
+     void on_pushButton_front_clicked();
+
+     void on_pushButton_setting_clicked();
+
+     void on_search_list_clicked(const QModelIndex &index);
 
 signals:
      void quit();
