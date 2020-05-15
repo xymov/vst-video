@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1324</width>
-    <height>702</height>
+    <width>1316</width>
+    <height>657</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -70,7 +70,7 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_4">
     <property name="spacing">
-     <number>5</number>
+     <number>0</number>
     </property>
     <property name="leftMargin">
      <number>0</number>
@@ -157,7 +157,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -341,7 +341,7 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QGroupBox {
-background: #000;
+
 }
 </string>
           </property>
@@ -373,13 +373,13 @@ background: #000;
               <number>0</number>
              </property>
              <property name="leftMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
             </layout>
            </item>
@@ -388,20 +388,18 @@ background: #000;
              <property name="minimumSize">
               <size>
                <width>546</width>
-               <height>0</height>
+               <height>60</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>80</height>
+               <height>60</height>
               </size>
              </property>
              <property name="styleSheet">
               <string notr="true">QGroupBox {
-background: #fff;
-border: 1px solid #c7c7c7;
-border-radius:15px;
+border: none ;
 }
 QGroupBox::title {
 border:none;
@@ -419,13 +417,13 @@ border:none;
                <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>5</number>
+               <number>2</number>
               </property>
               <property name="topMargin">
-               <number>0</number>
+               <number>2</number>
               </property>
               <property name="rightMargin">
-               <number>5</number>
+               <number>2</number>
               </property>
               <property name="bottomMargin">
                <number>0</number>
@@ -587,9 +585,6 @@ border:none;
                 <property name="leftMargin">
                  <number>10</number>
                 </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
                 <property name="rightMargin">
                  <number>10</number>
                 </property>
@@ -711,14 +706,14 @@ QPushButton:disabled{
                  <widget class="QPushButton" name="pushButton_sound">
                   <property name="minimumSize">
                    <size>
-                    <width>28</width>
-                    <height>30</height>
+                    <width>30</width>
+                    <height>32</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>28</width>
-                    <height>30</height>
+                    <width>30</width>
+                    <height>32</height>
                    </size>
                   </property>
                   <property name="focusPolicy">
@@ -998,7 +993,7 @@ border-radius: 4px;
                    <string>时间</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true"/>
+                   <string notr="true">color:#000;</string>
                   </property>
                   <property name="text">
                    <string>00:00:00/00:00:00</string>
@@ -1036,13 +1031,48 @@ border-radius: 4px;
                    </size>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true"/>
+                   <string notr="true">color:#000;</string>
                   </property>
                   <property name="text">
                    <string>准备就绪</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_full">
+                  <property name="minimumSize">
+                   <size>
+                    <width>28</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>28</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">
+
+QPushButton{
+    border-image:url(://resource/img/full_out.svg) 0px 0px no-repeat;
+filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
+}
+QPushButton:hover{
+     border-image:url(://resource/img/full_on.svg) -0px 0px no-repeat;
+border:none;
+}
+</string>
+                  </property>
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -1085,13 +1115,13 @@ border:none;
                   <property name="minimumSize">
                    <size>
                     <width>28</width>
-                    <height>28</height>
+                    <height>32</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>28</width>
-                    <height>28</height>
+                    <height>32</height>
                    </size>
                   </property>
                   <property name="focusPolicy">
@@ -1105,41 +1135,6 @@ QPushButton{
 }
 QPushButton:hover{
      border-image:url(://resource/img/list_on.svg) -0px 0px no-repeat;
-border:none;
-}
-</string>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_full">
-                  <property name="minimumSize">
-                   <size>
-                    <width>28</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>28</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="focusPolicy">
-                   <enum>Qt::NoFocus</enum>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">
-
-QPushButton{
-    border-image:url(://resource/img/full_out.svg) 0px 0px no-repeat;
-filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;
-}
-QPushButton:hover{
-     border-image:url(://resource/img/full_on.svg) -0px 0px no-repeat;
 border:none;
 }
 </string>
@@ -1418,7 +1413,7 @@ QPushButton:hover{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1324</width>
+     <width>1316</width>
      <height>28</height>
     </rect>
    </property>

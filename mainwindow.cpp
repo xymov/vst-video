@@ -230,7 +230,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
        if (event->type() == QEvent::MouseMove){
          //重启定时器
-         m_timer->start(5000);
+         m_timer->start(2000);
           if(ui->box_control->isHidden()){
               video->setCursor(Qt::ArrowCursor);
               ui->box_control->show();
@@ -617,7 +617,7 @@ void  MainWindow::switchFullScreen(bool cfull){
         ui->box_page->hide();
         ui->box_control->hide();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
-         m_timer->start(5000);
+         m_timer->start(2000);
         //video->setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
          ui->tabWidget->setStyleSheet("border:none;");
@@ -1017,7 +1017,7 @@ void MainWindow::loadMedia(int key){
 
 //加载播放
 
-void  MainWindow:: loadPlay(bool play){
+void  MainWindow::loadPlay(bool play,int index=0){
 
    if(play)
   {
@@ -1035,6 +1035,7 @@ void  MainWindow:: loadPlay(bool play){
 
           }
 
+        playlist->setCurrentIndex(index);
         player->play();
 
    }else{
@@ -1049,7 +1050,7 @@ void MainWindow::on_info_play_clicked()
     if(ui->comboBox_part->count()>0){
         ui->tabWidget->setCurrentIndex(1);
         app.live=false;
-        loadPlay(true);
+        loadPlay(true,ui->comboBox_part->currentIndex());
     }
 
     }

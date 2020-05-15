@@ -304,7 +304,7 @@ private:
 
     void  switchFullScreen(bool);
 
-    void  loadPlay(bool play);
+    void  loadPlay(bool play,int index);
 
     //运行信息
     Appinfo app;
