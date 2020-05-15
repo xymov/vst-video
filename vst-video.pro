@@ -42,6 +42,7 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    README.md \
     deb/DEBIAN/control \
     deb/install.sh \
     deb/usr/share/applications/vst-video.desktop \
