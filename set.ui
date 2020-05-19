@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>set</class>
  <widget class="QWidget" name="set">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,6 +12,9 @@
     <width>864</width>
     <height>533</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::WheelFocus</enum>
   </property>
   <property name="windowTitle">
    <string>资源设置</string>

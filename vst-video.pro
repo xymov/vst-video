@@ -18,19 +18,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    framelesshelper.cpp \
     main.cpp \
     mainwindow.cpp \
-    loading.cpp \
     set.cpp
 
 HEADERS += \
+    framelesshelper.h \
     mainwindow.h \
-    loading.h \
     set.h
 
 FORMS += \
     mainwindow.ui \
-    loading.ui \
     set.ui
 
 # Default rules for deployment.

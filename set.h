@@ -29,6 +29,8 @@ private slots:
 
     void reshow();
 
+    void quit();
+
 private:
     Ui::set *ui;
 

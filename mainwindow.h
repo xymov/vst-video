@@ -1,14 +1,21 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include <QDesktopServices>
 #include <QMainWindow>
-#include "loading.h"
 #include "set.h"
+#include "framelesshelper.h"
+
+
+
 
 
 //QMediaPlayer
 #include <QMediaPlayer> //add
 #include <QMediaPlaylist>
 #include <QVideoWidget>
+#include <QMovie>
+
+#include<QToolButton>
 
 
 //QtNetwork
@@ -46,7 +53,7 @@
 #include <QComboBox>
 #include <QPlainTextEdit>
 #include <QListWidget>
-
+#include <QLabel>
 
 #include <QDesktopWidget>
 #include <QMessageBox>
@@ -73,6 +80,8 @@ typedef struct Appinfo
    QString nopic;
 
    QStringList arguments;
+
+   Qt::WindowFlags Flags;
 
    bool live;
 
@@ -224,7 +233,6 @@ private slots:
 
      void on_tabWidget_currentChanged(int index);
 
-     void on_source_re_clicked();
 
      void on_search_source_currentIndexChanged(int index);
 
@@ -248,14 +256,11 @@ private slots:
 
      void on_action_Saturation_sub_triggered();
 
-
      void on_action_videosize_IgnoreAspectRatio_triggered();
 
      void on_action_videosize_KeepAspectRatio_triggered();
 
      void on_action_videosize_KeepAspectRatioByExpanding_triggered();
-
-     void on_source_set_clicked();
 
      void on_action_explore_play_triggered();
 
@@ -273,38 +278,78 @@ private slots:
 
      void on_search_list_clicked(const QModelIndex &index);
 
-signals:
-     void quit();
 
+
+     void on_action_mini_mode_triggered();
+
+     void on_action_exit_triggered();
+
+
+     void on_pushButton_close_clicked();
+
+     void on_pushButton_mini_clicked();
+
+     void on_pushButton_seting_clicked();
+
+     void on_pushButton_max_clicked();
+
+     void on_action_seting_triggered();
+
+
+     void on_action_mini_triggered();
+
+     void on_action_resource_triggered();
+
+signals:
+
+
+     void quit();
      void setshow();
+
+
+ protected:
+
 
 private:
 
     Ui::MainWindow *ui;
 
-   void  getCommond();
-   void  setVideoMode(Qt::AspectRatioMode mode);
+    //窗口任意移动
+    bool        m_bDrag;
+    QPoint      mouseStartPoint;
+    QPoint      windowTopLeftPoint;
 
-    bool eventFilter(QObject *target, QEvent *event);
-    void ThreadFunc(int,QString);
     QStandardItemModel *student_model;
     QString STimeDuration="00:00:00";
     QMediaPlaylist *playlist;
     QMediaPlayer *player;
     QVideoWidget *video;
-    void setSTime(qint64);
+
     QString API;
-    loading load;
-    set seting;
     QTimer *m_timer;
     QMutex mtx;
+    set seting;
+    QDialog loading;
 
+    QDialog volume;
 
+    //QScrollBar* value;
+
+     QLabel  labelTL;
+
+    void setSTime(qint64);
+    void  getCommond();
+    void  setVideoMode(Qt::AspectRatioMode mode);
+    void echoload(bool echo);
+    bool eventFilter(QObject *target, QEvent *event);
+    void ThreadFunc(int,QString);
     void createListWidget(QListWidget *listWidget,int key,bool insert);
-
+    void createLoading();
+    void createVolume();
     void  switchFullScreen(bool);
-
     void  loadPlay(bool play,int index);
+
+
 
     //运行信息
     Appinfo app;
@@ -558,35 +603,34 @@ private:
               }
           }
 
-                     //搜索资源站
-                     void  search(QString  searchword,int ctype=0){
-
-                         QString done,url,api;vSearch.clear();
-                         if(ctype==0){
-
-                             foreach (SourceInfo it, type) {
+       //搜索资源站
+        void  search(QString  searchword,int ctype=0)
+        {
+             QString done,url,api;vSearch.clear();
+               if(ctype==0)
+               {
+                    foreach (SourceInfo it, type)
+                    {
                                  VideoInfo cInfo;                 //重要,清空数据
                                  url=it.api+"?wd="+searchword;
                                  done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
                                  cInfo.sname=it.name;cInfo.api=it.api;
                                  vSearch.append(cInfo);
-                             }
+                       }
 
-
-                          }else{
+                 }else{
                                VideoInfo cInfo;
                                api=type.value(ctype-1).api;
                                url=api+"?wd="+searchword;
                                done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
                                cInfo.sname=type.value(ctype-1).name;cInfo.api=api;
                                vSearch.append(cInfo);
+                 }
+           }
 
-                          }
-                     }
-
-                    //组合简介信息
-                     QString todes(VideoInfo cInfo,int index){
-                         QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
+              //组合简介信息
+              QString todes(VideoInfo cInfo,int index){
+                  QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
                                     .arg(cInfo.name.value(index))
                                     .arg(cInfo.year.value(index))
                                     .arg(cInfo.area.value(index))
@@ -596,7 +640,7 @@ private:
                                     .arg(cInfo.actor.value(index))
                                     .arg(cInfo.des.value(index));
                           return str;
-                     }
+               }
 
                     //取文本MD5值
                      QString toHash(const QString pwd){
@@ -658,7 +702,7 @@ private:
                            }
 
                  //调用默认程序打开命令行
-                  void open(QString url,QString shell="xdg-open"){
+                  void open(QString url){
 
                      #ifdef Q_OS_WIN32
 
@@ -671,8 +715,7 @@ private:
                            return;
                        }
                    #else
-
-                       QString  cmd= shell+QString(" ")+ url; //在linux下，可以通过system来xdg-open命令调用默认程序打开文件；
+                       QString cmd=QString("xdg-open ")+ url; //在linux下，可以通过system来xdg-open命令调用默认程序打开文件；
 
                        system(cmd.toStdString().c_str());
                    #endif
@@ -727,19 +770,30 @@ private:
                           }
                    }
 
-
-
-                  void echoload(bool echo,int timeout=20000){
-
-                      if(echo){
-                          load.show();
-                          QTimer::singleShot(timeout, &load, SLOT(hide())); //超时
-                      }else{load.hide();}
+                 //图片路径
+                  QString topic(QString api,QString id){
+                     return app.cache+toHash(api)+"_"+id+".jpg";
                   }
 
+                  QString Readfile(const QString pfile)
+                  {
+                      QString ba;
+                      QFile file(pfile);
+                             if( file.open(QIODevice::ReadOnly|QIODevice::Text) ){
 
+                                 for(int i=0;  !file.atEnd();i++){
+                                      QByteArray line = file.readLine();
+                                      QString str(line);
+                                      if(str!=""){
+                                         ba+=str.toUtf8();
+                                      }
+                                 }
+                                 file.close();
+                             }
+                            return ba;
+                   }
 
 
 };
 
-              #endif // MAINWINDOW_H
+#endif // MAINWINDOW_H

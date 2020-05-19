@@ -10,8 +10,7 @@ set::set(QWidget *parent) :
     //窗口居中
     move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
-
-    this->setAttribute(Qt::WA_DeleteOnClose,0);
+     setWindowFlags(Qt::WindowStaysOnTopHint |windowFlags());
 
 
 
@@ -20,6 +19,11 @@ set::set(QWidget *parent) :
 set::~set()
 {
     delete ui;
+}
+
+void set::quit(){
+
+    close();
 }
 
 void set::reshow(){
@@ -49,7 +53,6 @@ void set::on_pushButton_live_ok_clicked()
     if(Writefile("./live.txt",ui->live_edit->toPlainText())){
          QMessageBox::information(nullptr, "提示", "保存成功！",QMessageBox::Yes);
     }
-
 
 }
 
