@@ -379,7 +379,7 @@ QPushButton:hover{
          <string notr="true"/>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -1595,10 +1595,10 @@ QPushButton:hover{
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton{
-    border-image:url(://resource/img/play_on.svg) 0px 0px no-repeat;
+    border-image:url(://resource/img/play_at.svg) 0px 0px no-repeat;
 }
 QPushButton:hover{
-     border-image:url(://resource/img/play_at.svg) 0px 0px no-repeat;
+     border-image:url(://resource/img/play_on.svg) 0px 0px no-repeat;
 }
 </string>
              </property>

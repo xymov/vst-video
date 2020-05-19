@@ -1,5 +1,5 @@
 Package: vst-video
-Version: 2.43
+Version: 2.5
 Section: net
 Priority: optional
 Architecture: amd64
