@@ -63,7 +63,9 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">QPushButton{
+ border: none ; 
+}</string>
    </property>
    <property name="inputMethodHints">
     <set>Qt::ImhHiddenText|Qt::ImhMultiLine|Qt::ImhNoAutoUppercase|Qt::ImhPreferNumbers|Qt::ImhSensitiveData</set>
@@ -410,6 +412,14 @@ QPushButton:hover{
           </item>
           <item>
            <widget class="QGroupBox" name="box_page">
+            <property name="styleSheet">
+             <string notr="true">QPushButton{
+ background: transparent; 
+}
+QLabel{
+ background: transparent; 
+}</string>
+            </property>
             <layout class="QHBoxLayout" name="box_page_l_2">
              <property name="spacing">
               <number>10</number>
@@ -427,6 +437,9 @@ QPushButton:hover{
                  <width>165</width>
                  <height>0</height>
                 </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"> background: transparent; </string>
                </property>
                <property name="text">
                 <string>当前第001页，共100 页</string>
@@ -1457,6 +1470,14 @@ QPushButton:hover{
           <height>16777215</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+ background: transparent; 
+}
+QLabel{
+ background: transparent; 
+}</string>
+        </property>
         <property name="title">
          <string>详细</string>
         </property>
@@ -1565,9 +1586,11 @@ QPushButton:hover{
              <property name="styleSheet">
               <string notr="true">QPushButton{
     border-image:url(://resource/img/front_out.svg) 0px 0px no-repeat;
+ background: transparent; 
 }
 QPushButton:hover{
      border-image:url(://resource/img/front_on.svg) -0px 0px no-repeat;
+  background: transparent; 
 }
 </string>
              </property>
@@ -1596,8 +1619,10 @@ QPushButton:hover{
              <property name="styleSheet">
               <string notr="true">QPushButton{
     border-image:url(://resource/img/play_at.svg) 0px 0px no-repeat;
+  background: transparent; 
 }
 QPushButton:hover{
+   background: transparent; 
      border-image:url(://resource/img/play_on.svg) 0px 0px no-repeat;
 }
 </string>
@@ -1624,6 +1649,7 @@ QPushButton:hover{
              <property name="styleSheet">
               <string notr="true">QPushButton{
     border-image:url(://resource/img/next_out.svg) 0px 0px no-repeat;
+ background: transparent; 
 }
 QPushButton:hover{
      border-image:url(://resource/img/next_on.svg) -0px 0px no-repeat;
@@ -1715,16 +1741,45 @@ QPushButton:hover{
     <property name="title">
      <string>设置</string>
     </property>
+    <widget class="QMenu" name="menu_notes">
+     <property name="title">
+      <string>播放记录</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>主题</string>
+     </property>
+     <addaction name="action_theme_1"/>
+     <addaction name="action_theme_2"/>
+     <addaction name="action_theme_0"/>
+    </widget>
+    <addaction name="separator"/>
     <addaction name="action_resource"/>
+    <addaction name="menu_notes"/>
     <addaction name="separator"/>
     <addaction name="action_seting"/>
+    <addaction name="menu"/>
     <addaction name="separator"/>
+    <addaction name="action_tophint"/>
     <addaction name="action_about"/>
+    <addaction name="separator"/>
     <addaction name="action_exit"/>
+   </widget>
+   <widget class="QMenu" name="menu_titlebar">
+    <property name="title">
+     <string>标题</string>
+    </property>
+    <addaction name="action_mini"/>
+    <addaction name="action_max"/>
+    <addaction name="action_top"/>
+    <addaction name="separator"/>
+    <addaction name="action_close"/>
    </widget>
    <addaction name="menu_play"/>
    <addaction name="menu_explore"/>
    <addaction name="menu_seting"/>
+   <addaction name="menu_titlebar"/>
   </widget>
   <action name="action_3">
    <property name="text">
@@ -1855,12 +1910,135 @@ QPushButton:hover{
   </action>
   <action name="action_resource">
    <property name="text">
-    <string>刷新</string>
+    <string>刷新资源</string>
+   </property>
+  </action>
+  <action name="action_tophint">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>置顶</string>
+   </property>
+   <property name="toolTip">
+    <string>窗口置顶</string>
+   </property>
+  </action>
+  <action name="action_mini">
+   <property name="text">
+    <string>最小化</string>
+   </property>
+  </action>
+  <action name="action_max">
+   <property name="text">
+    <string>最大/还原</string>
+   </property>
+  </action>
+  <action name="action_top">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>总在最前</string>
+   </property>
+  </action>
+  <action name="action_close">
+   <property name="text">
+    <string>关闭</string>
+   </property>
+  </action>
+  <action name="action_theme_1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>深色主题</string>
+   </property>
+  </action>
+  <action name="action_theme_2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>浅色主题</string>
+   </property>
+  </action>
+  <action name="action_theme_0">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>跟随系统</string>
    </property>
   </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>action_max</sender>
+   <signal>triggered()</signal>
+   <receiver>pushButton_max</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1164</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_close</sender>
+   <signal>triggered()</signal>
+   <receiver>pushButton_close</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1179</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_mini</sender>
+   <signal>triggered()</signal>
+   <receiver>pushButton_mini</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1146</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>action_tophint</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

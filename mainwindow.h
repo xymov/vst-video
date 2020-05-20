@@ -3,7 +3,10 @@
 #include <QDesktopServices>
 #include <QMainWindow>
 #include "set.h"
+#include "config.h"
 #include "framelesshelper.h"
+
+
 
 
 
@@ -79,6 +82,8 @@ typedef struct Appinfo
 
    QString nopic;
 
+   QString notes;
+
    QStringList arguments;
 
    Qt::WindowFlags Flags;
@@ -101,6 +106,17 @@ typedef struct Nameinfo
     QString name;
 }Nameinfo;
 Q_DECLARE_METATYPE(Nameinfo);
+
+//名称信息
+typedef struct Notesinfo
+{
+    QString title;
+    QString api;
+    QString id;
+    QString part;
+    QString time;
+}Notesinfo;
+Q_DECLARE_METATYPE(Notesinfo);
 
 
 
@@ -280,7 +296,7 @@ private slots:
 
 
 
-     void on_action_mini_mode_triggered();
+    // void on_action_mini_mode_triggered();
 
      void on_action_exit_triggered();
 
@@ -296,9 +312,29 @@ private slots:
      void on_action_seting_triggered();
 
 
-     void on_action_mini_triggered();
+     //void on_action_mini_triggered();
 
      void on_action_resource_triggered();
+
+     void  renotes();
+
+     void menu_action_notes_triggered(QAction *);
+
+     //void on_action_tophint_triggered();
+
+    void  setWindowsTopHint();
+    void  remWindowsTopHint();
+
+     void TitlebarMenu(const QPoint &pos);
+
+
+     void on_action_tophint_toggled(bool arg1);
+
+     void on_action_theme_1_triggered();
+
+     void on_action_theme_2_triggered();
+
+     void on_action_theme_0_triggered();
 
 signals:
 
@@ -330,12 +366,8 @@ private:
     QMutex mtx;
     set seting;
     QDialog loading;
+    Config  config;
 
-    QDialog volume;
-
-    //QScrollBar* value;
-
-     QLabel  labelTL;
 
     void setSTime(qint64);
     void  getCommond();
@@ -347,9 +379,9 @@ private:
     void createLoading();
     void createVolume();
     void  switchFullScreen(bool);
-    void  loadPlay(bool play,int index);
+    void  loadPlay(bool play,int index,qint64 time);
 
-
+    void MinWriteNotes(int index);
 
     //运行信息
     Appinfo app;
@@ -792,6 +824,22 @@ private:
                              }
                             return ba;
                    }
+
+
+                  //写播放记录
+                    void WriteNotes( const QString &logFile,const Notesinfo & note)
+                        {
+                            QFile file( logFile );
+                            if( file.open(QIODevice::WriteOnly | QIODevice::Append) )
+                            {
+                                QByteArray ba = (note.title+"|"+note.api+"|"+note.id+"|"+note.part+"|"+note.time).toLocal8Bit()+"\n";
+                                file.write( ba );
+                                file.close();
+                            }
+                        }
+
+
+
 
 
 };

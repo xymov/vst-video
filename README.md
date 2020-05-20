@@ -4,9 +4,9 @@
 ### 依赖  
 sudo apt-get install libqt5multimedia5 libqt5multimediawidgets5 qtmultimedia5-dev
 
-更新记录：
+### 更新记录：
 
-更新记录：2020.05.19发布 V2.5 正式版
+2020.05.19发布 V2.5 正式版
 主要更新：
 1.优化UI,标题栏添加设置按钮。
 2.修复已知BUG。

@@ -2,6 +2,7 @@
 
 #include <QApplication>
 
+ #include <QtCore>
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,10 @@ int main(int argc, char *argv[])
     qSetMessagePattern("[ %{file}: %{line} ] %{message}");
     MainWindow w;
     a.connect(&a, SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
+
+
+
+
     //a.setQuitOnLastWindowClosed(true);
     w.show();
     return a.exec();

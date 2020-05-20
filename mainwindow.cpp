@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* 圆角矩形
      QDialog * Parent=new QDialog();
-     Parent->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog |Qt::WindowStaysOnTopHint);  //无边框，置顶
+     Parent->setWindowFlags(Qt::FramelessWindowHint |Qt::WindowStaysOnTopHint |Parent->windowFlags());
      Parent->setAttribute(Qt::WA_TranslucentBackground);   //背景透明
      this->setParent(Parent);
      this->setStyleSheet("background-color:gray;border-radius:10px;");
@@ -19,8 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
      //配置设置
      app.sourcePath=QDir::currentPath()+"/source.txt";
      app.livePath=QDir::currentPath()+"/live.txt";
+     app.notes=QDir::currentPath()+"/notes.txt";
      app.cache=QDir::currentPath()+"/cache/";
      app.nopic="://resource/img/timg.jpeg";
+
      app.live=false;
 
      qDebug()<<app.cache;
@@ -36,15 +38,44 @@ MainWindow::MainWindow(QWidget *parent)
      this->setAttribute(Qt::WA_DeleteOnClose,true);
 
    /*  自定义标题栏    */
+        setWindowFlags(Qt::FramelessWindowHint |windowFlags());
 
-     setWindowFlags(Qt::FramelessWindowHint |Qt::WindowStaysOnTopHint |windowFlags());
+
+   /*  检查配置   */
+
+     //是否置顶
+
+     if(config.get("set","tophint").toInt()==1){
+         //setWindowFlags(Qt::FramelessWindowHint |Qt::WindowStaysOnTopHint|windowFlags());
+         ui->action_top->setChecked(true);
+     }else{
+         //setWindowFlags(Qt::FramelessWindowHint |windowFlags());
+         ui->action_top->setChecked(false);
+     }
+
+    //主题
+
+     int theme=config.get("set","theme").toInt();
+
+     switch (theme) {
+         default: ui->action_theme_0->setChecked(true);
+                  break;
+         case 1: ui->action_theme_1->setChecked(true);
+         this->setStyleSheet("QWidget{background-color:#606060;}");
+         break;
+         case 2: ui->action_theme_2->setChecked(true);
+         this->setStyleSheet("QWidget{background-color:#f0f0f0;}");
+         break;
+     }
+
+
      FramelessHelper *pHelper = new FramelessHelper(this);
      pHelper->activateOn(this);  //激活当前窗体
      pHelper->setTitleHeight(50);  //设置窗体的标题栏高度，可拖动高度
      pHelper->setWidgetMovable(true);  //设置窗体可移动
      pHelper->setWidgetResizable(true);  //设置窗体可缩放
      pHelper->setOnlyTitleBarMove(false); //设置是否只标题栏可拖动
-     //pHelper->setRubberBandOnMove(true);  //设置橡皮筋效果-可移动
+     pHelper->setRubberBandOnMove(true);  //设置橡皮筋效果-可移动
      //pHelper->setRubberBandOnResize(true);  //设置橡皮筋效果-可缩放
 
         //关闭按钮
@@ -128,8 +159,17 @@ void MainWindow::init(){
      }
   /*       控件初始化     */
 
-      //等待动画
-                 createLoading();
+          //等待动画
+             createLoading();
+          //播放记录
+                renotes();
+                connect(ui->menu_notes,SIGNAL(triggered(QAction*)),this,SLOT(menu_action_notes_triggered(QAction*)));
+
+           //置顶
+               // connect(ui->action_tophint,SIGNAL(toggled(bool)),this,SLOT(setWindowsTopHint(bool)));
+
+
+
 
                   //动态添加播放控件
                   video = new QVideoWidget;
@@ -139,6 +179,12 @@ void MainWindow::init(){
 
                   video->setMouseTracking(true);
                   //video->setAttribute(Qt::WA_OpaquePaintEvent);
+
+                  //标题栏菜单关联
+
+                  ui->titlebar->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
+                   connect(ui->titlebar,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(TitlebarMenu(const QPoint&)));
+
                   //播放器右键菜单关联
                   video->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
                   connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(PlayMenu(const QPoint&)));
@@ -149,6 +195,8 @@ void MainWindow::init(){
                   //搜索右键菜单管理
                   ui->search_list->setContextMenuPolicy(Qt::CustomContextMenu);
                   connect(ui->search_list,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ExploreMenu(const QPoint&)));
+
+
                   video->show();
                   // 缩放 Qt::KeepAspectRatio,铺满 Qt::IgnoreAspectRatio ，拉伸 Qt::KeepAspectRatioByExpanding  不缩放  Default
                   setVideoMode(Qt::KeepAspectRatio);
@@ -543,11 +591,12 @@ void MainWindow::durationChange(qint64 playtime)
 //播放器进度被改变
 void MainWindow::positionChange(qint64 p)
 {
-
+    //播放记录
+    MinWriteNotes(ui->comboBox_part->currentIndex());
     if(app.live)return;
      if (!ui->sliderProgress->isSliderDown()) {
      ui->sliderProgress->setValue(p);
-      setSTime(p);
+     setSTime(p);
 
     }
 }
@@ -757,6 +806,7 @@ void MainWindow::ThreadFunc(int tp,QString word){
          QApplication::postEvent(this ,new QEvent(event));
 
 
+
      }else if(tp==4){
         //下载浏览图片
          UrlRequestImg(vInfo.pic.value(word.toInt()),toHash(vInfo.api)+"_"+vInfo.id.value(word.toInt()));
@@ -824,7 +874,7 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->box_page->show();
         ui->tabWidget->findChildren<QTabBar*>().at(0)->show();
         //取消置顶
-       // hide();setWindowFlags(Qt::Widget);show();
+        //hide();setWindowFlags(windowFlags() ^ Qt::WindowStaysOnTopHint);show();
 
     }else{
 
@@ -834,7 +884,7 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->tabWidget->findChildren<QTabBar*>().at(0)->hide();
         ui->tabWidget->setStyleSheet("border:0;");
         //窗口置顶
-        //hide();setWindowFlags(Qt::WindowStaysOnTopHint);show();
+        //hide();setWindowFlags(windowFlags()|Qt::WindowStaysOnTopHint);show();
 
    }
 }
@@ -1076,12 +1126,13 @@ void MainWindow::loadMedia(int key){
 
 //加载播放
 
-void  MainWindow::loadPlay(bool play,int index=0){
+void  MainWindow::loadPlay(bool play,int index=0,qint64 time=0){
 
    if(play)
   {
 
         video->setUpdatesEnabled(true);
+
         ui->sliderProgress->setEnabled(true);
 
         player->stop();
@@ -1095,13 +1146,19 @@ void  MainWindow::loadPlay(bool play,int index=0){
           }
 
         playlist->setCurrentIndex(index);
-        player->play();
+
+        player->setPosition(time);player->play();
+
+
+
 
    }else{
 
         player->pause();
    }
 }
+
+
 
 //进入播放选项卡并播放视频
 void MainWindow::on_info_play_clicked()
@@ -1351,13 +1408,6 @@ void MainWindow::on_action_explore_xnew_triggered()
 
     }
 }
-//关于窗口
-void MainWindow::on_action_about_triggered()
-{
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.5\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
-    aboutMB.setIconPixmap(QPixmap("://resource/img/icon.png"));
-    aboutMB.exec();
-}
 
 void MainWindow::on_pushButton_front_clicked()
 {
@@ -1397,14 +1447,6 @@ void MainWindow::createLoading(){
 
 
 
-void MainWindow::on_action_mini_mode_triggered()
-{
-
-    this->hide();
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog |Qt::WindowStaysOnTopHint);  //无边框，置顶
-    this->show();
-
-}
 
 void MainWindow::on_action_exit_triggered()
 {
@@ -1425,7 +1467,7 @@ void MainWindow::on_pushButton_mini_clicked()
 
 void MainWindow::on_pushButton_seting_clicked()
 {
-
+    renotes();  //刷新播放记录
     ui->menu_seting->exec(QCursor::pos());
 }
 
@@ -1441,18 +1483,193 @@ void MainWindow::on_action_seting_triggered()
 }
 
 
-
-void MainWindow::on_action_mini_triggered()
-{
-    ui->box_source->show();
-    on_pushButton_playlist_clicked();
-    setGeometry((QApplication::desktop()->width() - width())/2,(QApplication::desktop()->height() - height())/2,400,200);
-
-}
-
 void MainWindow::on_action_resource_triggered()
 {
     model->removeRows(0,model->rowCount());
     model->setItem(0,0,new QStandardItem("正在刷新..."));
     QtConcurrent::run(this,&MainWindow::ThreadFunc,0,QString::number(1));
+}
+
+
+//写播放记录
+
+void MainWindow::MinWriteNotes(int index=0){
+    Notesinfo note;QString str;
+    note.title=QString("【%1】%2").arg(ui->comboBox_name->currentText()).arg(ui->comboBox_part->currentText());
+    if(ui->comboBox_name->currentText()!=""){
+    note.api=ui->comboBox_name->itemData(ui->comboBox_name->currentIndex()).toString();
+    note.id="";
+    note.part=QString::number(index);
+    note.time=QString::number(player->position());
+    str=QString("%1|%2|%3|%4").arg(note.title).arg(note.api).arg(note.part).arg(note.time);
+    config.set("notes",toHash(note.api),str);
+    }
+}
+
+//刷新播放记录
+void MainWindow::renotes()
+{
+  QStringList list,keys;
+  QString key;
+  ui->menu_notes->clear();
+  keys=config.getKeys("notes");
+
+  if(keys.size()>0){
+
+    for(int i=0;i<keys.size();i++){
+       key=config.getValue(keys.value(i)).toString();
+       list=key.split("|");
+       QAction *test = new QAction(list.value(0), this);test->setData(list);
+       ui->menu_notes->addAction(test);
+    }
+    //添加清除按钮
+    ui->menu_notes->addSeparator();
+    QAction *test = new QAction("清空记录", this);test->setData("clear");
+    ui->menu_notes->addAction(test);
+}
+
+}
+
+//播放记录被选择
+ void MainWindow::menu_action_notes_triggered(QAction *action){
+
+    QString name,api,id,part,time;
+
+    if(action->data().toString()=="clear"){
+
+        config.remove("notes");
+        renotes();
+
+   }else{
+
+    name=action->data().toList().value(0).toString();
+    api=action->data().toList().value(1).toString();
+    id=action->data().toList().value(2).toString();
+    part=action->data().toList().value(3).toString();
+    time=action->data().toList().value(4).toString();
+
+    echoload(true);
+    app.live=false;
+
+    getvideo(2,api,id);
+
+    ui->comboBox_name->clear();
+
+    ui->comboBox_part->clear(); ui->info_des->clear();
+
+    ui->comboBox_name->addItem(vInfo.name.value(0),api+"|"+id);
+
+     for(int i=0;i<vInfo.video.size();i++){
+         QStringList list =vInfo.video.value(i).split("#");
+         QStringList v;
+
+         //下载图片
+
+         if(!isFileExist(app.cache+"/"+toHash(vInfo.api)+"_"+vInfo.id.value(i)+".jpg"))
+         {
+
+            QtConcurrent::run(this,&MainWindow::ThreadFunc,3,vInfo.pic.value(i)+"|"+vInfo.api+"|"+vInfo.id.value(i));
+
+         }
+
+         foreach (QString s, list) {
+             //第30集$https://index.m3u8$ckm3u8
+             v=s.trimmed().split("$");
+              if(v.size()==1){
+                   ui->comboBox_part->addItem("高清",v.value(0));
+              }else if(v.size()==2){
+                  ui->comboBox_part->addItem("高清",v.value(0));
+              }else if(v.size()==3){
+                  ui->comboBox_part->addItem(v.value(0),v.value(1));
+              }
+         }
+         ui->info_des->setHtml(todes(vInfo,i));
+
+     }
+
+      ui->tabWidget->setCurrentIndex(1);
+
+      ui->comboBox_part->setCurrentIndex(part.toInt());
+
+      loadPlay(true,part.toInt(),time.toInt());
+
+
+   }
+
+}
+
+ //标题栏菜单
+ void MainWindow::TitlebarMenu(const QPoint &pos){
+     Q_UNUSED(pos);
+     if(this->isMaximized()){ui->action_max->setText("还原");}else{ui->action_max->setText("最大化");}
+     ui->menu_titlebar->exec(QCursor::pos());
+
+ }
+
+
+
+
+/*   置顶/取消   */
+ void  MainWindow::setWindowsTopHint(){
+
+     hide();
+     setWindowFlags(windowFlags()|Qt::WindowStaysOnTopHint);
+     config.set("set","tophint",1);
+     show();
+  }
+
+ void  MainWindow::remWindowsTopHint(){
+         hide();
+         setWindowFlags(windowFlags()^Qt::WindowStaysOnTopHint);
+         config.set("set","tophint",0);
+         show();
+  }
+
+ void MainWindow::on_action_tophint_toggled(bool arg1)
+ {
+     if(arg1){
+         QTimer::singleShot(500, this, SLOT(setWindowsTopHint()));
+     }else{
+         QTimer::singleShot(500, this, SLOT(remWindowsTopHint()));
+     }
+ }
+
+
+
+
+
+/*  主题切换     */
+void MainWindow::on_action_theme_1_triggered()
+{
+
+    this->setStyleSheet("QWidget{background-color:#606060;}");
+    config.set("set","theme",1);
+    ui->action_theme_0->setChecked(false);
+    ui->action_theme_2->setChecked(false);
+
+}
+
+void MainWindow::on_action_theme_2_triggered()
+{
+     this->setStyleSheet("QWidget{background-color:#f0f0f0;}");
+     config.set("set","theme",2);
+     ui->action_theme_0->setChecked(false);
+     ui->action_theme_1->setChecked(false);
+
+}
+
+void MainWindow::on_action_theme_0_triggered()
+{
+     this->setStyleSheet("");config.set("set","theme",0);
+     ui->action_theme_1->setChecked(false);
+     ui->action_theme_2->setChecked(false);
+
+}
+
+//关于窗口
+void MainWindow::on_action_about_triggered()
+{
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.51\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
+    aboutMB.setIconPixmap(QPixmap("://resource/img/icon.png"));
+    aboutMB.exec();
 }
