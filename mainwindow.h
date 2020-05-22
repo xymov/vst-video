@@ -17,7 +17,11 @@
 #include <QMediaPlaylist>
 #include <QVideoWidget>
 #include <QMovie>
+#include <QMediaMetaData>
 
+#include <QGraphicsVideoItem>
+
+#include <QGraphicsScene>
 #include<QToolButton>
 
 
@@ -83,6 +87,8 @@ typedef struct Appinfo
    QString nopic;
 
    QString notes;
+
+   int angle=0, mh=1, mv=1;
 
    QStringList arguments;
 
@@ -336,6 +342,18 @@ private slots:
 
      void on_action_theme_0_triggered();
 
+
+     void metaDataChange();
+
+
+     void on_action_rotate_left_triggered();
+
+     void on_action_rotate_right_triggered();
+
+     void on_action_rotate_x_triggered();
+
+     void on_action_rotate_y_triggered();
+
 signals:
 
 
@@ -344,7 +362,7 @@ signals:
 
 
  protected:
-
+       virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
 
@@ -369,6 +387,15 @@ private:
     Config  config;
 
 
+    QGraphicsScene *scene;
+    QGraphicsVideoItem *GVI;
+    QGraphicsTextItem *GTI;
+    QWidget*   viewWidget;
+
+
+    int widthV, heightV;
+
+    void viewresize();
     void setSTime(qint64);
     void  getCommond();
     void  setVideoMode(Qt::AspectRatioMode mode);
@@ -382,6 +409,8 @@ private:
     void  loadPlay(bool play,int index,qint64 time);
 
     void MinWriteNotes(int index);
+
+    void showMessage(QString);
 
     //运行信息
     Appinfo app;

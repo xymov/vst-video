@@ -90,7 +90,7 @@
      <widget class="QGroupBox" name="titlebar">
       <property name="minimumSize">
        <size>
-        <width>30</width>
+        <width>300</width>
         <height>40</height>
        </size>
       </property>
@@ -125,6 +125,12 @@
        </property>
        <item>
         <widget class="QLabel" name="label_ico">
+         <property name="minimumSize">
+          <size>
+           <width>35</width>
+           <height>35</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>35</width>
@@ -165,12 +171,15 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>20</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>菜单</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{
@@ -178,10 +187,10 @@ border: none ;
  background-color:transparent; 
 }
 QPushButton:hover{
-
  background-color:#E0E0E0; 
 }
-</string>
+QPushButton:pressed{
+}</string>
          </property>
          <property name="text">
           <string/>
@@ -202,18 +211,21 @@ QPushButton:hover{
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>20</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>最小化</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{
@@ -252,6 +264,9 @@ QPushButton:hover{
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
          </property>
+         <property name="toolTip">
+          <string>还原</string>
+         </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{
 border: none ;
@@ -282,14 +297,14 @@ QPushButton:hover{
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>14</width>
+           <height>14</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>13</width>
-           <height>15</height>
+           <width>14</width>
+           <height>14</height>
           </size>
          </property>
          <property name="sizeIncrement">
@@ -300,6 +315,9 @@ QPushButton:hover{
          </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>关闭</string>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{
@@ -328,7 +346,7 @@ QPushButton:hover{
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <layout class="QHBoxLayout" name="main">
       <item>
        <widget class="QGroupBox" name="box_source">
         <property name="minimumSize">
@@ -347,9 +365,6 @@ QPushButton:hover{
          <string>资源</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5"/>
-         </item>
          <item>
           <widget class="QTreeView" name="tree_source">
            <property name="minimumSize">
@@ -473,6 +488,15 @@ QLabel{
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton{
+
+}
+QPushButton:hover{
+color:#00F;
+}
+</string>
+               </property>
                <property name="text">
                 <string>上页</string>
                </property>
@@ -491,6 +515,15 @@ QLabel{
                  <width>50</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton{
+
+}
+QPushButton:hover{
+color:#00F;
+}
+</string>
                </property>
                <property name="text">
                 <string>下页</string>
@@ -613,6 +646,16 @@ QLabel{
                <property name="bottomMargin">
                 <number>0</number>
                </property>
+               <item>
+                <widget class="QGraphicsView" name="view">
+                 <property name="styleSheet">
+                  <string notr="true">border: none ;</string>
+                 </property>
+                 <property name="viewportUpdateMode">
+                  <enum>QGraphicsView::SmartViewportUpdate</enum>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
@@ -841,6 +884,9 @@ QLabel{
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
                     </property>
+                    <property name="toolTip">
+                     <string>播放</string>
+                    </property>
                     <property name="styleSheet">
                      <string notr="true">QPushButton{
     border-image:url(://resource/img/play_out.svg) 0px 0px no-repeat;
@@ -874,6 +920,9 @@ QPushButton:hover{
                     </property>
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
+                    </property>
+                    <property name="toolTip">
+                     <string>上一集</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true">QPushButton{
@@ -911,6 +960,9 @@ QPushButton:disabled{
                     </property>
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
+                    </property>
+                    <property name="toolTip">
+                     <string>下一集</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true">QPushButton{
@@ -1583,6 +1635,9 @@ QLabel{
                <height>35</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>上个视频</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">QPushButton{
     border-image:url(://resource/img/front_out.svg) 0px 0px no-repeat;
@@ -1616,6 +1671,9 @@ QPushButton:hover{
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
+             <property name="toolTip">
+              <string>播放视频</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">QPushButton{
     border-image:url(://resource/img/play_at.svg) 0px 0px no-repeat;
@@ -1645,6 +1703,9 @@ QPushButton:hover{
                <width>32</width>
                <height>35</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string>下个视频</string>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton{
@@ -1719,11 +1780,21 @@ QPushButton:hover{
      <addaction name="action_videosize_KeepAspectRatio"/>
      <addaction name="action_videosize_KeepAspectRatioByExpanding"/>
     </widget>
+    <widget class="QMenu" name="menu_3">
+     <property name="title">
+      <string>旋转</string>
+     </property>
+     <addaction name="action_rotate_left"/>
+     <addaction name="action_rotate_right"/>
+     <addaction name="action_rotate_x"/>
+     <addaction name="action_rotate_y"/>
+    </widget>
     <addaction name="menu_5"/>
     <addaction name="separator"/>
     <addaction name="menu_6"/>
     <addaction name="menu_7"/>
     <addaction name="menu_2"/>
+    <addaction name="menu_3"/>
     <addaction name="menu_4"/>
     <addaction name="separator"/>
    </widget>
@@ -1969,6 +2040,26 @@ QPushButton:hover{
    </property>
    <property name="text">
     <string>跟随系统</string>
+   </property>
+  </action>
+  <action name="action_rotate_left">
+   <property name="text">
+    <string>逆时针旋转</string>
+   </property>
+  </action>
+  <action name="action_rotate_right">
+   <property name="text">
+    <string>顺时针旋转</string>
+   </property>
+  </action>
+  <action name="action_rotate_x">
+   <property name="text">
+    <string>水平镜像</string>
+   </property>
+  </action>
+  <action name="action_rotate_y">
+   <property name="text">
+    <string>垂直镜像</string>
    </property>
   </action>
  </widget>
