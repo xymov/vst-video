@@ -1,26 +1,26 @@
 #ifndef FRAMELESSHELPER_H
 #define FRAMELESSHELPER_H
-#include<QRubberBand>
-#include<QStylePainter>
-#include<QStyleOptionFocusRect>
-
-
+#include <QRubberBand>
+#include <QStylePainter>
+#include <QStyleOptionFocusRect>
 #include <QtGui>
+
 class WidgetData;
+
 class LinuxRubberBand : public QRubberBand
 {
 public:
-    LinuxRubberBand(Shape s, QWidget * p = 0 )
-        : QRubberBand( s, p )
+    LinuxRubberBand(Shape s, QWidget *p = nullptr)
+        : QRubberBand(s, p)
     {
         QPalette palette;
-        palette.setBrush( QPalette::WindowText, QBrush(Qt::lightGray) );
+        palette.setBrush(QPalette::WindowText, QBrush(Qt::lightGray));
         setPalette(palette);
         repaint();
     }
 
 protected:
-    virtual void paintEvent( QPaintEvent * )
+    virtual void paintEvent(QPaintEvent *)
     {
         QStylePainter painter(this);
         QStyleOptionFocusRect option;
@@ -33,8 +33,8 @@ protected:
         painter.setPen(pen);
         painter.drawControl(QStyle::CE_FocusFrame, option);
     }
-
 };
+
 /*****
  * FramelessHelperPrivate
  * 存储界面对应的数据集合，以及是否可移动、可缩放属性
@@ -42,12 +42,12 @@ protected:
 class FramelessHelperPrivate
 {
 public:
-    QHash<QWidget*, WidgetData*> m_widgetDataHash;
-    bool m_bWidgetMovable        : true;
-    bool m_bWidgetResizable      : true;
-    bool m_bRubberBandOnResize   : true;
-    bool m_bRubberBandOnMove     : true;
-    bool m_bOnlyTitleBarMove     : true;
+    QHash<QWidget *, WidgetData *> m_widgetDataHash;
+    bool m_bWidgetMovable : true;
+    bool m_bWidgetResizable : true;
+    bool m_bRubberBandOnResize : true;
+    bool m_bRubberBandOnMove : true;
+    bool m_bOnlyTitleBarMove : true;
 };
 
 /*****
@@ -62,19 +62,17 @@ public:
     void recalculate(const QPoint &globalMousePos, const QRect &frameRect);
 
 public:
-    bool m_bOnEdges              : true;
-    bool m_bOnLeftEdge           : true;
-    bool m_bOnRightEdge          : true;
-    bool m_bOnTopEdge            : true;
-    bool m_bOnBottomEdge         : true;
-    bool m_bOnTopLeftEdge        : true;
-    bool m_bOnBottomLeftEdge     : true;
-    bool m_bOnTopRightEdge       : true;
-    bool m_bOnBottomRightEdge    : true;
-    static int m_nBorderWidth;
-    static int m_nTitleHeight;
-
-
+    bool m_bOnEdges : true;
+    bool m_bOnLeftEdge : true;
+    bool m_bOnRightEdge : true;
+    bool m_bOnTopEdge : true;
+    bool m_bOnBottomEdge : true;
+    bool m_bOnTopLeftEdge : true;
+    bool m_bOnBottomLeftEdge : true;
+    bool m_bOnTopRightEdge : true;
+    bool m_bOnBottomRightEdge : true;
+    static uint m_nBorderWidth;
+    static uint m_nTitleHeight;
 };
 
 /*****
@@ -86,7 +84,7 @@ class WidgetData
 public:
     explicit WidgetData(FramelessHelperPrivate *d, QWidget *pTopLevelWidget);
     ~WidgetData();
-    QWidget* widget();
+    QWidget *widget();
     // 处理鼠标事件-划过、厉害、按下、释放、移动
     void handleWidgetEvent(QEvent *event);
     // 更新橡皮筋状态
@@ -112,7 +110,6 @@ private:
     // 处理鼠标进入
     void handleHoverMoveEvent(QHoverEvent *event);
 
-
 private:
     FramelessHelperPrivate *d;
     LinuxRubberBand *m_pRubberBand;
@@ -132,7 +129,7 @@ class FramelessHelper : public QObject
     Q_OBJECT
 
 public:
-    explicit FramelessHelper(QObject *parent = 0);
+    explicit FramelessHelper(QObject *parent = nullptr);
     ~FramelessHelper();
     // 激活窗体
     void activateOn(QWidget *topLevelWidget);

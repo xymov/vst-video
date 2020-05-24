@@ -13,13 +13,11 @@ public:
     QStringList getKeys(QString);
     void clear();
     void remove(QString);
-    bool iskey(QString,QString);
-    void set(QString,QString,QVariant);
-    QVariant get(QString,QString);
-    void setValue(QString,QVariant );
+    bool iskey(QString, QString);
+    void set(QString, QString, QVariant);
+    QVariant get(QString, QString);
+    void setValue(QString, QVariant);
     QVariant getValue(QString);
-
-
 
 private:
     QString m_qstrFileName;

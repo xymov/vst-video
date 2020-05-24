@@ -22,13 +22,27 @@ SOURCES += \
     framelesshelper.cpp \
     main.cpp \
     mainwindow.cpp \
-    set.cpp
+    set.cpp \
+    mainwindow_tray.cpp \
+    mainwindow_player.cpp \
+    mainwindow_detail.cpp \
+    mainwindow_resource.cpp \
+    mainwindow_list.cpp \
+    mainwindow_titlebar.cpp \
+    mainwindow_theme.cpp \
+    mainwindow_record.cpp \
+    mainwindow_loading.cpp \
+    webresource.cpp \
+    utilities.cpp
 
 HEADERS += \
     config.h \
     framelesshelper.h \
     mainwindow.h \
-    set.h
+    set.h \
+    webresource.h \
+    types.h \
+    utilities.h
 
 FORMS += \
     mainwindow.ui \

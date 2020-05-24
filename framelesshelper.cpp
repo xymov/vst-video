@@ -1,7 +1,8 @@
 #include "framelesshelper.h"
 
-int CursorPosCalculator::m_nBorderWidth = 5;
-int CursorPosCalculator::m_nTitleHeight = 30;
+uint CursorPosCalculator::m_nBorderWidth = 5;
+uint CursorPosCalculator::m_nTitleHeight = 30;
+
 /***** CursorPosCalculator *****/
 CursorPosCalculator::CursorPosCalculator()
 {
@@ -17,33 +18,32 @@ void CursorPosCalculator::reset()
     m_bOnBottomEdge = false;
     m_bOnTopLeftEdge = false;
     m_bOnBottomLeftEdge = false;
-    m_bOnTopRightEdge  = false;
+    m_bOnTopRightEdge = false;
     m_bOnBottomRightEdge = false;
 }
 
 void CursorPosCalculator::recalculate(const QPoint &gMousePos, const QRect &frameRect)
 {
-    int globalMouseX = gMousePos.x();
-    int globalMouseY = gMousePos.y();
+    uint globalMouseX = static_cast<uint>(gMousePos.x());
+    uint globalMouseY = static_cast<uint>(gMousePos.y());
 
-    int frameX = frameRect.x();
-    int frameY = frameRect.y();
+    uint frameX = static_cast<uint>(frameRect.x());
+    uint frameY = static_cast<uint>(frameRect.y());
 
-    int frameWidth = frameRect.width();
-    int frameHeight = frameRect.height();
+    uint frameWidth = static_cast<uint>(frameRect.width());
+    uint frameHeight = static_cast<uint>(frameRect.height());
 
     m_bOnLeftEdge = (globalMouseX >= frameX &&
-                  globalMouseX <= frameX + m_nBorderWidth );
-
+                     globalMouseX <= frameX + m_nBorderWidth);
 
     m_bOnRightEdge = (globalMouseX >= frameX + frameWidth - m_nBorderWidth &&
-                   globalMouseX <= frameX + frameWidth);
+                      globalMouseX <= frameX + frameWidth);
 
     m_bOnTopEdge = (globalMouseY >= frameY &&
-                 globalMouseY <= frameY + m_nBorderWidth );
+                    globalMouseY <= frameY + m_nBorderWidth);
 
     m_bOnBottomEdge = (globalMouseY >= frameY + frameHeight - m_nBorderWidth &&
-                    globalMouseY <= frameY + frameHeight);
+                       globalMouseY <= frameY + frameHeight);
 
     m_bOnTopLeftEdge = m_bOnTopEdge && m_bOnLeftEdge;
     m_bOnBottomLeftEdge = m_bOnBottomEdge && m_bOnLeftEdge;
@@ -61,7 +61,7 @@ WidgetData::WidgetData(FramelessHelperPrivate *_d, QWidget *pTopLevelWidget)
     m_bLeftButtonPressed = false;
     m_bCursorShapeChanged = false;
     m_bLeftButtonTitlePressed = false;
-    m_pRubberBand = NULL;
+    m_pRubberBand = nullptr;
 
     m_windowFlags = m_pWidget->windowFlags();
     m_pWidget->setMouseTracking(true);
@@ -77,10 +77,10 @@ WidgetData::~WidgetData()
     m_pWidget->setAttribute(Qt::WA_Hover, false);
 
     delete m_pRubberBand;
-    m_pRubberBand = NULL;
+    m_pRubberBand = nullptr;
 }
 
-QWidget* WidgetData::widget()
+QWidget *WidgetData::widget()
 {
     return m_pWidget;
 }
@@ -91,25 +91,23 @@ void WidgetData::handleWidgetEvent(QEvent *event)
     {
     default:
         break;
-
-     case QEvent::MouseButtonDblClick:
-        handleMouseButtonDblClickEvent(static_cast<QMouseEvent*>(event));
+    case QEvent::MouseButtonDblClick:
+        handleMouseButtonDblClickEvent(static_cast<QMouseEvent *>(event));
         break;
-
     case QEvent::MouseButtonPress:
-        handleMousePressEvent(static_cast<QMouseEvent*>(event));
+        handleMousePressEvent(static_cast<QMouseEvent *>(event));
         break;
     case QEvent::MouseButtonRelease:
-        handleMouseReleaseEvent(static_cast<QMouseEvent*>(event));
+        handleMouseReleaseEvent(static_cast<QMouseEvent *>(event));
         break;
     case QEvent::MouseMove:
-        handleMouseMoveEvent(static_cast<QMouseEvent*>(event));
+        handleMouseMoveEvent(static_cast<QMouseEvent *>(event));
         break;
     case QEvent::Leave:
-        handleLeaveEvent(static_cast<QMouseEvent*>(event));
+        handleLeaveEvent(static_cast<QMouseEvent *>(event));
         break;
     case QEvent::HoverMove:
-        handleHoverMoveEvent(static_cast<QHoverEvent*>(event));
+        handleHoverMoveEvent(static_cast<QHoverEvent *>(event));
         break;
     }
 }
@@ -118,7 +116,8 @@ void WidgetData::updateRubberBandStatus()
 {
     if (d->m_bRubberBandOnMove || d->m_bRubberBandOnResize)
     {
-        if (NULL == m_pRubberBand) {
+        if (nullptr == m_pRubberBand)
+        {
             m_pRubberBand = new LinuxRubberBand(QRubberBand::Rectangle);
             //m_pRubberBand = new QRubberBand(QRubberBand::Rectangle);
         }
@@ -126,7 +125,7 @@ void WidgetData::updateRubberBandStatus()
     else
     {
         delete m_pRubberBand;
-        m_pRubberBand = NULL;
+        m_pRubberBand = nullptr;
     }
 }
 
@@ -143,24 +142,24 @@ void WidgetData::updateCursorShape(const QPoint &gMousePos)
 
     m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry());
 
-    if(m_moveMousePos.m_bOnTopLeftEdge || m_moveMousePos.m_bOnBottomRightEdge)
+    if (m_moveMousePos.m_bOnTopLeftEdge || m_moveMousePos.m_bOnBottomRightEdge)
     {
-        m_pWidget->setCursor( Qt::SizeFDiagCursor );
+        m_pWidget->setCursor(Qt::SizeFDiagCursor);
         m_bCursorShapeChanged = true;
     }
-    else if(m_moveMousePos.m_bOnTopRightEdge || m_moveMousePos.m_bOnBottomLeftEdge)
+    else if (m_moveMousePos.m_bOnTopRightEdge || m_moveMousePos.m_bOnBottomLeftEdge)
     {
-        m_pWidget->setCursor( Qt::SizeBDiagCursor );
+        m_pWidget->setCursor(Qt::SizeBDiagCursor);
         m_bCursorShapeChanged = true;
     }
-    else if(m_moveMousePos.m_bOnLeftEdge || m_moveMousePos.m_bOnRightEdge)
+    else if (m_moveMousePos.m_bOnLeftEdge || m_moveMousePos.m_bOnRightEdge)
     {
-        m_pWidget->setCursor( Qt::SizeHorCursor );
+        m_pWidget->setCursor(Qt::SizeHorCursor);
         m_bCursorShapeChanged = true;
     }
-    else if(m_moveMousePos.m_bOnTopEdge || m_moveMousePos.m_bOnBottomEdge)
+    else if (m_moveMousePos.m_bOnTopEdge || m_moveMousePos.m_bOnBottomEdge)
     {
-        m_pWidget->setCursor( Qt::SizeVerCursor );
+        m_pWidget->setCursor(Qt::SizeVerCursor);
         m_bCursorShapeChanged = true;
     }
     else
@@ -260,9 +259,9 @@ void WidgetData::resizeWidget(const QPoint &gMousePos)
     }
 }
 
-void WidgetData::moveWidget(const QPoint& gMousePos)
+void WidgetData::moveWidget(const QPoint &gMousePos)
 {
-    if (d->m_bRubberBandOnMove &&m_bLeftButtonTitlePressed )
+    if (d->m_bRubberBandOnMove && m_bLeftButtonTitlePressed)
     {
         m_pRubberBand->move(gMousePos - m_ptDragPos);
     }
@@ -272,28 +271,26 @@ void WidgetData::moveWidget(const QPoint& gMousePos)
     }
 }
 
-void WidgetData::handleMouseButtonDblClickEvent(QMouseEvent *event){
-
+void WidgetData::handleMouseButtonDblClickEvent(QMouseEvent *event)
+{
     if (event->button() == Qt::LeftButton)
     {
-
-     if(event->pos().y() < m_moveMousePos.m_nTitleHeight){
-
-         m_pWidget->isMaximized() ? m_pWidget->showNormal() : m_pWidget->showMaximized();
-     }
+        if (static_cast<uint>(event->pos().y()) < m_moveMousePos.m_nTitleHeight)
+        {
+            m_pWidget->isMaximized() ? m_pWidget->showNormal() : m_pWidget->showMaximized();
+        }
     }
-
 }
-
 
 void WidgetData::handleMousePressEvent(QMouseEvent *event)
 {
-    if(m_pWidget->isFullScreen() || m_pWidget->isMaximized())return;
+    if (m_pWidget->isFullScreen() || m_pWidget->isMaximized())
+        return;
 
     if (event->button() == Qt::LeftButton)
     {
         m_bLeftButtonPressed = true;
-        m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
+        m_bLeftButtonTitlePressed = static_cast<uint>(event->pos().y()) < m_moveMousePos.m_nTitleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
         QRect moveRect(frameRect.x(), frameRect.y(), frameRect.width(), 30);
@@ -311,7 +308,8 @@ void WidgetData::handleMousePressEvent(QMouseEvent *event)
         }
         else if (d->m_bRubberBandOnMove)
         {
-            if (moveRect.contains(event->globalPos())) {
+            if (moveRect.contains(event->globalPos()))
+            {
                 m_pRubberBand->setGeometry(frameRect);
                 m_pRubberBand->show();
             }
@@ -321,7 +319,9 @@ void WidgetData::handleMousePressEvent(QMouseEvent *event)
 
 void WidgetData::handleMouseReleaseEvent(QMouseEvent *event)
 {
-    if(m_pWidget->isFullScreen() || m_pWidget->isMaximized())return;
+    if (m_pWidget->isFullScreen() || m_pWidget->isMaximized())
+        return;
+
     if (event->button() == Qt::LeftButton)
     {
         m_bLeftButtonPressed = false;
@@ -337,15 +337,16 @@ void WidgetData::handleMouseReleaseEvent(QMouseEvent *event)
 
 void WidgetData::handleMouseMoveEvent(QMouseEvent *event)
 {
+    if (m_pWidget->isFullScreen() || m_pWidget->isMaximized())
+        return;
 
-    if(m_pWidget->isFullScreen() || m_pWidget->isMaximized())return;
     if (m_bLeftButtonPressed)
     {
         if (d->m_bWidgetResizable && m_pressedMousePos.m_bOnEdges)
         {
             resizeWidget(event->globalPos());
         }
-        else if (d->m_bWidgetMovable && (m_bLeftButtonTitlePressed |!d->m_bOnlyTitleBarMove))
+        else if (d->m_bWidgetMovable && (m_bLeftButtonTitlePressed | !d->m_bOnlyTitleBarMove))
         {
             moveWidget(event->globalPos());
         }
@@ -386,9 +387,10 @@ FramelessHelper::FramelessHelper(QObject *parent)
 
 FramelessHelper::~FramelessHelper()
 {
-    QList<QWidget*> keys = d->m_widgetDataHash.keys();
+    QList<QWidget *> keys = d->m_widgetDataHash.keys();
     int size = keys.size();
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i)
+    {
         delete d->m_widgetDataHash.take(keys[i]);
     }
 
@@ -399,7 +401,8 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
 {
     switch (event->type())
     {
-    default:break;
+    default:
+        break;
     case QEvent::MouseButtonDblClick:
     case QEvent::MouseMove:
     case QEvent::HoverMove:
@@ -407,7 +410,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
     case QEvent::MouseButtonRelease:
     case QEvent::Leave:
     {
-        WidgetData *data = d->m_widgetDataHash.value(static_cast<QWidget*>(obj));
+        WidgetData *data = d->m_widgetDataHash.value(static_cast<QWidget *>(obj));
         if (data)
         {
             data->handleWidgetEvent(event);
@@ -415,6 +418,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
         }
     }
     }
+
     return QObject::eventFilter(obj, event);
 }
 
@@ -439,13 +443,10 @@ void FramelessHelper::removeFrom(QWidget *topLevelWidget)
     }
 }
 
-
-
-
 void FramelessHelper::setRubberBandOnMove(bool movable)
 {
     d->m_bRubberBandOnMove = movable;
-    QList<WidgetData*> list = d->m_widgetDataHash.values();
+    QList<WidgetData *> list = d->m_widgetDataHash.values();
     foreach (WidgetData *data, list)
     {
         data->updateRubberBandStatus();
@@ -457,7 +458,8 @@ void FramelessHelper::setWidgetMovable(bool movable)
     d->m_bWidgetMovable = movable;
 }
 
-void FramelessHelper::setOnlyTitleBarMove(bool movable){
+void FramelessHelper::setOnlyTitleBarMove(bool movable)
+{
 
     d->m_bOnlyTitleBarMove = movable;
 }
@@ -470,7 +472,7 @@ void FramelessHelper::setWidgetResizable(bool resizable)
 void FramelessHelper::setRubberBandOnResize(bool resizable)
 {
     d->m_bRubberBandOnResize = resizable;
-    QList<WidgetData*> list = d->m_widgetDataHash.values();
+    QList<WidgetData *> list = d->m_widgetDataHash.values();
     foreach (WidgetData *data, list)
     {
         data->updateRubberBandStatus();
@@ -522,4 +524,3 @@ uint FramelessHelper::titleHeight()
 {
     return CursorPosCalculator::m_nTitleHeight;
 }
-
