@@ -1,7 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include <QDesktopServices>
 #include <QMainWindow>
-#include "loading.h"
+#include "set.h"
+#include "config.h"
+#include "framelesshelper.h"
+
+
+
 
 
 
@@ -10,6 +16,13 @@
 #include <QMediaPlayer> //add
 #include <QMediaPlaylist>
 #include <QVideoWidget>
+#include <QMovie>
+#include <QMediaMetaData>
+
+#include <QGraphicsVideoItem>
+
+#include <QGraphicsScene>
+#include<QToolButton>
 
 
 //QtNetwork
@@ -40,7 +53,6 @@
 #include <QMutex>
 
 
-
 #include <QEvent>
 #include <QTime>
 #include <QTextEdit>
@@ -48,8 +60,7 @@
 #include <QComboBox>
 #include <QPlainTextEdit>
 #include <QListWidget>
-
-
+#include <QLabel>
 
 #include <QDesktopWidget>
 #include <QMessageBox>
@@ -57,6 +68,9 @@
 #include <QtConcurrent>
 #include <QListWidgetItem>
 #include <QScrollBar>
+#include <QFileDialog>
+#include <QInputDialog>
+
 
 
 //运行信息
@@ -72,8 +86,17 @@ typedef struct Appinfo
 
    QString nopic;
 
+   QString notes;
+
+   int angle=0, mh=1, mv=1;
+
+   QStringList arguments;
+
+   Qt::WindowFlags Flags;
+
    bool live;
 
+   bool liveload;
 
    Qt::WindowStates windowState;
 
@@ -90,6 +113,16 @@ typedef struct Nameinfo
 }Nameinfo;
 Q_DECLARE_METATYPE(Nameinfo);
 
+//名称信息
+typedef struct Notesinfo
+{
+    QString title;
+    QString api;
+    QString id;
+    QString part;
+    QString time;
+}Notesinfo;
+Q_DECLARE_METATYPE(Notesinfo);
 
 
 
@@ -183,7 +216,7 @@ private slots:
      void on_comboBox_name_currentIndexChanged(int index);
 
      void on_comboBox_part_currentIndexChanged(int index);
-
+     //bool close();
      void addseek();
      void decseek();
      void volumeUp();
@@ -220,46 +253,167 @@ private slots:
 
      void on_search_ok_clicked();
 
-     void on_search_list_pressed(const QModelIndex &index);
-
      void on_tabWidget_currentChanged(int index);
 
-     void on_source_re_clicked();
 
      void on_search_source_currentIndexChanged(int index);
 
+     void PlayMenu(const QPoint &pos);
 
+     void ExploreMenu(const QPoint &pos);
+
+     void on_action_open_triggered();
+
+     void on_action_openurl_triggered();
+
+     void on_action_brightness_add_triggered();
+
+     void on_action_brightness_sub_triggered();
+
+     void on_action_contrast_add_triggered();
+
+     void on_action_contrast_sub_triggered();
+
+     void on_action_Saturation_add_triggered();
+
+     void on_action_Saturation_sub_triggered();
+
+     void on_action_videosize_IgnoreAspectRatio_triggered();
+
+     void on_action_videosize_KeepAspectRatio_triggered();
+
+     void on_action_videosize_KeepAspectRatioByExpanding_triggered();
+
+     void on_action_explore_play_triggered();
+
+     void on_action_explore_xopen_triggered();
+
+     void on_action_explore_xplay_triggered();
+
+     void on_action_explore_xnew_triggered();
+
+     void on_action_about_triggered();
+
+     void on_pushButton_front_clicked();
+
+     void on_pushButton_setting_clicked();
+
+     void on_search_list_clicked(const QModelIndex &index);
+
+
+
+    // void on_action_mini_mode_triggered();
+
+     void on_action_exit_triggered();
+
+
+     void on_pushButton_close_clicked();
+
+     void on_pushButton_mini_clicked();
+
+     void on_pushButton_seting_clicked();
+
+     void on_pushButton_max_clicked();
+
+     void on_action_seting_triggered();
+
+
+     //void on_action_mini_triggered();
+
+     void on_action_resource_triggered();
+
+     void  renotes();
+
+     void menu_action_notes_triggered(QAction *);
+
+     //void on_action_tophint_triggered();
+
+    void  setWindowsTopHint();
+    void  remWindowsTopHint();
+
+     void TitlebarMenu(const QPoint &pos);
+
+
+     void on_action_tophint_toggled(bool arg1);
+
+     void on_action_theme_1_triggered();
+
+     void on_action_theme_2_triggered();
+
+     void on_action_theme_0_triggered();
+
+
+     void metaDataChange();
+
+
+     void on_action_rotate_left_triggered();
+
+     void on_action_rotate_right_triggered();
+
+     void on_action_rotate_x_triggered();
+
+     void on_action_rotate_y_triggered();
 
 signals:
+
+
      void quit();
+     void setshow();
+
+
+ protected:
+       virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
 
     Ui::MainWindow *ui;
 
+    //窗口任意移动
+    bool        m_bDrag;
+    QPoint      mouseStartPoint;
+    QPoint      windowTopLeftPoint;
 
-    void  createSource();
-
-    bool eventFilter(QObject *target, QEvent *event);
-    void ThreadFunc(int,QString);
     QStandardItemModel *student_model;
     QString STimeDuration="00:00:00";
     QMediaPlaylist *playlist;
     QMediaPlayer *player;
     QVideoWidget *video;
-    void setSTime(qint64);
-    void echoload(bool);
+
     QString API;
-    loading load;
     QTimer *m_timer;
+    QMutex mtx;
+    set seting;
+    QDialog loading;
+    Config  config;
+
+
+    QGraphicsScene *scene;
+    QGraphicsVideoItem *GVI;
+    QGraphicsTextItem *GTI;
+    QWidget*   viewWidget;
+
+
+    int widthV, heightV;
+
+    void viewresize();
+    void setSTime(qint64);
+    void  getCommond();
+    void  setVideoMode(Qt::AspectRatioMode mode);
+    void echoload(bool echo);
+    bool eventFilter(QObject *target, QEvent *event);
+    void ThreadFunc(int,QString);
     void createListWidget(QListWidget *listWidget,int key,bool insert);
-
+    void createLoading();
+    void createVolume();
     void  switchFullScreen(bool);
+    void  loadPlay(bool play,int index,qint64 time);
 
-    void  loadPlay(bool play);
+    void MinWriteNotes(int index);
+
+    void showMessage(QString);
 
     //运行信息
-    Appinfo set;
+    Appinfo app;
 
 
     //影片信息
@@ -286,7 +440,6 @@ private:
       //取网页数据
       QString UrlRequestGet( const QString url )
         {
-
           //异常处理
 
           try
@@ -296,11 +449,10 @@ private:
             QNetworkRequest qnr( aurl );
             qnr.setRawHeader("Content-Type","application/json");
             QNetworkReply *reply = qnam.get( qnr );
-
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit())); //超时20秒
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
-
             QTextCodec *codec = QTextCodec::codecForName("utf8");
             QString replyData = codec->toUnicode( reply->readAll() );
 
@@ -332,6 +484,7 @@ private:
             QNetworkAccessManager qnam;
             QNetworkReply *reply=qnam.get(QNetworkRequest(QUrl(url)));
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit()));
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
             QPixmap currentPicture;
@@ -361,6 +514,7 @@ private:
             QNetworkReply *reply = qnam.post( qnr, data.toLocal8Bit() );
 
             QEventLoop eventloop;
+            QTimer::singleShot(20000, &eventloop, SLOT(quit()));
             connect( reply,SIGNAL(finished()),&eventloop,SLOT(quit()));
             eventloop.exec( QEventLoop::ExcludeUserInputEvents);
 
@@ -385,8 +539,6 @@ private:
                     file.close();
                 }
             }
-
-
       //xml文本转dom对象
         QDomElement xmltoDom(QString xmlText)
         {
@@ -475,11 +627,13 @@ private:
     //取所有资源类型
        void getclass(const QString pfile){
 
+          //QQueue<Nameinfo>type;
+
            QFile file(pfile);type.clear();
             if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
                 for(int i=0;!file.atEnd();i++){
                      QByteArray line = file.readLine().trimmed();
-                     QString str(line);
+                     QString str(line);str=str.toUtf8();
                      if(str!=""){
                      QStringList list =str.split(",");
                      SourceInfo info;info.name=list.value(0);info.api=list.value(1);
@@ -497,13 +651,11 @@ private:
                   SourceInfo info; info.name="直播列表";
                   for(int i=0;!file.atEnd();i++){
                        QByteArray line = file.readLine().trimmed();
-                       QString str(line);
+                       QString str(line);str=str.toUtf8();
                        if(str!=""){
                         QStringList list =str.split(",");
                         Nameinfo var; var.name=list.value(0);var.id=list.value(1);
-                        info.type.insert(i,var);;
-
-                        //info.type[i].name=list.value(0);info.type[i].id=list.value(1);
+                        info.type.insert(i,var);
                        }
                   }
                  file.close();
@@ -512,35 +664,34 @@ private:
               }
           }
 
-                     //搜索资源站
-                     void  search(QString  searchword,int ctype=0){
-
-                         QString done,url,api;vSearch.clear();
-                         if(ctype==0){
-
-                             foreach (SourceInfo it, type) {
+       //搜索资源站
+        void  search(QString  searchword,int ctype=0)
+        {
+             QString done,url,api;vSearch.clear();
+               if(ctype==0)
+               {
+                    foreach (SourceInfo it, type)
+                    {
                                  VideoInfo cInfo;                 //重要,清空数据
                                  url=it.api+"?wd="+searchword;
                                  done=UrlRequestGet(url); listDom(xmltoDom(done),cInfo);
                                  cInfo.sname=it.name;cInfo.api=it.api;
                                  vSearch.append(cInfo);
-                             }
+                       }
 
-
-                          }else{
+                 }else{
                                VideoInfo cInfo;
                                api=type.value(ctype-1).api;
                                url=api+"?wd="+searchword;
                                done=UrlRequestGet(url);listDom(xmltoDom(done),cInfo);
                                cInfo.sname=type.value(ctype-1).name;cInfo.api=api;
                                vSearch.append(cInfo);
+                 }
+           }
 
-                          }
-                     }
-
-                    //组合简介信息
-                     QString todes(VideoInfo cInfo,int index){
-                         QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
+              //组合简介信息
+              QString todes(VideoInfo cInfo,int index){
+                  QString str =QString("<h3>%1</h3><h4>%2 %3 %4 %5 %6 %7</h4><p>%8</p>")
                                     .arg(cInfo.name.value(index))
                                     .arg(cInfo.year.value(index))
                                     .arg(cInfo.area.value(index))
@@ -550,7 +701,7 @@ private:
                                     .arg(cInfo.actor.value(index))
                                     .arg(cInfo.des.value(index));
                           return str;
-                     }
+               }
 
                     //取文本MD5值
                      QString toHash(const QString pwd){
@@ -611,5 +762,115 @@ private:
 
                            }
 
-              };
-              #endif // MAINWINDOW_H
+                 //调用默认程序打开命令行
+                  void open(QString url){
+
+                     #ifdef Q_OS_WIN32
+
+                       QString m_szHelpDoc = QString("file:///") + url;
+                       bool is_open = QDesktopServices::openUrl(QUrl(m_szHelpDoc, QUrl::TolerantMode));
+                       if(!is_open)
+                       {
+                           LogWriter::getLogCenter()->PrintLog(LOG_ERROR,"open help doc failed" );
+                           LogWriter::getLogCenter()->SaveFileLog(LOG_ERROR,"open help doc failed" );
+                           return;
+                       }
+                   #else
+                       QString cmd=QString("xdg-open ")+ url; //在linux下，可以通过system来xdg-open命令调用默认程序打开文件；
+
+                       system(cmd.toStdString().c_str());
+                   #endif
+
+                     }
+
+                 //调用默认程序打开M3U8格式
+                  void OpenM3u8(QString url){
+                         QFileInfo fi(url); QString tmp="/tmp/"+fi.fileName();
+                         QFile file(tmp);
+                         if( file.open(QIODevice::WriteOnly|QIODevice::Text) ){
+                             file.write(localtom3u8(url).toUtf8());
+                             file.close();
+                         }
+                         open(tmp);
+                     }
+
+                 //本地化m3u8,返回内容
+                   QString localtom3u8(const QString url)
+                   {
+                       QString done=UrlRequestGet(url);
+                      qDebug()<<done;
+                       QStringList lists=done.split("\n");
+                       QString m3u8="";
+
+                       foreach (QString list,lists)
+                         {
+                             //判断是文件信息
+                           if( list!="" && list.mid(0,1)!="#"){
+                                m3u8+=put_url(url,list.trimmed());
+                              }else{
+                                 m3u8+=list.trimmed()+"\n";
+                              }
+                       }
+                        qDebug()<<m3u8;
+                       return m3u8;
+                   }
+
+                 //相对路径转绝对路径
+                  QString put_url(QString path,QString url)
+                  {
+                       QFileInfo fi(path);QString cpath;
+                         if(url.mid(0,4)=="http"){
+                             return url;
+                          }else if(url.mid(0,1)=="/"){
+                             QStringList list=path.split("/");
+                             cpath=list.value(0)+list.value(1)+"//"+list.value(2);
+                             return cpath+url;
+                          }else{
+                             //cpath=path.mid(0,path.size()-fi.fileName().size());
+                             return fi.path()+"/"+url;
+                          }
+                   }
+
+                 //图片路径
+                  QString topic(QString api,QString id){
+                     return app.cache+toHash(api)+"_"+id+".jpg";
+                  }
+
+                  QString Readfile(const QString pfile)
+                  {
+                      QString ba;
+                      QFile file(pfile);
+                             if( file.open(QIODevice::ReadOnly|QIODevice::Text) ){
+
+                                 for(int i=0;  !file.atEnd();i++){
+                                      QByteArray line = file.readLine();
+                                      QString str(line);
+                                      if(str!=""){
+                                         ba+=str.toUtf8();
+                                      }
+                                 }
+                                 file.close();
+                             }
+                            return ba;
+                   }
+
+
+                  //写播放记录
+                    void WriteNotes( const QString &logFile,const Notesinfo & note)
+                        {
+                            QFile file( logFile );
+                            if( file.open(QIODevice::WriteOnly | QIODevice::Append) )
+                            {
+                                QByteArray ba = (note.title+"|"+note.api+"|"+note.id+"|"+note.part+"|"+note.time).toLocal8Bit()+"\n";
+                                file.write( ba );
+                                file.close();
+                            }
+                        }
+
+
+
+
+
+};
+
+#endif // MAINWINDOW_H

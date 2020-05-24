@@ -18,17 +18,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    config.cpp \
+    framelesshelper.cpp \
     main.cpp \
     mainwindow.cpp \
-    loading.cpp
+    set.cpp
 
 HEADERS += \
+    config.h \
+    framelesshelper.h \
     mainwindow.h \
-    loading.h
+    set.h
 
 FORMS += \
     mainwindow.ui \
-    loading.ui
+    set.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -39,6 +43,7 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    README.md \
     deb/DEBIAN/control \
     deb/install.sh \
     deb/usr/share/applications/vst-video.desktop \
@@ -55,12 +60,18 @@ DISTFILES += \
     install/QIFW/packages/net.xymov.ifw/meta/installscript.qs \
     install/QIFW/packages/net.xymov.ifw/meta/package.xml \
     install/README \
+    install/README.md \
     install/appimage/bin/appimagetool \
     install/appimage/bin/linuxdeployqt \
     install/appimage/bin/patchelf \
     install/appimage/icon.png.png \
     install/appimage/install.sh \
     install/appimage/vst-video.desktop \
+    install/bin/README.md \
+    install/bin/appimagetool \
+    install/bin/install.sh \
+    install/bin/linuxdeployqt \
+    install/bin/patchelf \
     install/config/config.xml \
     install/deb/DEBIAN/control \
     install/deb/getdll.sh \
@@ -78,6 +89,7 @@ DISTFILES += \
     install/deb/usr/src/vst-video/install.sh \
     install/deb/usr/src/vst-video/vst-video \
     install/deb/usr/src/vst-video/vst-video.sh \
+    install/install.sh \
     install/install.sh \
     install/packages/net.xymov.ifw/data/LICENSE \
     install/packages/net.xymov.ifw/data/vst-video \
@@ -153,10 +165,10 @@ DISTFILES += \
     install/usr/src/vst-video/source.txt \
     install/usr/src/vst-video/vst-video \
     install/usr/src/vst-video/vst-video.sh \
-    live.txt \
     vst-video \
     icon.png
 
 SUBDIRS += \
+    install/QIFW/vst-video.pro \
     install/QIFW/vst-video.pro \
     install/vst-video.pro
