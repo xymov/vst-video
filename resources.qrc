@@ -40,6 +40,13 @@
         <file>resource/img/menu.svg</file>
         <file>resource/img/list_on.svg</file>
         <file>resource/img/general_on.svg</file>
-        <file>resource/source/volume.qss</file>
+        <file>resource/img/minimize_light.svg</file>
+        <file>resource/img/maximize_light.svg</file>
+        <file>resource/img/menu_light.svg</file>
+        <file>resource/img/close_light.svg</file>
+        <file>resource/img/maximize_deep.svg</file>
+        <file>resource/img/minimize_deep.svg</file>
+        <file>resource/img/close_deep.svg</file>
+        <file>resource/img/menu_deep.svg</file>
     </qresource>
 </RCC>

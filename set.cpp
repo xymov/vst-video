@@ -28,7 +28,7 @@ void set::quit(){
 
 void set::reshow(){
 
-    ui->source_edit->setText(Readfile("./source.txt"));
+    ui->source_edit->setPlainText(Readfile("./source.txt"));
 
     ui->live_edit->setText(Readfile("./live.txt"));
 

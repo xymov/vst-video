@@ -22,8 +22,11 @@
   <layout class="QHBoxLayout" name="horizontalLayout_3">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -31,7 +34,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QTextEdit" name="source_edit"/>
+        <widget class="QPlainTextEdit" name="source_edit"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">

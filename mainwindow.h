@@ -10,8 +10,6 @@
 
 
 
-
-
 //QMediaPlayer
 #include <QMediaPlayer> //add
 #include <QMediaPlaylist>
@@ -88,7 +86,10 @@ typedef struct Appinfo
 
    QString notes;
 
+   bool playState;
+
    int angle=0, mh=1, mv=1;
+   int page;
 
    QStringList arguments;
 
@@ -266,17 +267,7 @@ private slots:
 
      void on_action_openurl_triggered();
 
-     void on_action_brightness_add_triggered();
 
-     void on_action_brightness_sub_triggered();
-
-     void on_action_contrast_add_triggered();
-
-     void on_action_contrast_sub_triggered();
-
-     void on_action_Saturation_add_triggered();
-
-     void on_action_Saturation_sub_triggered();
 
      void on_action_videosize_IgnoreAspectRatio_triggered();
 
@@ -315,11 +306,6 @@ private slots:
 
      void on_pushButton_max_clicked();
 
-     void on_action_seting_triggered();
-
-
-     //void on_action_mini_triggered();
-
      void on_action_resource_triggered();
 
      void  renotes();
@@ -328,22 +314,13 @@ private slots:
 
      //void on_action_tophint_triggered();
 
-    void  setWindowsTopHint();
-    void  remWindowsTopHint();
+    void  setWindowsTopHint(bool);
 
      void TitlebarMenu(const QPoint &pos);
-
-
-     void on_action_tophint_toggled(bool arg1);
 
      void on_action_theme_1_triggered();
 
      void on_action_theme_2_triggered();
-
-     void on_action_theme_0_triggered();
-
-
-     void metaDataChange();
 
 
      void on_action_rotate_left_triggered();
@@ -354,6 +331,30 @@ private slots:
 
      void on_action_rotate_y_triggered();
 
+     void on_action_info_triggered();
+
+     void switchtheme(int,bool);
+
+
+
+     void on_action_tophint_triggered();
+
+     void on_box_explore_currentChanged(int index);
+     void Sleep(int msec);
+
+     void on_action_update_triggered();
+
+     void on_action_set_triggered();
+
+     void bufferStatusChanged(int);
+
+
+
+
+
+     void on_action_theme_0_triggered();
+
+
 signals:
 
 
@@ -363,7 +364,7 @@ signals:
 
  protected:
        virtual void resizeEvent(QResizeEvent *event) override;
-
+       virtual bool eventFilter(QObject *target, QEvent *event) override;
 private:
 
     Ui::MainWindow *ui;
@@ -390,7 +391,7 @@ private:
     QGraphicsScene *scene;
     QGraphicsVideoItem *GVI;
     QGraphicsTextItem *GTI;
-    QWidget*   viewWidget;
+    QWidget* viewWidget,*expWidget,*searchWidget;
 
 
     int widthV, heightV;
@@ -400,7 +401,7 @@ private:
     void  getCommond();
     void  setVideoMode(Qt::AspectRatioMode mode);
     void echoload(bool echo);
-    bool eventFilter(QObject *target, QEvent *event);
+
     void ThreadFunc(int,QString);
     void createListWidget(QListWidget *listWidget,int key,bool insert);
     void createLoading();
@@ -410,7 +411,11 @@ private:
 
     void MinWriteNotes(int index);
 
-    void showMessage(QString);
+    void showMessage(QString,bool);
+
+    void hideMessage();
+
+
 
     //运行信息
     Appinfo app;
@@ -866,8 +871,6 @@ private:
                                 file.close();
                             }
                         }
-
-
 
 
 

@@ -187,9 +187,10 @@ border: none ;
  background-color:transparent; 
 }
 QPushButton:hover{
- background-color:#E0E0E0; 
+
 }
 QPushButton:pressed{
+ background-color:#E0E0E0; 
 }</string>
          </property>
          <property name="text">
@@ -361,6 +362,12 @@ QPushButton:hover{
           <height>16777215</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox::title {
+background-color:transparent;
+
+}</string>
+        </property>
         <property name="title">
          <string>资源</string>
         </property>
@@ -385,7 +392,7 @@ QPushButton:hover{
        </widget>
       </item>
       <item>
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="box_explore">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -563,6 +570,12 @@ color:#00F;
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton:hover{
+color:#00F;
+}
+</string>
+               </property>
                <property name="text">
                 <string>跳转</string>
                </property>
@@ -648,8 +661,23 @@ color:#00F;
                </property>
                <item>
                 <widget class="QGraphicsView" name="view">
+                 <property name="baseSize">
+                  <size>
+                   <width>300</width>
+                   <height>300</height>
+                  </size>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">border: none ;</string>
+                 </property>
+                 <property name="backgroundBrush">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
                  </property>
                  <property name="viewportUpdateMode">
                   <enum>QGraphicsView::SmartViewportUpdate</enum>
@@ -662,7 +690,7 @@ color:#00F;
               <widget class="QGroupBox" name="box_control">
                <property name="minimumSize">
                 <size>
-                 <width>564</width>
+                 <width>0</width>
                  <height>65</height>
                 </size>
                </property>
@@ -1302,31 +1330,6 @@ border-radius: 4px;
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QLabel" name="status">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">color:#000;</string>
-                    </property>
-                    <property name="text">
-                     <string>准备就绪</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QPushButton" name="pushButton_setting">
                     <property name="minimumSize">
                      <size>
@@ -1523,7 +1526,10 @@ QPushButton:hover{
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{
+         <string notr="true">QGroupBox::title {
+background-color:transparent;
+}
+QPushButton{
  background: transparent; 
 }
 QLabel{
@@ -1531,50 +1537,77 @@ QLabel{
 }</string>
         </property>
         <property name="title">
-         <string>详细</string>
+         <string>信息</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <property name="leftMargin">
-          <number>5</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
          <property name="topMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>5</number>
+          <number>11</number>
          </property>
          <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="info_pic">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>151</height>
-            </size>
-           </property>
+          <widget class="QGroupBox" name="info_video">
            <property name="maximumSize">
             <size>
-             <width>16777215</width>
-             <height>300</height>
+             <width>300</width>
+             <height>200</height>
             </size>
            </property>
-           <property name="text">
+           <property name="styleSheet">
+            <string notr="true">QGroupBox{border: none ;}</string>
+           </property>
+           <property name="title">
             <string/>
            </property>
-           <property name="pixmap">
-            <pixmap resource="resources.qrc">:/resource/img/timg.jpeg</pixmap>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="info_pic">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>151</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>300</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="resources.qrc">:/resource/img/timg.jpeg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
@@ -1584,6 +1617,9 @@ QLabel{
              <width>16777215</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
           </widget>
          </item>
@@ -1639,11 +1675,11 @@ QLabel{
               <string>上个视频</string>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton{
+              <string notr="true">QPushButton#info_front{
     border-image:url(://resource/img/front_out.svg) 0px 0px no-repeat;
  background: transparent; 
 }
-QPushButton:hover{
+QPushButton#info_front:hover{
      border-image:url(://resource/img/front_on.svg) -0px 0px no-repeat;
   background: transparent; 
 }
@@ -1751,27 +1787,6 @@ QPushButton:hover{
      <addaction name="action_open"/>
      <addaction name="action_openurl"/>
     </widget>
-    <widget class="QMenu" name="menu_6">
-     <property name="title">
-      <string>亮度</string>
-     </property>
-     <addaction name="action_brightness_add"/>
-     <addaction name="action_brightness_sub"/>
-    </widget>
-    <widget class="QMenu" name="menu_7">
-     <property name="title">
-      <string>对比度</string>
-     </property>
-     <addaction name="action_contrast_add"/>
-     <addaction name="action_contrast_sub"/>
-    </widget>
-    <widget class="QMenu" name="menu_2">
-     <property name="title">
-      <string>饱和度</string>
-     </property>
-     <addaction name="action_Saturation_add"/>
-     <addaction name="action_Saturation_sub"/>
-    </widget>
     <widget class="QMenu" name="menu_4">
      <property name="title">
       <string>缩放</string>
@@ -1789,14 +1804,13 @@ QPushButton:hover{
      <addaction name="action_rotate_x"/>
      <addaction name="action_rotate_y"/>
     </widget>
+    <addaction name="action_player"/>
     <addaction name="menu_5"/>
     <addaction name="separator"/>
-    <addaction name="menu_6"/>
-    <addaction name="menu_7"/>
-    <addaction name="menu_2"/>
     <addaction name="menu_3"/>
     <addaction name="menu_4"/>
     <addaction name="separator"/>
+    <addaction name="action_info"/>
    </widget>
    <widget class="QMenu" name="menu_explore">
     <property name="title">
@@ -1825,15 +1839,28 @@ QPushButton:hover{
      <addaction name="action_theme_2"/>
      <addaction name="action_theme_0"/>
     </widget>
+    <widget class="QMenu" name="menu_9">
+     <property name="title">
+      <string>设置</string>
+     </property>
+     <addaction name="action_set"/>
+     <addaction name="action_tophint"/>
+    </widget>
+    <widget class="QMenu" name="menu_8">
+     <property name="title">
+      <string>帮助</string>
+     </property>
+     <addaction name="action_about"/>
+     <addaction name="action_update"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="action_resource"/>
     <addaction name="menu_notes"/>
     <addaction name="separator"/>
-    <addaction name="action_seting"/>
+    <addaction name="menu_9"/>
     <addaction name="menu"/>
     <addaction name="separator"/>
-    <addaction name="action_tophint"/>
-    <addaction name="action_about"/>
+    <addaction name="menu_8"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
@@ -1974,11 +2001,6 @@ QPushButton:hover{
     <string>退出</string>
    </property>
   </action>
-  <action name="action_seting">
-   <property name="text">
-    <string>设置</string>
-   </property>
-  </action>
   <action name="action_resource">
    <property name="text">
     <string>刷新资源</string>
@@ -1989,7 +2011,7 @@ QPushButton:hover{
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>置顶</string>
+    <string>窗口置顶</string>
    </property>
    <property name="toolTip">
     <string>窗口置顶</string>
@@ -2034,14 +2056,6 @@ QPushButton:hover{
     <string>浅色主题</string>
    </property>
   </action>
-  <action name="action_theme_0">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>跟随系统</string>
-   </property>
-  </action>
   <action name="action_rotate_left">
    <property name="text">
     <string>逆时针旋转</string>
@@ -2060,6 +2074,34 @@ QPushButton:hover{
   <action name="action_rotate_y">
    <property name="text">
     <string>垂直镜像</string>
+   </property>
+  </action>
+  <action name="action_info">
+   <property name="text">
+    <string>信息</string>
+   </property>
+  </action>
+  <action name="action_update">
+   <property name="text">
+    <string>更新</string>
+   </property>
+  </action>
+  <action name="action_set">
+   <property name="text">
+    <string>资源设置</string>
+   </property>
+  </action>
+  <action name="action_player">
+   <property name="text">
+    <string>播放</string>
+   </property>
+  </action>
+  <action name="action_theme_0">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>跟随系统</string>
    </property>
   </action>
  </widget>
@@ -2117,9 +2159,9 @@ QPushButton:hover{
   </connection>
   <connection>
    <sender>action_top</sender>
-   <signal>toggled(bool)</signal>
+   <signal>triggered()</signal>
    <receiver>action_tophint</receiver>
-   <slot>setChecked(bool)</slot>
+   <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -2128,6 +2170,22 @@ QPushButton:hover{
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_player</sender>
+   <signal>triggered()</signal>
+   <receiver>pushButton_paly</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>798</y>
     </hint>
    </hints>
   </connection>
