@@ -186,6 +186,15 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
                 ui->box_control->show();
                 ui->titlebar->show();
             }
+            else if(isFullScreen())
+            {
+                switchFullScreen(false);
+            }
+            // 进一步取消更多隐藏
+            else if(ui->box_source->isHidden())
+            {
+                on_pushButton_playlist_clicked();
+            }
         }
         // 搜索框
         else if (target == ui->search_name)
@@ -248,6 +257,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
             else if (keyEvent->key() == Qt::Key_Down)
             {
                 volumeDown();
+                return true;
+            }
+            else if(keyEvent->key() == Qt::Key_Tab)
+            {
+                on_pushButton_playlist_clicked();
                 return true;
             }
         }
