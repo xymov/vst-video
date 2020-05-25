@@ -294,7 +294,7 @@ void MainWindow::remWindowsTopHint()
 // 关于窗口
 void MainWindow::on_action_about_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "<H3>全聚合影视 v2.5.1（2020.5.24 魔改版）</H3>一款基于 Qt5 的云播放器。<H4>作者：nohacks</H4><ul><li>E-mail：<a href='mailto:nohacks@vip.qq.com'>nohacks@vip.qq.com</a></li><li>主&nbsp;&nbsp;&nbsp;&nbsp;页：<a href='htts://github/xymov'>https://github.com/xymov</a></li></ul><H4>致谢：</H4><ul><li>播放器：<a href='https://github.com/sonichy/HTYMediaPlayer'>https://github.com/sonichy/HTYMediaPlayer</a></li></ul>");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "<H3>全聚合影视 v2.5.1（2020.5.24 魔改版）</H3>一款基于 Qt5 的云播放器。<H4>作者：nohacks</H4><ul><li>E-mail：<a href='mailto:nohacks@vip.qq.com'>nohacks@vip.qq.com</a></li><li>主&nbsp;&nbsp;&nbsp;&nbsp;页：<a href='https://github.com/xymov'>https://github.com/xymov</a></li></ul><H4>致谢：</H4><ul><li>播放器：<a href='https://github.com/sonichy/HTYMediaPlayer'>https://github.com/sonichy/HTYMediaPlayer</a></li></ul>");
     aboutMB.setIconPixmap(QPixmap("://resource/img/icon.png"));
     aboutMB.setStyleSheet("QLabel#qt_msgbox_label{"
                           "min-width: 360px;"
