@@ -443,6 +443,8 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->tabWidget->setStyleSheet("border:0;");
         // 窗口置顶
         //hide();setWindowFlags(windowFlags()|Qt::WindowStaysOnTopHint);show();
+
+        m_timer->start(3000);
     }
 }
 

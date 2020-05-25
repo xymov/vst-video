@@ -130,11 +130,14 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
             // 重启定时器
             m_timer->start(3000);
 
-            if (ui->box_control->isHidden())
+            if(ui->box_source->isHidden())
             {
-                video->setCursor(Qt::ArrowCursor);
-                ui->box_control->show();
-                ui->titlebar->show();
+                if (ui->box_control->isHidden())
+                {
+                    video->setCursor(Qt::ArrowCursor);
+                    ui->box_control->show();
+                    ui->titlebar->show();
+                }
             }
         }
         // 处理播放器鼠标双击消息
