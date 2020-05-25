@@ -382,8 +382,8 @@ void MainWindow::switchFullScreen(bool cfull)
         app.playlist = !ui->box_source->isHidden();
         app.windowState = this->windowState();
         ui->box_source->hide();
-        ui->box_info->hide();
-        ui->box_page->hide();
+        //ui->box_info->hide();
+        //ui->box_page->hide();
         ui->box_control->hide();
         ui->tabWidget->findChildren<QTabBar *>().at(0)->hide();
         m_timer->start(2000);
@@ -406,8 +406,8 @@ void MainWindow::switchFullScreen(bool cfull)
         if (app.playlist)
         {
             ui->box_source->show();
-            ui->box_info->show();
-            ui->box_page->show();
+            //ui->box_info->show();
+            //ui->box_page->show();
             ui->tabWidget->findChildren<QTabBar *>().at(0)->show();
             setWindowState(app.windowState);
         }
@@ -428,8 +428,8 @@ void MainWindow::on_pushButton_playlist_clicked()
         ui->tabWidget->setStyleSheet("");
         ui->box_control->show();
         ui->box_source->show();
-        ui->box_info->show();
-        ui->box_page->show();
+        //ui->box_info->show();
+        //ui->box_page->show();
         ui->tabWidget->findChildren<QTabBar *>().at(0)->show();
         // 取消置顶
         //hide();setWindowFlags(windowFlags() ^ Qt::WindowStaysOnTopHint);show();
@@ -437,8 +437,8 @@ void MainWindow::on_pushButton_playlist_clicked()
     else
     {
         ui->box_source->hide();
-        ui->box_info->hide();
-        ui->box_page->hide();
+        //ui->box_info->hide();
+        //ui->box_page->hide();
         ui->tabWidget->findChildren<QTabBar *>().at(0)->hide();
         ui->tabWidget->setStyleSheet("border:0;");
         // 窗口置顶

@@ -170,11 +170,23 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
     // 处理搜索回车消息
     else if (event->type() == QEvent::KeyPress)
     {
-        // 搜索框
-        if (target == ui->search_name)
-        {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
+        // 取消消息
+        if (keyEvent->key() == Qt::Key_Escape)
+        {
+            if (ui->box_control->isHidden())
+            {
+                ui->tabWidget->setCurrentWidget(ui->tab_player);
+
+                video->setCursor(Qt::ArrowCursor);
+                ui->box_control->show();
+                ui->titlebar->show();
+            }
+        }
+        // 搜索框
+        else if (target == ui->search_name)
+        {
             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
             {
                 on_search_name_returnPressed();
@@ -184,8 +196,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         // 浏览器
         else if (target == ui->listWidget)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-
             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
             {
                 on_listWidget_itemDoubleClicked(ui->listWidget->currentItem());
@@ -195,8 +205,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         // 搜索表格
         else if (target == _tableView)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-
             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
             {
                 on_tableView_doubleClicked(_tableView->currentIndex());
@@ -206,8 +214,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
         // 播放器
         else if(ui->tabWidget->currentWidget() == ui->tab_player)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-
             // 回车消息
             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == 16777220)
             {
@@ -215,20 +221,10 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
                 return true;
             }
-            // 取消消息
-            else if (keyEvent->key() == Qt::Key_Escape)
-            {
-                if (isFullScreen())
-                {
-                    switchFullScreen(false);
-                    return true;
-                }
-            }
             // 空格消息
             else if (keyEvent->key() == Qt::Key_Space)
             {
                 on_pushButton_paly_clicked();
-
                 return true;
             }
             else if (keyEvent->key() == Qt::Key_Left)
