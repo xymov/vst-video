@@ -205,7 +205,7 @@ void MainWindow::requestBrowseImage(QString word)
 
     QStringList v = word.split("|");
 
-    QMutexLocker locker(&_browse_locker);
+    //QMutexLocker locker(&_browse_locker);
 
     // 下载浏览图片
     UrlRequestImg(v.value(0), toHash(v.value(1)) + "_" + v.value(2));
@@ -356,7 +356,7 @@ void MainWindow::requestPreviewImage(QString word)
     if(v.size() != 3)
         return;
 
-    QMutexLocker locker(&_browse_locker);
+    //QMutexLocker locker(&_browse_locker);
 
     QString url = v.value(0);
     // 搜索的图片地址是空的,需要从视频信息中获取
@@ -448,7 +448,7 @@ void MainWindow::requestPreviewVideoInfo(QString word)
     if(v.size() != 3)
         return;
 
-    QMutexLocker locker(&_browse_locker);
+    //QMutexLocker locker(&_browse_locker);
 
     QString api = v.value(1);
     QString id = v.value(2);

@@ -193,7 +193,7 @@ void MainWindow::on_action_resource_triggered()
 void MainWindow::requestResources()
 {
     // type.clear();
-    QMutexLocker locker(&mtx);
+    //QMutexLocker locker(&mtx);
 
     getclass(app.sourcePath);
 

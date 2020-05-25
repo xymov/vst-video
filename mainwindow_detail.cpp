@@ -46,7 +46,7 @@ void MainWindow::on_comboBox_name_currentIndexChanged(int index)
 
 void MainWindow::requestDetailVideoInfo(QString word)
 {
-    QMutexLocker locker(&_detail_locker);
+    //QMutexLocker locker(&_detail_locker);
 
     // 获取浏览影片数据
     QStringList v = word.split("|");
@@ -105,7 +105,7 @@ void MainWindow::requestDetailImage(QString word)
     if(v.size() != 3)
         return;
 
-    QMutexLocker locker(&_detail_locker);
+    //QMutexLocker locker(&_detail_locker);
 
     UrlRequestImg(v.value(0), toHash(v.value(1)) + "_" + v.value(2));
 
