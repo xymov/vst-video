@@ -69,7 +69,7 @@ void MainWindow::initPlayer()
     _volume_slider->setPageStep(2);
     _volume_slider->setValue(100);
     _volume_slider->setTickPosition(QSlider::NoTicks);
-    _volume_slider->move(ui->pushButton_paly->width() + ui->pushButton_front->width() + ui->pushButton_next->width() + 15 * 3 + ui->pushButton_sound->width() / 2, ui->box_video->height() + ui->sliderProgress->height() + 50);
+    _volume_slider->move(ui->pushButton_paly->width() + ui->pushButton_front->width() + ui->pushButton_next->width() + 15 * 3 + ui->pushButton_sound->width() / 2, ui->box_video->height() + ui->sliderProgress->height());
     _volume_slider->hide();
 
     // 显示音量的标签
