@@ -31,20 +31,23 @@ typedef struct Appinfo
 
     Qt::WindowStates windowState;
 
-    QString basePath;
-
     Appinfo()
     {
-        basePath = QDir::homePath() + "/.vst-video";
+        QString configPath = QDir::homePath() + "/.vst-video/";
 
-        QDir dir(basePath);
+        QDir dir(configPath);
         if(!dir.exists())
-            dir.mkpath(basePath);
+            dir.mkpath(configPath);
 
-        sourcePath = basePath + "/source.txt";
-        livePath = basePath + "/live.txt";
-        notes = basePath + "/notes.txt";
-        cache = basePath + "/cache/";
+        sourcePath = configPath + "source.txt";
+        livePath = configPath + "live.txt";
+        notes = configPath + "notes.txt";
+
+        cache = QDir::homePath() + "/.cache/vst-video/";
+        QDir dir2(cache);
+        if(!dir2.exists())
+            dir2.mkpath(cache);
+
         nopic = "://resource/img/timg.jpeg";
 
         live = false;

@@ -362,7 +362,6 @@ void OpenM3u8(QString url)
 QString localtom3u8(const QString url)
 {
     QString done = UrlRequestGet(url);
-    qDebug() << done;
     QStringList lists = done.split("\n");
     QString m3u8 = "";
 
