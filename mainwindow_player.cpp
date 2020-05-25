@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QCompleter>
 #include <QFileDialog>
 #include <QInputDialog>
 

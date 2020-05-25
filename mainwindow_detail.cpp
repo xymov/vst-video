@@ -211,6 +211,7 @@ void MainWindow::loadPlay(int index, qint64 time)
 
     player->stop();
     playlist->clear();
+    ui->player_control_part->clear();
 
     for (int i = 0; i < ui->comboBox_part->count(); i++)
     {
@@ -218,7 +219,7 @@ void MainWindow::loadPlay(int index, qint64 time)
         playlist->addMedia(QUrl(ui->comboBox_part->itemData(i).toString()));
 
         // 添加到播放器控制板列表
-        ui->player_control_part->insertItem(i, ui->comboBox_part->itemText(i));
+        ui->player_control_part->addItem(ui->comboBox_part->itemText(i));
     }
 
     // 设置分集输入自动选择
