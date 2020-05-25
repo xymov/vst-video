@@ -61,7 +61,7 @@ void MainWindow::initPlayer()
     connect(m_timer, SIGNAL(timeout()), this, SLOT(TimerTimeOut()));
 
     // 音量调节
-    _volume_slider = new QSlider(Qt::Vertical, ui->tab_player);
+    _volume_slider = new QSlider(Qt::Vertical, ui->box_video);
     _volume_slider->setMinimumSize(30, 100);
     _volume_slider->setMaximumSize(30, 100);
     _volume_slider->setMinimum(0);
@@ -69,11 +69,10 @@ void MainWindow::initPlayer()
     _volume_slider->setPageStep(2);
     _volume_slider->setValue(100);
     _volume_slider->setTickPosition(QSlider::NoTicks);
-    _volume_slider->move(ui->pushButton_paly->width() + ui->pushButton_front->width() + ui->pushButton_next->width() + 15 * 3 + ui->pushButton_sound->width() / 2, ui->box_video->height() + ui->sliderProgress->height());
     _volume_slider->hide();
 
     // 显示音量的标签
-    _volume_value = new QLabel(ui->tab_player);
+    _volume_value = new QLabel(ui->box_video);
     _volume_value->setMinimumSize(100, 30);
     _volume_value->setStyleSheet("color:green;");
     _volume_value->hide();
@@ -128,6 +127,8 @@ void MainWindow::hideVolumeSlider()
 
 void MainWindow::showVolumeSlider()
 {
+    _volume_slider->move(ui->pushButton_paly->width() + ui->pushButton_front->width() + ui->pushButton_next->width() + 15 * 3 + ui->pushButton_sound->width() / 2, video->height() - _volume_slider->height());
+
     _volume_slider->show();
     _volume_value->show();
     _volume_slider->setFocus();
