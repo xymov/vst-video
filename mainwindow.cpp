@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
      //窗口居中
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
+     resize(QSize(800,600)); //默认大小
 
 
     /* 圆角矩形
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
      app.Flags=windowFlags();
 
      qDebug()<<app.cache;
+
 
 
 
@@ -64,45 +66,25 @@ MainWindow::MainWindow(QWidget *parent)
          //ui->action_tophint->setChecked(false);
      }
 
-      //切换主题
 
-       switchtheme(config.get("set","theme").toInt(),false);
 
-         FramelessHelper *pHelper = new FramelessHelper(this);
-         pHelper->activateOn(this);  //激活当前窗体
-         pHelper->setTitleHeight(50);  //设置窗体的标题栏高度，可拖动高度
-         pHelper->setWidgetMovable(true);  //设置窗体可移动
-         pHelper->setWidgetResizable(true);  //设置窗体可缩放
-         pHelper->setOnlyTitleBarMove(true); //设置是否只标题栏可拖动
-         //pHelper->setRubberBandOnMove(true);  //设置橡皮筋效果-可移动
-         //pHelper->setRubberBandOnResize(true);  //设置橡皮筋效果-可缩放
-            //关闭按钮
-             ui->pushButton_close->setFixedSize(60, 40);
-             //ui->pushButton_close->setIcon(QIcon("://resource/img/close_out.svg"));
-             ui->pushButton_close->setIconSize(QSize(14,14));
 
-             //最大化按钮
-             ui->pushButton_max->setFixedSize(60, 40);
-              //ui->pushButton_max->setIcon(QIcon("://resource/img/normal-size_out.svg"));
-               ui->pushButton_max->setIconSize(QSize(16,16));
+            //切换主题
 
-              //最小化按钮
-              ui->pushButton_mini->setFixedSize(60, 40);
-               //ui->pushButton_mini->setIcon(QIcon("://resource/img/minimize.svg"));
-               ui->pushButton_mini->setIconSize(QSize(16,16));
-
-              //设置按钮
-               ui->pushButton_seting->setFixedSize(60, 40);
-               //ui->pushButton_seting->setIcon(QIcon("://resource/img/menu.svg"));
-               ui->pushButton_seting->setIconSize(QSize(16,16));
+             switchtheme(config.get("set","theme").toInt(),false);
 
   }
+
+
+
+
+
 
 //Delete信号
 MainWindow::~MainWindow()
 {
     seting.close();
-    delete video;
+    player->stop();
     delete player;
     delete ui;
     qDebug()<<"App quit success!";
@@ -162,6 +144,10 @@ void MainWindow::init(){
 
           //等待动画
              createLoading();
+
+
+
+
           //播放记录
                 renotes();
                 connect(ui->menu_notes,SIGNAL(triggered(QAction*)),this,SLOT(menu_action_notes_triggered(QAction*)));
@@ -173,6 +159,10 @@ void MainWindow::init(){
                     // 缩放 Qt::KeepAspectRatio,
                     // 铺满 Qt::IgnoreAspectRatio ，
                     // 拉伸 Qt::KeepAspectRatioByExpanding
+
+                    //视频默认缩放
+                     ui->action_videosize_KeepAspectRatio->setChecked(true);
+
 
                    //文字设备
                     GTI = new QGraphicsTextItem;
@@ -191,10 +181,9 @@ void MainWindow::init(){
                     // 绑定场景
                      // ui->view->fitInView(GVI,Qt::KeepAspectRatio);
                       ui->view->setScene(scene);
-                      ui->view->horizontalScrollBar()->setDisabled(true);  //不显示横向滚动条
-                      ui->view->verticalScrollBar()->setDisabled(true);   //不显示纵向滚动条
+                      ui->view->horizontalScrollBar()->hide();  //不显示横向滚动条
+                      ui->view->verticalScrollBar()->hide();   //不显示纵向滚动条
                       ui->view->setRenderHint(QPainter::SmoothPixmapTransform);  //平滑
-
 
 
                      //获取场景内部viewport区域,
@@ -203,24 +192,35 @@ void MainWindow::init(){
                       viewWidget->installEventFilter(this);
 
 
-                 /*
+                 /*     */
+
                   //动态添加播放控件
                   video = new QVideoWidget;
                   video->setStyleSheet("background:black;");
-                  ui->box_player->addWidget(video);
-                  ui->box_player->addWidget(ui->box_control);
+                  ui->tab_2->layout()->addWidget(video);
+                  ui->tab_2->layout()->addWidget(ui->box_control);
                   video->setMouseTracking(true);
                   //video->setAttribute(Qt::WA_OpaquePaintEvent);
 
-                */
 
                  //标题栏菜单关联
                   ui->titlebar->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
                    connect(ui->titlebar,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(TitlebarMenu(const QPoint&)));
 
+
+
+
+
                   //播放器右键菜单关联
                   ui->view->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
                   connect(ui->view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(PlayMenu(const QPoint&)));
+
+                  video->setContextMenuPolicy(Qt::CustomContextMenu); //鼠标右键点击控件时会发送一个customContextMenuRequested信号
+                  connect(video,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(PlayMenu(const QPoint&)));
+
+
+
+
                   //浏览器右键菜单管理
                   ui->listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
                   connect(ui->listWidget,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(ExploreMenu(const QPoint&)));
@@ -239,7 +239,24 @@ void MainWindow::init(){
 
                     player = new QMediaPlayer(this);
 
-                    player->setVideoOutput(GVI);
+                     app.videoMode=config.get("set","videoMode").toInt();
+
+                    if(app.videoMode==0){
+                          player->setVideoOutput(video);
+                          ui->view->hide();
+                          video->show();
+
+
+                    }else{
+                          player->setVideoOutput(GVI);
+                          ui->view->show();
+                          video->hide();
+
+                    }
+
+
+
+
 
 
                    playlist = new QMediaPlaylist;
@@ -262,7 +279,7 @@ void MainWindow::init(){
             ui->listWidget->setViewMode(QListView::IconMode);  //大图标模式
             ui->listWidget->setMovement(QListView::Static);      //禁止拖动
             ui->listWidget->setSpacing(10);                    //间距
-            ui->listWidget->horizontalScrollBar()->setDisabled(true);  //不显示横向滚动条
+            ui->listWidget->horizontalScrollBar()->hide();  //不显示横向滚动条
 
              //搜索表格
 
@@ -288,6 +305,31 @@ void MainWindow::init(){
                 ui->search_list->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection); // 只能单选
                 ui->search_list->setSelectionBehavior(QAbstractItemView::SelectRows);   //设置选中时为整行选中
                 ui->search_list->setEditTriggers(QAbstractItemView::NoEditTriggers);     //不可编辑
+
+
+
+                 // 初始化按钮
+                  //关闭按钮
+                     ui->pushButton_close->setFixedSize(60, 40);
+                     //ui->pushButton_close->setIcon(QIcon("://resource/img/close_out.svg"));
+                     ui->pushButton_close->setIconSize(QSize(14,14));
+
+                     //最大化按钮
+                     ui->pushButton_max->setFixedSize(60, 40);
+                      //ui->pushButton_max->setIcon(QIcon("://resource/img/normal-size_out.svg"));
+                       ui->pushButton_max->setIconSize(QSize(16,16));
+
+                      //最小化按钮
+                      ui->pushButton_mini->setFixedSize(60, 40);
+                       //ui->pushButton_mini->setIcon(QIcon("://resource/img/minimize.svg"));
+                       ui->pushButton_mini->setIconSize(QSize(16,16));
+
+                      //设置按钮
+                       ui->pushButton_seting->setFixedSize(60, 40);
+                       //ui->pushButton_seting->setIcon(QIcon("://resource/img/menu.svg"));
+                       ui->pushButton_seting->setIconSize(QSize(16,16));
+
+
 
 
            //自动隐藏鼠标定时器
@@ -336,6 +378,8 @@ void MainWindow::init(){
                             expWidget= ui->listWidget->viewport();
                             searchWidget=ui->search_list->viewport();
 
+                            ui->titlebar->installEventFilter(this);
+
                             this->installEventFilter(this);
 
                             searchWidget->installEventFilter(this);
@@ -348,7 +392,10 @@ void MainWindow::init(){
 
                             ui->search_name->installEventFilter(this);
 
-                            ui->box_video->installEventFilter(this);
+
+                            video->installEventFilter(this);
+
+                           // ui->box_video->installEventFilter(this);
 
                             ui->box_control->installEventFilter(this);
 
@@ -358,7 +405,6 @@ void MainWindow::init(){
 
                             this->setMouseTracking(true);
 
-                            resize(QSize(800,600)); //默认大小
 
 }
 
@@ -369,9 +415,12 @@ void MainWindow::TimerTimeOut()
     if(player->state()==QMediaPlayer::PlayingState && ui->box_source->isHidden()){
 
          //隐藏鼠标
-          viewWidget->setCursor(Qt::BlankCursor);
+
+          if(app.videoMode==0){video->setCursor(Qt::BlankCursor);}else{viewWidget->setCursor(Qt::BlankCursor);}
+
           ui->box_control->hide();
           ui->titlebar->hide();
+          ui->statusBar->hide();
           scene->setSceneRect(0, 0, ui->view->width(), ui->view->height());
           GVI->setSize(QSizeF(ui->view->width(), ui->view->height()));
 
@@ -386,25 +435,26 @@ void MainWindow::TimerTimeOut()
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
 
+    //处理窗口移动
 
-    if(target ==expWidget || target ==viewWidget ||  target ==searchWidget)
+    if(target ==expWidget || target ==viewWidget ||  target ==searchWidget ||  target ==video || target ==ui->titlebar )
    {
 
       /*处理播放器鼠标移动消息 */
 
        if (event->type() == QEvent::MouseMove ){
 
-        if(target ==viewWidget ){
+        if(target ==viewWidget ||  target ==video){
          //重启定时器
          m_timer->start(3000);
           if(ui->box_control->isHidden()){
-              viewWidget->setCursor(Qt::ArrowCursor);
+
+              if(app.videoMode==0){video->setCursor(Qt::ArrowCursor);}else{viewWidget->setCursor(Qt::ArrowCursor);}
               ui->box_control->show();
-               if(!ui->action_theme_0->isCheckable()){
+              ui->statusBar->show();
+               if(!ui->action_theme_0->isChecked()){
                    ui->titlebar->show();
                }
-
-
               viewresize();
               }
           }
@@ -449,13 +499,24 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
           /*处理播放器鼠标双击消息 */
 
-         }else if(event->type() == QEvent::MouseButtonDblClick &&target ==viewWidget ){
+         }else if(event->type() == QEvent::MouseButtonDblClick &&(target ==viewWidget||target ==video) ){
             if(ui->box_explore->currentIndex()==1){on_pushButton_full_clicked();}else{
                 ui->box_explore->setCurrentIndex(1);
             }
 
             return  true;
 
+
+      /*处理标题栏鼠标双击消息 */
+        }else if(event->type() == QEvent::MouseButtonDblClick && target ==ui->titlebar ){
+
+
+            on_pushButton_max_clicked();
+
+           return  true;
+
+
+        /*处理浏览器双击消息 */
        }else if(event->type() == QEvent::MouseButtonDblClick &&target ==expWidget){
 
            on_info_play_clicked();
@@ -464,8 +525,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 
        }
 
-
-    /*处理预览图片鼠标双击消息 */
+      /*处理预览图片鼠标双击消息 */
 
     }else if(event->type() == QEvent::MouseButtonDblClick &&target ==ui->info_pic ){
         //用默认应用打开图片
@@ -473,7 +533,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
          QString file=topic(v.value(0),v.value(1));
          open(file);
 
-       //处理播放器消息
+
+         //处理播放器消息
     }else if(event->type() ==QEvent::KeyPress && ui->box_explore->currentIndex()==1){
 
                 QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
@@ -680,7 +741,7 @@ void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)
          showMessage("正在加载",true); viewresize();
          ui->sliderProgress->setEnabled(false);
          ui->comboBox_part->setCurrentIndex(playlist->currentIndex());
-         qDebug()<<"openUrl:"<<player->currentMedia().canonicalUrl().toString();
+         //qDebug()<<"openUrl:"<<player->currentMedia().request().url();
          break;
     case QMediaPlayer::LoadedMedia:showMessage("准备就绪",true);break;
     case QMediaPlayer::StalledMedia:player->pause();showMessage("正在缓冲",false);break;
@@ -845,39 +906,106 @@ void  MainWindow::switchFullScreen(bool cfull){
          //保存全屏前状态
          app.playlist=!ui->box_source->isHidden();
          app.windowState=this->windowState();
+
+
         ui->box_source->hide();
         ui->box_info->hide();
-        ui->box_page->hide();
-        ui->box_control->hide();
-        ui->box_explore->findChildren<QTabBar*>().at(0)->hide();
-         m_timer->start(2000);
+        ui->box_explore->hide();
+
+        m_timer->start(2000);
         //setCursor(Qt::BlankCursor);  //隐藏鼠标
          ui->pushButton_full->setStyleSheet(general);
-         ui->box_explore->setStyleSheet("border:none;");
-         ui->titlebar->hide();
+
+
+         if(app.videoMode==0){
+
+             ui->centralwidget->layout()->addWidget(video);
+             ui->centralwidget->layout()->addWidget(ui->box_control);
+             video->show();ui->view->hide();
+
+         }else{
+
+             ui->centralwidget->layout()->addWidget(ui->view);
+             ui->centralwidget->layout()->addWidget(ui->box_control);
+             ui->view->show();video->hide();
+         }
+
+
+         ui->box_control->hide();
+
+         ui->statusBar->hide();
+
+          ui->titlebar->hide();
+
          showFullScreen();
+
+
+
 
     }else{
 
-        ui->box_explore->setStyleSheet(app.playlist?"":"border:none;");
+
         ui->pushButton_full->setStyleSheet(full);
         ui->box_control->show();
+          ui->statusBar->show();
         m_timer->stop();
 
+        //显示正常鼠标
+        if(app.videoMode==0){video->setCursor(Qt::ArrowCursor); }else{viewWidget->setCursor(Qt::ArrowCursor); }
 
-        viewWidget->setCursor(Qt::ArrowCursor);  //显示正常鼠标
         showNormal();
+
 
         if(!ui->action_theme_0->isChecked()){ui->titlebar->show();}
 
+
         if(app.playlist){
+
+            ui->box_explore->show();
             ui->box_source->show();
             ui->box_info->show();
-             ui->box_page->show();
-             ui->box_explore->findChildren<QTabBar*>().at(0)->show();
-             setWindowState(app.windowState);
+
+
+             if(app.videoMode==0){
+
+                 ui->tab_2->layout()->addWidget(video); video->show();ui->view->hide();
+                 ui->tab_2->layout()->addWidget(ui->box_control);
+
+
+             }else{
+
+                 ui->tab_2->layout()->addWidget(ui->view); ui->view->show();video->hide();
+                 ui->tab_2->layout()->addWidget(ui->box_control);
+
+
+             }
+
+          setWindowState(app.windowState);
+
+
+      }else{
+
+
+             if(app.videoMode==0){
+
+                 ui->centralwidget->layout()->addWidget(video);video->show();ui->view->hide();
+                 ui->centralwidget->layout()->addWidget(ui->box_control);
+
+             }else{
+
+                ui->centralwidget->layout()->addWidget(ui->view);ui->view->show();video->hide();
+                ui->centralwidget->layout()->addWidget(ui->box_control);
+
+
+             }
+
         }
+
+
+
+
     }
+
 
 }
 
@@ -993,35 +1121,58 @@ void MainWindow::on_pushButton_playlist_clicked()
     if(ui->box_explore->currentIndex()!=1) ui->box_explore->setCurrentIndex(1);
     if(ui->box_source->isHidden()){
 
-       showMaximized();
+        showMaximized();
 
-       ui->box_explore->setStyleSheet("");
         ui->box_control->show();
         ui->box_source->show();
         ui->box_info->show();
-        ui->box_page->show();
-        ui->box_explore->findChildren<QTabBar*>().at(0)->show();
 
+        if(app.videoMode==0){
+
+             ui->tab_2->layout()->addWidget(video);
+             ui->tab_2->layout()->addWidget(video);
+             ui->view->hide();
+
+        }else{
+
+           ui->tab_2->layout()->addWidget(ui->view);
+           ui->tab_2->layout()->addWidget(ui->box_control);
+           video->hide();
+     }
+        ui->box_explore->show();
+        ui->statusBar->show();
 
         //取消置顶
         //hide();setWindowFlags(windowFlags() ^ Qt::WindowStaysOnTopHint);show();
 
     }else{
 
-       showNormal();
+        if(this->isMaximized()){showNormal();}
+
+
         ui->box_source->hide();
         ui->box_info->hide();
-        ui->box_page->hide();
-        ui->box_explore->findChildren<QTabBar*>().at(0)->hide();
-        ui->box_explore->setStyleSheet("border:0;");
-       // resize(QSize(ui->view->width(),ui->view->height()));
+        ui->box_explore->hide();
 
+        if(app.videoMode==0) {
+
+            ui->centralwidget->layout()->addWidget(video);video->show();
+            ui->centralwidget->layout()->addWidget(ui->box_control);
+            ui->view->hide();
+
+        }else{
+
+           ui->centralwidget->layout()->addWidget(ui->view);ui->view->show();
+           ui->centralwidget->layout()->addWidget(ui->box_control);
+           video->hide();
+   }
+       ui->statusBar->show();
          //窗口置顶
         //hide();setWindowFlags(windowFlags()|Qt::WindowStaysOnTopHint);show();
 
    }
 
- //viewresize();
+
 // ui->view->show();
 }
 
@@ -1422,6 +1573,8 @@ void MainWindow::on_action_openurl_triggered()
 void MainWindow::on_action_videosize_IgnoreAspectRatio_triggered()
 {
      setVideoMode(Qt::IgnoreAspectRatio);
+
+
 }
 
 void MainWindow::on_action_videosize_KeepAspectRatio_triggered()
@@ -1455,7 +1608,7 @@ void MainWindow::setVideoMode(Qt::AspectRatioMode mode){
         break;
     }
 
-   GVI->setAspectRatioMode(mode);
+   if(app.videoMode==0){video->setAspectRatioMode(mode);}else{ GVI->setAspectRatioMode(mode);}
 
 }
 
@@ -1467,8 +1620,14 @@ void MainWindow::PlayMenu(const QPoint &pos){
     }else{
      ui->action_player->setText("播放");
     }
-     ui->menu_play->exec(QCursor::pos());
- }
+
+     ui->menu_video_xz->setEnabled(app.videoMode==1);
+
+
+
+      ui->menu_play->exec(QCursor::pos());
+
+   }
 
 //浏览器弹出菜单
 void MainWindow::ExploreMenu(const QPoint &pos){
@@ -1577,6 +1736,16 @@ void MainWindow::on_pushButton_seting_clicked()
 {
 
     renotes();  //刷新播放记录
+
+    if(app.videoMode==0){
+         ui->action_graphics->setChecked(false);
+          ui->action_video->setChecked(true);
+
+    }else{
+         ui->action_graphics->setChecked(true);
+         ui->action_video->setChecked(false);
+    }
+
     ui->menu_seting->exec(QCursor::pos());
 }
 
@@ -1660,9 +1829,11 @@ void MainWindow::renotes()
     time=action->data().toList().value(4).toString();
 
     echoload(true);
+
     app.live=false;
 
     getvideo(2,api,id);
+
 
     ui->comboBox_name->clear();
 
@@ -1704,6 +1875,9 @@ void MainWindow::renotes()
 
       loadPlay(true,part.toInt(),time.toInt());
 
+
+      echoload(false);
+
    }
 
 }
@@ -1741,11 +1915,15 @@ void MainWindow::renotes()
 
    switch (index) {
 
-      default:
+
 
        case 0:
 
-            if(sleep){
+         //取消自定义缩放支持
+
+
+
+          if(sleep){
 
                  QTimer::singleShot(500, this, [=]{setWindowFlags(app.Flags);show();});
             }else{
@@ -1760,6 +1938,8 @@ void MainWindow::renotes()
            break;
 
        case 1:
+
+
        ui->titlebar->show();
 
        if(sleep){
@@ -1787,17 +1967,22 @@ void MainWindow::renotes()
 
 
        this->setStyleSheet("QWidget{background-color:#606060;border-color:#606060}"
-                           "QTreeView{color:#909090;}"
+                           "QTreeView{color:#909090;}QTreeView::HorizontalHeaderLabels{background-color:#606060;}"
                            "QComboBox{color:#909090;}QComboBox QAbstractItemView {background-color:#f0f0f0;}"
                            "QTextEdit{color:#909090;}"
                            "QLineEdit#page_edit{background-color:#606060;}"
                            "QLineEdit#search_name{background-color:#909090;}"
+                           "QGroupBox::title{background-color:#606060;}"
+
                            );
 
 
+
        ui->pushButton_max->setStyleSheet(light);
-       ui->pushButton_close->setStyleSheet(light);
+       ui->pushButton_close->setStyleSheet("QPushButton{  border: none ;background-color:transparent; }QPushButton:hover{background-color:red; }");
        ui->pushButton_mini->setStyleSheet(light);
+
+
        ui->pushButton_seting->setStyleSheet("QPushButton{border:none;background-color:transparent;}QPushButton:pressed{background-color:#505050;}");
 
 
@@ -1806,8 +1991,10 @@ void MainWindow::renotes()
        break;
 
       //默认浅色主题
-
+       default:
        case 2:
+
+
        if(sleep){
              QTimer::singleShot(500, this, [=]{setWindowFlags(windowFlags()|Qt::FramelessWindowHint);show();});
        }else{
@@ -1819,8 +2006,6 @@ void MainWindow::renotes()
        ui->action_theme_2->setChecked(true);
 
 
-
-
        //图标
        ui->pushButton_max->setIcon(QIcon("://resource/img/maximize_deep.svg"));
        ui->pushButton_close->setIcon(QIcon("://resource/img/close_deep.svg"));
@@ -1830,20 +2015,20 @@ void MainWindow::renotes()
        //样式
 
        this->setStyleSheet("QWidget{background-color:#F0F0F0;border-color:#000}"
-                           "QTreeView{color:#606060;}"
+                           "QTreeView{color:#606060;}QTreeView::HorizontalHeaderLabels{background-color:#F0F0F0;}"
                            "QComboBox{color:#606060;}"
                            "QComboBox QAbstractItemView{background-color:#ff0;}"
                            "QTextEdit{color:#606060;}"
                            "QLineEdit#page_edit{background-color:#f0f0f0;}"
                            "QLineEdit#search_name{background-color:#c0c0c0;}"
-
+                           "QGroupBox::title{background-color:#f0f0f0;}"
 
                            );
 
        ui->listWidget->setStyleSheet("border-color:#f0f0f0");
        ui->pushButton_max->setStyleSheet(deep);
-       ui->pushButton_close->setStyleSheet(deep);
        ui->pushButton_mini->setStyleSheet(deep);
+        ui->pushButton_close->setStyleSheet("QPushButton{  border: none ;background-color:transparent; }QPushButton:hover{background-color:red; }");
        ui->pushButton_seting->setStyleSheet("QPushButton{border:none;background-color:transparent;}QPushButton:pressed{background-color:#e0e0e0;}");
 
        break;
@@ -1892,24 +2077,6 @@ void MainWindow::viewresize(){
      //ui->view->show();
 }
 
-/*  视频消息输出    */
-
-void MainWindow::showMessage(QString s,bool autoHide=false)
-{
-    //GTI->setY(ui->view->y()+ui->view->height()-40);
-    GTI->setPlainText(s);
-    GTI->show();
-    if (autoHide)
-    {
-       QTimer::singleShot(5000, this, [=]{GTI->hide();});
-    }
-}
-
-void MainWindow::hideMessage()
-{
-      GTI->hide();
-}
-
 
 
 /*  旋转镜像  */
@@ -1948,29 +2115,6 @@ void MainWindow::on_action_rotate_y_triggered()
 
 
 
-//媒体信息
-void MainWindow::on_action_info_triggered()
-{
-    QString s;QStringList SLMD;
-    SLMD = player->availableMetaData();
-    for(int i=0; i<SLMD.size(); i++){
-        if(SLMD.at(i)=="PixelAspectRatio" || SLMD.at(i)=="Resolution"){
-            s += SLMD.at(i) + ": " + QString::number(player->metaData(SLMD.at(i)).toSize().width()) + " X " + QString::number(player->metaData(SLMD.at(i)).toSize().height()) + "\n";
-        }else{
-            s += SLMD.at(i) + ": " + player->metaData(SLMD.at(i)).toString() + "\n";
-        }
-    }
-    QMessageBox MBInfo(QMessageBox::NoIcon, "信息", s);
-    QImage imageCover = player->metaData(QMediaMetaData::ThumbnailImage).value<QImage>();
-    if(imageCover.isNull()){
-         MBInfo.setIconPixmap(QPixmap("://resource/img/ico.svg"));
-         //MBInfo.setIconPixmap(*ui->info_pic->pixmap());
-    }else{
-         MBInfo.setIconPixmap(QPixmap::fromImage(imageCover));
-    }
-
-    MBInfo.exec();
-}
 
 
 /*   置顶/取消   */
@@ -2017,25 +2161,53 @@ void MainWindow::on_box_explore_currentChanged(int index)
         if(player->state()==QMediaPlayer::PlayingState)
         {
          ui->info_pic->hide();
-         ui->info_video->layout()->addWidget(ui->view);
-         ui->view->show();
+
+
+         if(app.videoMode==0){
+
+             ui->info_video->layout()->addWidget(video);
+             video->show();
+
+         }else{
+
+            ui->info_video->layout()->addWidget(ui->view);
+             ui->view->show();
+
+          }
+
+
         }
-        if(ui->listWidget->count()!=vInfo.name.count()){getpageinfo (app.page);}
+        if(ui->listWidget->count()!=vInfo.name.count()&&ui->listWidget->count()>0){getpageinfo (app.page);}
         break;
     case 1:
         ui->info_pic->show();
-        ui->box_player->addWidget(ui->view);
-        ui->view->show();
+        if(app.videoMode==0){
+            ui->tab_2->layout()->addWidget(video);
+             ui->tab_2->layout()->addWidget(ui->box_control);
+
+            video->show();
+         }else{
+           ui->tab_2->layout()->addWidget(ui->view);
+           ui->tab_2->layout()->addWidget(ui->box_control);
+           ui->view->show();
+        }
         break;
     case 2:
         if(player->state()==QMediaPlayer::PlayingState)
         {
           ui->info_pic->hide();
-          ui->info_video->layout()->addWidget(ui->view);
-          ui->view->show();
+          if(app.videoMode==0){
+              ui->info_video->layout()->addWidget(video);
+              video->show();
+          }else{
+             ui->info_video->layout()->addWidget(ui->view);
+              ui->view->show();
+
+           }
+
          }
 
-        if(ui->comboBox_name->count()!=student_model->rowCount()){on_search_ok_clicked(); }
+        if(ui->comboBox_name->count()!=student_model->rowCount()&& ui->comboBox_name->count()>0){on_search_ok_clicked(); }
         break;
     }
        viewresize();
@@ -2055,19 +2227,100 @@ void MainWindow::on_action_set_triggered()
 
 void MainWindow::bufferStatusChanged(int index){
  if(index<100){
-    showMessage(QString("正在缓冲: %1%").arg(index));
+    showMessage(QString("正在缓冲: %1%").arg(index),true);
 
  }
 }
 
 
 
-//关于窗口
-void MainWindow::on_action_about_triggered()
+
+
+/* 视频输出模式  */
+
+
+void MainWindow::on_action_video_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.54\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
-    aboutMB.setIconPixmap(QPixmap("://resource/img/ico.svg"));
-    aboutMB.exec();
+    player->pause();
+    player->setVideoOutput(video);video->show();ui->view->hide();
+    app.videoMode=0;
+    config.set("set","videoMode",0);
+    ui->action_graphics->setChecked(false);
+     ui->action_video->setChecked(true);
+}
+
+void MainWindow::on_action_graphics_triggered()
+{
+    player->pause();
+     player->setVideoOutput(GVI);ui->view->show();video->hide();
+     app.videoMode=1;
+     config.set("set","videoMode",1);
+     ui->action_graphics->setChecked(true);
+     ui->action_video->setChecked(false);
+
+
 }
 
 
+/*  视频消息输出    */
+
+void MainWindow::showMessage(QString s,bool autoHide=false)
+{
+
+    if(app.videoMode==0){
+
+       ui->info->layout()->addWidget(ui->outinfo);
+       ui->outinfo->setStyleSheet("background-color:transparent;color:#000;");
+       ui->outinfo->setText(s);
+       ui->outinfo->show();
+
+
+    }else{
+
+        GTI->setPlainText(s);
+        GTI->show(); ui->outinfo->hide();
+
+    }
+
+
+    if (autoHide)
+    {
+       QTimer::singleShot(5000, this, [=]{hideMessage();});
+    }
+}
+
+void MainWindow::hideMessage()
+{
+
+        if(app.videoMode==0){
+
+             ui->outinfo->hide();
+        }else{
+             GTI->hide();
+
+        }
+
+
+}
+
+
+//重载视频
+void MainWindow::on_action_break_triggered()
+{
+
+    qint64 time=player->position();
+    int index=playlist->currentIndex();
+    player->stop();
+    playlist->setCurrentIndex(index);
+    player->setPosition(time);
+    player->play();
+
+}
+
+//关于窗口
+void MainWindow::on_action_about_triggered()
+{
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "全聚合影视 v2.55\n一款基于 Qt5 的云播放器。\n作者：nohacks\nE-mail: nohacks@vip.qq.com\n主页：https://github.com/xymov\n致谢：\n播放器：https://github.com/sonichy/HTYMediaPlayer\n");
+    aboutMB.setIconPixmap(QPixmap("://resource/img/ico.svg"));
+    aboutMB.exec();
+}

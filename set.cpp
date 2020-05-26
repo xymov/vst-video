@@ -14,6 +14,10 @@ set::set(QWidget *parent) :
 
 
 
+
+
+
+
 }
 
 set::~set()
@@ -31,6 +35,7 @@ void set::reshow(){
     ui->source_edit->setPlainText(Readfile("./source.txt"));
 
     ui->live_edit->setText(Readfile("./live.txt"));
+    ui->lineEdit->setText(config.get("set","typeFilter").toString());
 
     this->show();
 
@@ -51,15 +56,18 @@ void set::on_pushButton_live_esc_clicked()
 void set::on_pushButton_live_ok_clicked()
 {
     if(Writefile("./live.txt",ui->live_edit->toPlainText())){
-         QMessageBox::information(nullptr, "提示", "保存成功！",QMessageBox::Yes);
+         QMessageBox::information(this, "提示", "保存成功！",QMessageBox::Yes);
     }
 
 }
 
 void set::on_source_ok_clicked()
 {
+     config.set("set","typeFilter",ui->lineEdit->text());
     if(Writefile("./source.txt",ui->source_edit->toPlainText()))
      {
-        QMessageBox::information(nullptr, "提示", "保存成功！",QMessageBox::Yes);
+        QMessageBox ::information(this, "提示", "保存成功！",QMessageBox::Yes);
+
+
       };
 }

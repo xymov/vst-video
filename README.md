@@ -6,13 +6,20 @@ sudo apt-get install libqt5multimedia5 libqt5multimediawidgets5 qtmultimedia5-de
 
 ### 更新记录：
 
-#### 2020.05.25 发布 2.54 final
+#### 2020.05.26 发布 2.55
+主要更新：
+* 添加视频渲染选项，可选视频（默认）和绘制(视频有绿边选择此模式可消除);
+* 资源设置添加分类过滤功能；
+* 视频播放器右键添加刷新功能;
+* 修复自选主题缩放BUG;
+* 其它细节优化;
+
+#### 2020.05.25 发布 2.54
 主要更新：
 * 优化主题设置,默认使用系统标题栏(可在播放器界面重新设置);
 * 优化视频输出组件,提高清晰度,去掉视频对比度调节等失效功能;
 * 优化UI及操作体验,现在双击可直接播放;
 * 修复若干BUG;
-  此为V2终结版本,下个版本更新暂缓,准备构建全平台版本.
 
 #### 2020.05.24 发布 V2.53 正式版
 主要更新：
@@ -101,6 +108,7 @@ sudo apt-get install gst123
 gst123 gstreamer1.0-pulseaudio gstreamer1.0-x  
 
 【Windows】
-* 安装 LAV Filters 解码解决。
+* 安装 LAV Filters 解码或 K-Lite 解码包解决。
+  下载地址： https://files3.codecguide.com/K-Lite_Codec_Pack_1544_Standard.exe
 
 

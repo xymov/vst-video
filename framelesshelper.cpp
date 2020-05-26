@@ -182,6 +182,8 @@ void WidgetData::resizeWidget(const QPoint &gMousePos)
     else
         origRect = m_pWidget->frameGeometry();
 
+
+
     int left = origRect.left();
     int top = origRect.top();
     int right = origRect.right();
@@ -190,8 +192,8 @@ void WidgetData::resizeWidget(const QPoint &gMousePos)
 
     //int minWidth = m_pWidget->minimumWidth();
     //int minHeight = m_pWidget->minimumHeight();
-    int minWidth = 40;
-    int minHeight = 40;
+    int minWidth = 30;
+    int minHeight = 30;
 
     if (m_pressedMousePos.m_bOnTopLeftEdge)
     {
@@ -232,6 +234,10 @@ void WidgetData::resizeWidget(const QPoint &gMousePos)
 
     QRect newRect(QPoint(left, top), QPoint(right, bottom));
 
+
+     m_pWidget->setGeometry(newRect);
+
+
     if (newRect.isValid())
     {
         if (minWidth > newRect.width())
@@ -255,7 +261,7 @@ void WidgetData::resizeWidget(const QPoint &gMousePos)
         }
         else
         {
-            m_pWidget->setGeometry(newRect);
+          //  m_pWidget->setGeometry(newRect);
         }
     }
 }
@@ -296,7 +302,11 @@ void WidgetData::handleMousePressEvent(QMouseEvent *event)
         m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
-        QRect moveRect(frameRect.x(), frameRect.y(), frameRect.width(), 30);
+
+
+       // QRect frameRect = m_pWidget->geometry();
+
+         QRect moveRect(frameRect.x(), frameRect.y(), frameRect.width(), 30);
         m_pressedMousePos.recalculate(event->globalPos(), frameRect);
 
         m_ptDragPos = event->globalPos() - frameRect.topLeft();
@@ -321,7 +331,7 @@ void WidgetData::handleMousePressEvent(QMouseEvent *event)
 
 void WidgetData::handleMouseReleaseEvent(QMouseEvent *event)
 {
-    if(m_pWidget->isFullScreen() || m_pWidget->isMaximized())return;
+   // if(m_pWidget->isFullScreen() || m_pWidget->isMaximized())return;
     if (event->button() == Qt::LeftButton)
     {
         m_bLeftButtonPressed = false;
@@ -343,8 +353,11 @@ void WidgetData::handleMouseMoveEvent(QMouseEvent *event)
     {
         if (d->m_bWidgetResizable && m_pressedMousePos.m_bOnEdges)
         {
-            resizeWidget(event->globalPos());
+           resizeWidget(event->globalPos());
         }
+
+        // else if (d->m_bWidgetMovable &&m_bLeftButtonTitlePressed)
+
         else if (d->m_bWidgetMovable && (m_bLeftButtonTitlePressed |!d->m_bOnlyTitleBarMove))
         {
             moveWidget(event->globalPos());

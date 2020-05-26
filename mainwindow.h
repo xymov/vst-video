@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include "set.h"
 #include "config.h"
-#include "framelesshelper.h"
-
 
 
 
@@ -75,6 +73,8 @@
 typedef struct Appinfo
 {
    bool  playlist;
+
+   int videoMode=0;
 
    QString sourcePath;
 
@@ -331,8 +331,6 @@ private slots:
 
      void on_action_rotate_y_triggered();
 
-     void on_action_info_triggered();
-
      void switchtheme(int,bool);
 
 
@@ -355,6 +353,15 @@ private slots:
      void on_action_theme_0_triggered();
 
 
+
+
+     void on_action_video_triggered();
+
+     void on_action_graphics_triggered();
+
+
+     void on_action_break_triggered();
+
 signals:
 
 
@@ -370,9 +377,10 @@ private:
     Ui::MainWindow *ui;
 
     //窗口任意移动
-    bool        m_bDrag;
+    bool        m_bDrag=false;
     QPoint      mouseStartPoint;
     QPoint      windowTopLeftPoint;
+
 
     QStandardItemModel *student_model;
     QString STimeDuration="00:00:00";
@@ -388,10 +396,14 @@ private:
     Config  config;
 
 
+
     QGraphicsScene *scene;
     QGraphicsVideoItem *GVI;
     QGraphicsTextItem *GTI;
     QWidget* viewWidget,*expWidget,*searchWidget;
+
+
+
 
 
     int widthV, heightV;
@@ -495,7 +507,6 @@ private:
             QPixmap currentPicture;
             currentPicture.loadFromData(reply->readAll());
             currentPicture.save(filename);//保存图片
-
             reply->deleteLater();
             reply = nullptr;
 
@@ -588,7 +599,16 @@ private:
                         Nameinfo  name;
                         name.id=element.attribute("id");
                         name.name=element.text();
-                        cInfo.type << name;
+
+                        QString typeFilter=config.get("set","typeFilter").toString();
+
+
+                        //分类过滤
+                        if(typeFilter.trimmed()=="" || name.name.indexOf(QRegExp(typeFilter))==-1){
+                             cInfo.type << name;
+                         }
+
+
                     }
                       listDom(element,cInfo);
                 }
@@ -772,12 +792,12 @@ private:
 
                      #ifdef Q_OS_WIN32
 
-                       QString m_szHelpDoc = QString("file:///") + url;
+                        QString m_szHelpDoc =url;
+                         //QString m_szHelpDoc = QString("file:///") + url;
                        bool is_open = QDesktopServices::openUrl(QUrl(m_szHelpDoc, QUrl::TolerantMode));
                        if(!is_open)
                        {
-                           LogWriter::getLogCenter()->PrintLog(LOG_ERROR,"open help doc failed" );
-                           LogWriter::getLogCenter()->SaveFileLog(LOG_ERROR,"open help doc failed" );
+                           qDebug()<<"ERROR:open help doc failed";
                            return;
                        }
                    #else

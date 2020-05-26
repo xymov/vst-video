@@ -19,14 +19,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     config.cpp \
-    framelesshelper.cpp \
     main.cpp \
     mainwindow.cpp \
     set.cpp
 
 HEADERS += \
     config.h \
-    framelesshelper.h \
     mainwindow.h \
     set.h
 
@@ -41,6 +39,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources.qrc
+
+RC_ICONS =icon.ico
+
 
 DISTFILES += \
     README.md \

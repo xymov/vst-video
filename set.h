@@ -5,6 +5,8 @@
 #include <QDesktopWidget>
 #include <QFile>
 #include <QMessageBox>
+#include "config.h"
+
 
 namespace Ui {
 class set;
@@ -33,7 +35,7 @@ private slots:
 
 private:
     Ui::set *ui;
-
+    Config config;
 
     QString Readfile(const QString pfile)
     {
