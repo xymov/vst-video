@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>主程序</DisplayName>
+    <Description>必装，全聚合影视主程序</Description>
+    <Version>2.2.0-1</Version>
+    <ReleaseDate>2020-05-10</ReleaseDate>
+    <Default>true</Default>
+    <Script>installscript.qs</Script>
+</Package>

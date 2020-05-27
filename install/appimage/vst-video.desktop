@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=AudioVideo;
+Comment=vst-video player
+Exec=vst-video %u
+Name=vst-video
+Path=/usr/src/vst-video
+Terminal=false
+Type=Application
+Icon=icon.png
+X-AppImage-Version=5410991
