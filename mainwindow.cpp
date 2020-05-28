@@ -2072,8 +2072,8 @@ void MainWindow::viewresize(){
      heightV=viewWidget->height();
      scene->setSceneRect(0, 0, widthV, heightV);
      GVI->setSize(QSizeF(widthV, heightV));
-     scene->update();GVI->update();
-     ui->view->updateSceneRect(QRectF(0,0,widthV, heightV));
+    // scene->update();GVI->update();
+    // ui->view->updateSceneRect(QRectF(0,0,widthV, heightV));
      //ui->view->show();
 }
 
