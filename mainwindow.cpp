@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
      //窗口居中
      move((QApplication::desktop()->width() - width())/2, (QApplication::desktop()->height() - height())/2);
 
-     resize(QSize(800,600)); //默认大小
+     //resize(QSize(800,600)); //默认大小
 
 
     /* 圆角矩形
