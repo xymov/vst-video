@@ -1,4 +1,5 @@
 ![image](https://github.com/user-attachments/assets/ff51a6ab-a85e-4204-b8b6-e6bb33220bbe)
+![image](https://github.com/user-attachments/assets/bc884cc9-2070-40a8-821d-e27a25b5b273)
 
 
 # Qt 全聚合影视
