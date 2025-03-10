@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/ff51a6ab-a85e-4204-b8b6-e6bb33220bbe)
+
+
 # Qt 全聚合影视
 基于 Qt 的 QMultiMedia组件构建，目标是搭建deepin v20云播放平台。  
 "vst-video"文件是已编译好的程序,适用于64位Linux系统Qt5环境,双击运行,终端运行"./install.sh"生成桌面图标。  
